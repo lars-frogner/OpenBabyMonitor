@@ -43,9 +43,13 @@ echo "Storing password hash in database $db_name\n";
 createPasswordTableIfMissing($database, strlen($hashed_password));
 storeHashedPassword($database, $hashed_password);
 
-foreach ($database_info['tables'] as $name => $columns) {
-  echo "Creating table $name in database $db_name\n";
-  createTableIfMissing($database, $name, $columns);
+foreach ($database_info['tables'] as $table_name => $table_info) {
+  echo "Creating table $table_name in database $db_name\n";
+  createTableIfMissing($database, $table_name, $table_info['types']);
+  if (array_key_exists('initial_values', $table_info)) {
+    echo "Writing initial values to table $table_name in database $db_name\n";
+    writeValuesToTable($database, $table_name, $table_info['initial_values']);
+  }
 }
 
 echo "Closing connection to database $db_name\n";

@@ -13,14 +13,23 @@
         "name": "babymonitor",
         "tables": {
             "settings": {
-                "id": "TINYINT UNSIGNED PRIMARY KEY",
-                "videostream_fullhd": "BOOLEAN NOT NULL",
-                "videostream_audio": "BOOLEAN NOT NULL"
+                "types": {
+                    "id": "TINYINT UNSIGNED PRIMARY KEY",
+                    "videostream_fullhd": "BOOLEAN NOT NULL",
+                    "videostream_audio": "BOOLEAN NOT NULL"
+                }
             },
             "modes": {
-                "id": "TINYINT UNSIGNED PRIMARY KEY",
-                "current": "TINYINT NOT NULL",
-                "queued": "TINYINT"
+                "types": {
+                    "id": "TINYINT UNSIGNED PRIMARY KEY",
+                    "current": "TINYINT NOT NULL",
+                    "queued": "TINYINT"
+                },
+                "initial_values": {
+                    "id": 0,
+                    "current": 0,
+                    "queued": "NULL"
+                }
             }
         }
     },
