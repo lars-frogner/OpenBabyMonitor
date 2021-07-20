@@ -1,0 +1,33 @@
+{
+    "database": {
+        "root_account": {
+            "host": "localhost",
+            "user": "root",
+            "password": "root"
+        },
+        "account": {
+            "host": "localhost",
+            "user": "babymonitor",
+            "password": ""
+        },
+        "name": "babymonitor",
+        "tables": {
+            "settings": {
+                "id": "TINYINT UNSIGNED PRIMARY KEY",
+                "videostream_fullhd": "BOOLEAN NOT NULL",
+                "videostream_audio": "BOOLEAN NOT NULL"
+            },
+            "modes": {
+                "id": "TINYINT UNSIGNED PRIMARY KEY",
+                "current": "TINYINT NOT NULL",
+                "queued": "TINYINT"
+            }
+        }
+    },
+    "modes": {
+        "standby": 0,
+        "listen": 1,
+        "audiostream": 2,
+        "videostream": 3
+    }
+}
