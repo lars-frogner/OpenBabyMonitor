@@ -10,28 +10,28 @@ function connectToAccount($host, $user, $password) {
 }
 
 function createUserIfMissing($connection, $host, $user, $password) {
-  if (! $connection->query("CREATE USER IF NOT EXISTS '$user'@'$host' IDENTIFIED BY '$password';")) {
+  if (!$connection->query("CREATE USER IF NOT EXISTS '$user'@'$host' IDENTIFIED BY '$password';")) {
     echo "Error: Could not create user $user: " . $connection->error . "\n";
     exit(1);
   }
 }
 
 function createDatabaseIfMissing($connection, $name) {
-  if (! $connection->query("CREATE DATABASE IF NOT EXISTS $name")) {
+  if (!$connection->query("CREATE DATABASE IF NOT EXISTS $name")) {
     echo "Error: Could not create database $name: " . $connection->error . "\n";
     exit(1);
   }
 }
 
 function grantUserAllPrivilegesOnDatabase($connection, $host, $user, $name) {
-  if (! $connection->query("GRANT ALL PRIVILEGES ON $name.* TO '$user'@'$host'")) {
+  if (!$connection->query("GRANT ALL PRIVILEGES ON $name.* TO '$user'@'$host'")) {
     echo "Error: Could not grant user $user privileges on database $name: " . $connection->error . "\n";
     exit(1);
   }
 }
 
 function useDatabase($connection, $name) {
-  if (! $connection->query("USE $name")) {
+  if (!$connection->query("USE $name")) {
     echo "Error: Could not use database $name: " . $connection->error . "\n";
     exit(1);
   }
@@ -56,7 +56,7 @@ function createTableIfMissing($database, $table_name, $columns) {
     $entries = substr($entries, 0, -2);
   }
   $create_table = "CREATE TABLE IF NOT EXISTS $table_name ($entries)";
-  if (! $database->query($create_table)) {
+  if (!$database->query($create_table)) {
     echo "Error creating table for $table_name: " . $database->error . "\n";
     exit(1);
   }
@@ -80,7 +80,7 @@ function writeValuesToTable($database, $table_name, $column_values) {
     $updates = substr($updates, 0, -2);
   }
   $insert_values = "INSERT INTO $table_name ($names) VALUES($values) ON DUPLICATE KEY UPDATE $updates";
-  if (! $database->query($insert_values)) {
+  if (!$database->query($insert_values)) {
     echo "Error writing values to table $table_name: " . $database->error . "\n";
     exit(1);
   }
@@ -91,9 +91,9 @@ function readValuesFromTable($database, $table_name, $columns, $condition) {
     $columns = join(', ', $columns);
   }
   $result = $database->query("SELECT $columns FROM $table_name WHERE $condition");
-  if (! $result) {
-      echo "Error selecting $columns from table $table_name: " . $database->error . "\n";
-      exit(1);
+  if (!$result) {
+    echo "Error selecting $columns from table $table_name: " . $database->error . "\n";
+    exit(1);
   }
   return $result->fetch_all(MYSQLI_ASSOC);
 }

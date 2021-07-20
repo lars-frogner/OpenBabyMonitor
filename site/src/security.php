@@ -15,10 +15,10 @@ function storeHashedPassword($database, $hashed_password) {
 }
 
 function readHashedPassword($database) {
-    $result = readValuesFromTable($database, 'password', 'hash', 'id = 0');
-    if (empty($result)) {
-        echo "Password hash not present in database\n";
-        exit(1);
-    }
-    return $result[0]['hash'];
+  $result = readValuesFromTable($database, 'password', 'hash', 'id = 0');
+  if (empty($result)) {
+    echo "Password hash not present in database\n";
+    exit(1);
+  }
+  return $result[0]['hash'];
 }

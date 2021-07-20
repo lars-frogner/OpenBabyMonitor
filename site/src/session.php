@@ -6,20 +6,21 @@ function tryLogin($database, $password, $destination, $otherwise) {
   if (password_verify($password, $password_hash)) {
     $_SESSION['login'] = true;
     redirectTo($destination);
-  }
-  else {
+  } else {
     echo $otherwise;
   }
 }
+
 function redirectIfLoggedIn($destination) {
   session_start();
   if (isset($_SESSION['login'])) {
     redirectTo($destination);
   }
 }
+
 function redirectIfLoggedOut($destination) {
   session_start();
-  if (! isset($_SESSION['login'])) {
+  if (!isset($_SESSION['login'])) {
     redirectTo($destination);
   }
 }
