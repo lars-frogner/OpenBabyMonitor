@@ -22,7 +22,7 @@ set -e
 # ssh pi@babymonitor # Log in with new password
 # Note: mini USB microphone does not appear to useable without sudo for other users than pi.
 
-SITE_ROOT=~/babymonitor/site
+SITE_ROOT=~/babymonitor/site/public
 
 UPDATE=false
 if [[ "$UPDATE" = true ]]; then
@@ -133,7 +133,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     FILENAME_ROOT="${FILENAME%%.*}"
     wget $DOWNLOAD_URL
     tar xvf $FILENAME
-    mv "$FILENAME_ROOT/picam" $DEST_DIR/
+    mv $FILENAME_ROOT/picam $DEST_DIR/
     rm -r $FILENAME $FILENAME_ROOT
 fi
 
@@ -156,7 +156,7 @@ if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
         DOWNLOAD_URL="https://github.com/twbs/bootstrap/releases/download/v${BOOTSTRAP_VERSION}/$FILENAME"
     fi
     wget $DOWNLOAD_URL
-    unzip $FILENAME -d $SITE_ROOT/public/library/bootstrap
+    unzip $FILENAME -d $SITE_ROOT/library/bootstrap
     rm $FILENAME
 fi
 
@@ -173,6 +173,6 @@ if [[ "$INSTALL_VIDEOJS" = true ]]; then
         DOWNLOAD_URL="https://github.com/videojs/video.js/releases/download/v${VIDEOJS_VERSION}/$FILENAME"
     fi
     wget $DOWNLOAD_URL
-    unzip $FILENAME -d $SITE_ROOT/public/library/video-js
+    unzip $FILENAME -d $SITE_ROOT/library/video-js
     rm $FILENAME
 fi
