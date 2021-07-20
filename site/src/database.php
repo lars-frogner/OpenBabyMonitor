@@ -67,7 +67,7 @@ function writeValuesToTable($database, $table_name, $column_values) {
   $values = '';
   $updates = '';
   foreach ($column_values as $name => $value) {
-    if (is_string($value)) {
+    if (is_string($value) && $value != 'NULL') {
       $value = "'$value'";
     }
     $names = $names . "$name, ";
