@@ -1,5 +1,5 @@
 <?php
-require_once('../config/config.php');
+require_once('../config/site_config.php');
 redirectIfLoggedIn('main.php');
 ?>
 <!DOCTYPE html>
