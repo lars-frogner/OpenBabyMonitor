@@ -1,7 +1,8 @@
 <?php
+require_once('security.php');
 
 function tryLogin($database, $password, $destination, $otherwise) {
-  $password_hash = obtainPasswordHash($database);
+  $password_hash = readHashedPassword($database);
   if (password_verify($password, $password_hash)) {
     $_SESSION['login'] = true;
     redirectTo($destination);
