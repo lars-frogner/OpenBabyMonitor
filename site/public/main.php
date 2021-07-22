@@ -44,8 +44,11 @@ define('HIDDEN_STYLE', 'style="display: none;"');
           <p>Standby</p>
         </div>
 
-        <div id="mode_content_waiting" <?php echo HIDDEN_STYLE; ?>>
-          <div class="spinner-grow text-dark"></div>
+        <div id="mode_content_waiting" class="spinner-grow text-dark" <?php echo HIDDEN_STYLE; ?>></div>
+
+        <div id="mode_content_error" class="text-center" <?php echo HIDDEN_STYLE; ?>>
+          <div id="mode_content_error_message" class="alert alert-danger">Error</div>
+          <a class="btn btn-secondary" href="main.php">Refresh</a>
         </div>
       </div>
 
@@ -53,16 +56,16 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
     <footer class="d-flex flex-grow-0 flex-shrink-1 justify-content-center">
       <div class="btn-group">
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_listen" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == LISTEN_MODE) ? 'checked' : '' ?>>
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_listen" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == LISTEN_MODE) ? 'checked' : '' ?> value="<?php echo LISTEN_MODE ?>">
         <label class="btn btn-outline-primary" for="mode_radio_listen">Listen</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_audio" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == AUDIOSTREAM_MODE) ? 'checked' : '' ?>>
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_audio" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == AUDIOSTREAM_MODE) ? 'checked' : '' ?> value="<?php echo AUDIOSTREAM_MODE ?>">
         <label class="btn btn-outline-primary" for="mode_radio_audio">Audio</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_video" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == VIDEOSTREAM_MODE) ? 'checked' : '' ?>>
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_video" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == VIDEOSTREAM_MODE) ? 'checked' : '' ?> value="<?php echo VIDEOSTREAM_MODE ?>">
         <label class="btn btn-outline-primary" for="mode_radio_video">Video</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_standby" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == STANDBY_MODE) ? 'checked' : '' ?>>
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_standby" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == STANDBY_MODE) ? 'checked' : '' ?> value="<?php echo STANDBY_MODE ?>">
         <label class="btn btn-outline-primary" for="mode_radio_standby">Standby</label>
       </div>
     </footer>
