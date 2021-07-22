@@ -57,17 +57,21 @@ function createTableIfMissing($database, $table_name, $columns) {
   }
   $create_table = "CREATE TABLE IF NOT EXISTS $table_name ($entries)";
   if (!$database->query($create_table)) {
-    echo "Error creating table for $table_name: " . $database->error . "\n";
+    echo "Error: Could not create table for $table_name: " . $database->error . "\n";
     exit(1);
   }
 }
 
-function writeValuesToTable($database, $table_name, $column_values) {
+function insertValuesIntoTable($database, $table_name, $column_values) {
   $names = '';
   $values = '';
   $updates = '';
   foreach ($column_values as $name => $value) {
-    if (is_string($value) && $value != 'NULL') {
+    if (is_null($value)) {
+      $value = 'NULL';
+    } else if ($value === false) {
+      $value = 'FALSE';
+    } else if (is_string($value)) {
       $value = "'$value'";
     }
     $names = $names . "$name, ";
@@ -81,7 +85,34 @@ function writeValuesToTable($database, $table_name, $column_values) {
   }
   $insert_values = "INSERT INTO $table_name ($names) VALUES($values) ON DUPLICATE KEY UPDATE $updates";
   if (!$database->query($insert_values)) {
-    echo "Error writing values to table $table_name: " . $database->error . "\n";
+    echo "Error: Could not insert values into table $table_name: " . $database->error . "\n";
+    exit(1);
+  }
+}
+
+function updateValuesInTable($database, $table_name, $column_values, $condition_key) {
+  $updates = '';
+  $condition = NULL;
+  foreach ($column_values as $name => $value) {
+    if ($name == $condition_key) {
+      $condition = "$name = $value";
+    } else {
+      if (is_string($value) && $value != 'NULL') {
+        $value = "'$value'";
+      }
+      $updates = $updates . "$name = $value, ";
+    }
+  }
+  if (is_null($condition)) {
+    echo "Error: No value provided for condition key $condition_key\n";
+    exit(1);
+  }
+  if (count($column_values) > 1) {
+    $updates = substr($updates, 0, -2);
+  }
+  $update_values = "UPDATE $table_name SET $updates WHERE $condition";
+  if (!$database->query($update_values)) {
+    echo "Error: Could update values in table $table_name: " . $database->error . "\n";
     exit(1);
   }
 }
@@ -92,7 +123,7 @@ function readValuesFromTable($database, $table_name, $columns, $condition) {
   }
   $result = $database->query("SELECT $columns FROM $table_name WHERE $condition");
   if (!$result) {
-    echo "Error selecting $columns from table $table_name: " . $database->error . "\n";
+    echo "Error: Could not select $columns from table $table_name: " . $database->error . "\n";
     exit(1);
   }
   return $result->fetch_all(MYSQLI_ASSOC);
