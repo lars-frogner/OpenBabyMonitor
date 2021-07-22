@@ -11,7 +11,7 @@ function createPasswordTableIfMissing($database, $hash_len) {
 }
 
 function storeHashedPassword($database, $hashed_password) {
-  writeValuesToTable($database, 'password', array('id' => 0, 'hash' => $hashed_password));
+  insertValuesIntoTable($database, 'password', array('id' => 0, 'hash' => $hashed_password));
 }
 
 function readHashedPassword($database) {
