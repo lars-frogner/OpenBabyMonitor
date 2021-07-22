@@ -15,7 +15,7 @@ redirectIfLoggedIn('main.php');
   <main class="form-signin">
     <?php
     if (isset($_POST['submit'])) {
-      tryLogin($_DATABASE, $_POST['password'], 'main.php', "<div class='alert alert-danger'>Feil passord</div>");
+      tryLogin($_DATABASE, $_POST['password'], 'main.php', '<div class="alert alert-danger">Feil passord</div>');
     }
     ?>
     <form action="" method="post">
