@@ -48,7 +48,7 @@ foreach ($database_info['tables'] as $table_name => $table_info) {
   createTableIfMissing($database, $table_name, $table_info['types']);
   if (array_key_exists('initial_values', $table_info)) {
     echo "Writing initial values to table $table_name in database $db_name\n";
-    writeValuesToTable($database, $table_name, $table_info['initial_values']);
+    insertValuesIntoTable($database, $table_name, $table_info['initial_values']);
   }
 }
 
