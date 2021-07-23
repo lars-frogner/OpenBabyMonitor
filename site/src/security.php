@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(__DIR__ . '/database.php');
 
 function hashPassword($password) {
@@ -17,8 +18,7 @@ function storeHashedPassword($database, $hashed_password) {
 function readHashedPassword($database) {
   $result = readValuesFromTable($database, 'password', 'hash', 'id = 0');
   if (empty($result)) {
-    echo "Password hash not present in database\n";
-    exit(1);
+    bm_error('Password hash not present in database');
   }
   return $result[0]['hash'];
 }

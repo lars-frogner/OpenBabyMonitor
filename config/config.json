@@ -65,6 +65,5 @@
     "control": {
         "mode_query_interval": 1e-2,
         "mode_switch_timeout": 5.0
-    },
-    "php_error_log": "/tmp/php_errors.log"
+    }
 }

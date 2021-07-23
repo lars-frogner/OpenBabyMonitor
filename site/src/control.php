@@ -1,12 +1,12 @@
 <?php
+require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(dirname(__DIR__) . '/config/mode_config.php');
 require_once(__DIR__ . '/database.php');
 
 function readCurrentMode($database) {
   $result = readValuesFromTable($database, 'modes', 'current', 'id = 0');
   if (empty($result)) {
-    echo "Modes not present in database\n";
-    exit(1);
+    bm_error('Modes not present in database');
   }
   return $result[0]['current'];
 }
@@ -17,8 +17,7 @@ function startMode($mode) {
     $result_code = null;
     exec(MODE_START_COMMANDS[$mode], $output, $result_code);
     if ($result_code != 0) {
-      echo "Error: Request for mode start failed with error code $result_code:\n" . join("\n", $output);
-      exit(1);
+      bm_error("Request for mode start failed with error code $result_code:\n" . join("\n", $output));
     }
   }
 }
@@ -29,8 +28,7 @@ function stopMode($mode) {
     $result_code = null;
     exec(MODE_STOP_COMMANDS[$mode], $output, $result_code);
     if ($result_code != 0) {
-      echo "Error: Request for mode stop failed with error code $result_code:\n" . join("\n", $output);
-      exit(1);
+      bm_error("Request for mode stop failed with error code $result_code:\n" . join("\n", $output));
     }
   }
 }
@@ -42,8 +40,7 @@ function waitForModeSwitch($database, $new_mode) {
     $elapsed_time += MODE_QUERY_INTERVAL;
     if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
       updateCurrentMode($database, STANDBY_MODE);
-      echo "Error: Request for mode switch timed out";
-      exit(1);
+      bm_error('Request for mode switch timed out');
     }
   }
 }

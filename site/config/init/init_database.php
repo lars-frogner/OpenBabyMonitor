@@ -5,8 +5,7 @@ require_once(SRC_PATH . '/database.php');
 require_once(SRC_PATH . '/security.php');
 
 if (count($argv) < 2) {
-  echo "Error: Password must be passed as first command line argument\n";
-  exit(1);
+  bm_error('Password must be passed as first command line argument');
 }
 
 $database_info = $_CONFIG['database'];
