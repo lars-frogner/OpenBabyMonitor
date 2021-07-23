@@ -7,7 +7,7 @@ read PASSWORD
 stty echo
 printf '\n'
 
-php init_database.php $PASSWORD
+sudo php init_database.php $PASSWORD
 if [[ "$?" == '0' ]]; then
     echo 'Database initialized successfully'
 else
