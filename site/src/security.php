@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . 'database.php');
+require_once(__DIR__ . '/database.php');
 
 function hashPassword($password) {
   return password_hash($password, PASSWORD_DEFAULT);
