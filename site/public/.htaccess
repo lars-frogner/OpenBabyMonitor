@@ -1,3 +1,5 @@
+DirectoryIndex index.php
+
 # Deny access to .htaccess
 <Files .htaccess>
 Order allow,deny
@@ -6,5 +8,3 @@ Deny from all
 
 # Disable directory browsing
 Options -Indexes
-
-#RedirectMatch 403 ^/media/.*$
