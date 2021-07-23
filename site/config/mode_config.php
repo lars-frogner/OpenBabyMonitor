@@ -17,6 +17,9 @@ foreach (MODE_VALUES as $mode => $value) {
   $_MODE_STOP_COMMANDS[$value] = $_MODES_INFO[$mode]['stop_command'];
   $_MODE_RESTART_COMMANDS[$value] = $_MODES_INFO[$mode]['restart_command'];
 }
+define('MODE_START_COMMANDS', $_MODE_START_COMMANDS);
+define('MODE_STOP_COMMANDS', $_MODE_STOP_COMMANDS);
+define('MODE_RESTART_COMMANDS', $_MODE_RESTART_COMMANDS);
 
 define('MODE_QUERY_INTERVAL', intval($_CONFIG['control']['mode_query_interval'] * 1e6)); // In microseconds
 define('MODE_SWITCH_TIMEOUT', intval($_CONFIG['control']['mode_switch_timeout'] * 1e6));
