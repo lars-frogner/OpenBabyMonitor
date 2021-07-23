@@ -29,9 +29,15 @@ set -e
 # for Raspbian Buster). The two modes of operation can be switched between using the
 # activate_ap_mode.sh and activate_client_mode.sh scripts.
 
-USER=pi
-GROUP=www-data
+SERVER_USER=pi
+WEB_USER=www-data
+WEB_GROUP=www-data
 PERMISSIONS=750
+
+PHP_TIMEZONE=Europe/Oslo
+
+APACHE_LOG_DIR=/var/log/apache2
+APACHE_ERROR_LOG_PATH=$APACHE_LOG_DIR/error.log
 
 BM_PATH=$(dirname $(readlink -f $0))
 BM_ENV_PATH=$BM_PATH/babymonitor_env.sh
@@ -85,8 +91,7 @@ if [[ "$DISABLE_BLUETOOTH" = true ]]; then
     # Disable bluetooth
     echo "
 # Disable Bluetooth
-dtoverlay=disable-bt
-" | sudo tee -a /boot/config.txt
+dtoverlay=disable-bt" | sudo tee -a /boot/config.txt
 
     sudo systemctl disable hciuart.service
     sudo systemctl disable bluetooth.service
@@ -94,7 +99,7 @@ fi
 
 SETUP_MIC=true
 if [[ "$SETUP_MIC" = true ]]; then
-    sudo adduser $USER audio
+    sudo adduser $SERVER_USER audio
     echo "export BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')" >> $BM_ENV_PATH
 fi
 
@@ -146,7 +151,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     sudo apt -y install libharfbuzz0b libfontconfig1
 
     # Create directories and symbolic links
-    sudo install -d -o $USER -g $GROUP -m $PERMISSIONS $BM_PICAM_PATH{,/archive} $BM_SHAREDMEM_PATH/{rec,hooks,state}
+    sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $PERMISSIONS $BM_PICAM_PATH{,/archive} $BM_SHAREDMEM_PATH/{rec,hooks,state}
 
     ln -sfn {$BM_PICAM_PATH,$BM_SHAREDMEM_PATH/rec}/archive
     ln -sfn {$BM_SHAREDMEM_PATH,$BM_PICAM_PATH}/rec
@@ -156,7 +161,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     sudo ln -s $BM_PICAM_OUTPUT_PATH $BM_PICAM_LINKED_OUTPUT_PATH
 
     sudo touch $BM_PICAM_LOG_PATH
-    sudo chown $USER:$GROUP $BM_PICAM_LOG_PATH
+    sudo chown $SERVER_USER:$WEB_GROUP $BM_PICAM_LOG_PATH
 
     # Install picam binary
     PICAM_VERSION=1.4.9
@@ -191,9 +196,10 @@ After=mysqld.service
 
 [Service]
 Type=oneshot
-User=$USER
-Group=$GROUP
+User=$SERVER_USER
+Group=$WEB_GROUP
 ExecStart=$BM_PATH/control/startup.py
+StandardError=append:$APACHE_ERROR_LOG_PATH
 
 [Install]
 WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
@@ -212,15 +218,18 @@ Description=Babymonitor $SERVICE service
 
 [Service]
 Type=simple
-User=$USER
-Group=$GROUP
-ExecStart=$BM_PATH/control/$SERVICE.py" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
+User=$SERVER_USER
+Group=$WEB_GROUP
+ExecStart=$BM_PATH/control/$SERVICE.py
+StandardError=append:$APACHE_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
 
         sudo ln -sfn {$LINKED_UNIT_DIR,$UNIT_DIR}/$SERVICE_FILENAME
 
         CMD_ALIAS+=" $SYSTEMCTL stop $SERVICE_FILENAME, $SYSTEMCTL start $SERVICE_FILENAME, $SYSTEMCTL restart $SERVICE_FILENAME,"
     done
-    echo -e "${CMD_ALIAS%,}\n%$USER ALL=BM_MODES\n" | sudo tee /etc/sudoers.d/$USER
+
+    # Allow users in web group to manage the mode services without providing a password
+    echo -e "${CMD_ALIAS%,}\n%$WEB_GROUP ALL = NOPASSWD: BM_MODES" | sudo tee /etc/sudoers.d/$WEB_GROUP
 fi
 
 INSTALL_SERVER=true
@@ -228,15 +237,30 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Install Apache, PHP and MySQL (MariaDB)
     sudo apt -y install apache2 mariadb-server php php-mysql libapache2-mod-php
 
+    # Install required Python packages
+    sudo apt -y install python-pip
+    pip install -r requirements.txt
+
     # Configure MySQL
+    echo 'NOTE: Setup root account according to root_account entry in config/config.json'
     sudo mysql_secure_installation
 
+    # Set time zone
+    PHP_INI_CLI_PATH=$(php -i | grep /.+/php.ini -oE)
+    PHP_INI_APACHE_PATH=$(dirname $(dirname $PHP_INI_CLI_PATH))/apache2/php.ini
+    sudo sed -i "s/;date.timezone =/date.timezone = ${PHP_TIMEZONE/'/'/'\/'}/g" $PHP_INI_CLI_PATH
+    sudo sed -i "s/;date.timezone =/date.timezone = ${PHP_TIMEZONE/'/'/'\/'}/g" $PHP_INI_APACHE_PATH
+
+    # Use index.php as index file
+    APACHE_CONF_PATH=/etc/apache2/apache2.conf
+    echo -e "\nDirectoryIndex index.php" | sudo tee -a $APACHE_CONF_PATH
+
     # Add main user to www-data group
-    sudo adduser $USER $GROUP
+    sudo adduser $SERVER_USER $WEB_GROUP
 
     # Ensure permissions are correct in project folder
     sudo chmod -R $PERMISSIONS $BM_PATH
-    sudo chown -R $USER:$GROUP $BM_PATH
+    sudo chown -R $SERVER_USER:$WEB_GROUP $BM_PATH
 
     # Link site folder to default Apache site root
     sudo ln -s $BM_LINKED_SITE_ROOT $BM_SITE_ROOT
@@ -251,8 +275,8 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     SITE_NAME=$(basename $BM_SITE_ROOT)
     echo "<VirtualHost *:80>
 	DocumentRoot $BM_SITE_ROOT
-	ErrorLog \${APACHE_LOG_DIR}/error.log
-	CustomLog \${APACHE_LOG_DIR}/access.log combined
+	ErrorLog $APACHE_ERROR_LOG_PATH
+	CustomLog $APACHE_LOG_DIR/access.log combined
 </VirtualHost>
 " > /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME
