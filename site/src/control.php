@@ -14,8 +14,10 @@ function readCurrentMode($database) {
 function startMode($mode) {
   if (!is_null(MODE_START_COMMANDS[$mode])) {
     $output = null;
-    if (!exec(MODE_START_COMMANDS[$mode], $output)) {
-      echo "Error: Request for mode start failed:\n" . join("\n", $output);
+    $result_code = null;
+    exec(MODE_START_COMMANDS[$mode], $output, $result_code);
+    if ($result_code != 0) {
+      echo "Error: Request for mode start failed with error code $result_code:\n" . join("\n", $output);
       exit(1);
     }
   }
@@ -24,8 +26,10 @@ function startMode($mode) {
 function stopMode($mode) {
   if (!is_null(MODE_STOP_COMMANDS[$mode])) {
     $output = null;
-    if (!exec(MODE_STOP_COMMANDS[$mode], $output)) {
-      echo "Error: Request for mode stop failed:\n" . join("\n", $output);
+    $result_code = null;
+    exec(MODE_STOP_COMMANDS[$mode], $output, $result_code);
+    if ($result_code != 0) {
+      echo "Error: Request for mode stop failed with error code $result_code:\n" . join("\n", $output);
       exit(1);
     }
   }
