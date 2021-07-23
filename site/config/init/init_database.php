@@ -1,6 +1,6 @@
 <?php
-include_once('../error_config.php');
-include_once('../config.php');
+include_once(dirname(__DIR__) . '/error_config.php');
+include_once(dirname(__DIR__) . '/config.php');
 require_once(SRC_PATH . '/database.php');
 require_once(SRC_PATH . '/security.php');
 

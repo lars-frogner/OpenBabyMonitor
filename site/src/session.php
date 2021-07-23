@@ -1,5 +1,5 @@
 <?php
-require_once('security.php');
+require_once(__DIR__ . 'security.php');
 
 function tryLogin($database, $password, $destination, $otherwise) {
   $password_hash = readHashedPassword($database);

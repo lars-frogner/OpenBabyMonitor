@@ -1,5 +1,5 @@
 <?php
-require_once('config.php');
+require_once(__DIR__ . '/config.php');
 
 $_MODES_INFO = $_CONFIG['modes'];
 define('STANDBY_MODE', $_MODES_INFO['standby']['value']);
