@@ -36,8 +36,8 @@ def update_mode_in_database(mode, config=None, database=None):
         config = get_config()
     if database is None:
         database = get_database(config)
-    database.update_values_in_table('modes',
-                                    dict(id=0, current=config['modes'][mode]))
+    database.update_values_in_table(
+        'modes', dict(id=0, current=config['modes'][mode]['value']))
 
 
 def handle_shutdown(*args):
