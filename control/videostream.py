@@ -14,9 +14,9 @@ def stream_video():
 
 def stream_video_with_settings(full_hd=False, audio=True):
     mic_id = os.environ['BM_MIC_ID']
-    picam_path = os.environ['BM_PICAM_PATH']
+    picam_path = os.environ['BM_PICAM_DIR']
     picam_log_path = os.environ['BM_PICAM_LOG_PATH']
-    picam_output_path = os.environ['BM_PICAM_OUTPUT_PATH']
+    picam_output_path = os.environ['BM_PICAM_STREAM_DIR']
 
     resolution_args = ['-w', '1920', '-h', '1080'] if full_hd else []
     audio_args = ['--noaudio'] if not audio else []

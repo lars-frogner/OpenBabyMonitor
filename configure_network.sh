@@ -2,8 +2,8 @@
 set -x
 set -e
 
-BM_PATH=$(dirname $(readlink -f $0))
-SERVER_CONTROL_PATH=$BM_PATH/site/servercontrol
+BM_DIR=$(dirname $(readlink -f $0))
+SERVER_CONTROL_DIR=$BM_DIR/site/servercontrol
 
 AP_DIR=~/.netconf_ap # Directory for configurations files set up for wireless access point mode
 CLIENT_DIR=~/.netconf_client # Directory for configurations files set up for wireless client mode
@@ -109,7 +109,7 @@ set -e
 
 # If called manually over SSH, make sure the script is allowed
 # to finish even if the terminal disconnects by calling as
-# nohup $SERVER_CONTROL_PATH/activate_ap_mode.sh &
+# nohup $SERVER_CONTROL_DIR/activate_ap_mode.sh &
 
 AP_DIR=$AP_DIR
 
@@ -121,8 +121,8 @@ sudo systemctl enable dnsmasq
 sudo systemctl enable hostapd
 sudo systemctl start dnsmasq
 sudo systemctl start hostapd
-" > $SERVER_CONTROL_PATH/activate_ap_mode.sh
-chmod +x $SERVER_CONTROL_PATH/activate_ap_mode.sh
+" > $SERVER_CONTROL_DIR/activate_ap_mode.sh
+chmod +x $SERVER_CONTROL_DIR/activate_ap_mode.sh
 
 # Generate script for activating client mode
 echo "#!/bin/bash
@@ -130,7 +130,7 @@ set -e
 
 # If called manually over SSH, make sure the script is allowed
 # to finish even if the terminal disconnects by calling as
-# nohup $SERVER_CONTROL_PATH/activate_client_mode.sh &
+# nohup $SERVER_CONTROL_DIR/activate_client_mode.sh &
 
 CLIENT_DIR=$CLIENT_DIR
 
@@ -142,12 +142,12 @@ sudo rm -f /etc/dhcpcd.conf
 sudo ln -s {\$CLIENT_DIR,}/etc/dhcpcd.conf
 sudo systemctl daemon-reload
 sudo service dhcpcd restart
-" > $SERVER_CONTROL_PATH/activate_client_mode.sh
-chmod +x $SERVER_CONTROL_PATH/activate_client_mode.sh
+" > $SERVER_CONTROL_DIR/activate_client_mode.sh
+chmod +x $SERVER_CONTROL_DIR/activate_client_mode.sh
 
 # Start in access point mode
 echo "Start access point mode by running the following command:
-nohup $SERVER_CONTROL_PATH/activate_ap_mode.sh &
+nohup $SERVER_CONTROL_DIR/activate_ap_mode.sh &
 
 Start client mode by running the following command:
-nohup $SERVER_CONTROL_PATH/activate_client_mode.sh &"
+nohup $SERVER_CONTROL_DIR/activate_client_mode.sh &"
