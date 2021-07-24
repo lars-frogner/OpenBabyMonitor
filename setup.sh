@@ -94,14 +94,15 @@ if [[ "$DISABLE_BLUETOOTH" = true ]]; then
 # Disable Bluetooth
 dtoverlay=disable-bt" | sudo tee -a /boot/config.txt
 
-    sudo systemctl disable hciuart.service
-    sudo systemctl disable bluetooth.service
+    sudo systemctl disable hciuart
+    sudo systemctl disable bluetooth
 fi
 
 SETUP_MIC=true
 if [[ "$SETUP_MIC" = true ]]; then
     sudo adduser $SERVER_USER audio
-    echo "export BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')" >> $BM_ENV_PATH
+    BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
+    echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_PATH
 fi
 
 INSTALL_BOOTSTRAP=true
@@ -186,6 +187,7 @@ SETUP_SERVICES=true
 if [[ "$SETUP_SERVICES" = true ]]; then
     UNIT_DIR=/lib/systemd/system
     LINKED_UNIT_DIR=$BM_PATH/control/services
+    UNIT_ENV_FILE=$LINKED_UNIT_DIR/envvars
     SYSTEMCTL=/usr/bin/systemctl
 
     mkdir -p $LINKED_UNIT_DIR
@@ -197,6 +199,7 @@ After=mysqld.service
 
 [Service]
 Type=forking
+EnvironmentFile=$UNIT_ENV_FILE
 ExecStart=$BM_PATH/control/startup.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH
 
@@ -211,7 +214,8 @@ WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
 
     for SERVICE in standby listen audiostream videostream
     do
-        SERVICE_FILENAME=bm_$SERVICE.service
+        SERVICE_ROOT_NAME=bm_$SERVICE
+        SERVICE_FILENAME=$SERVICE_ROOT_NAME.service
         echo "[Unit]
 Description=Babymonitor $SERVICE service
 
@@ -219,16 +223,21 @@ Description=Babymonitor $SERVICE service
 Type=simple
 User=$SERVER_USER
 Group=$WEB_GROUP
+EnvironmentFile=$UNIT_ENV_FILE
 ExecStart=$BM_PATH/control/$SERVICE.py
 StandardError=append:$APACHE_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
 
         sudo ln -sfn {$LINKED_UNIT_DIR,$UNIT_DIR}/$SERVICE_FILENAME
 
-        CMD_ALIAS+=" $SYSTEMCTL stop $SERVICE_FILENAME, $SYSTEMCTL start $SERVICE_FILENAME, $SYSTEMCTL restart $SERVICE_FILENAME,"
+        CMD_ALIAS+=" $SYSTEMCTL stop $SERVICE_ROOT_NAME, $SYSTEMCTL start $SERVICE_ROOT_NAME, $SYSTEMCTL restart $SERVICE_ROOT_NAME,"
     done
 
     # Allow users in web group to manage the mode services without providing a password
     echo -e "${CMD_ALIAS%,}\n%$WEB_GROUP ALL = NOPASSWD: BM_MODES" | sudo tee /etc/sudoers.d/$WEB_GROUP
+
+    # Copy environment variables (without 'export') into environment file for services
+    ENV_VAR_EXPORTS=$(cat $BM_ENV_PATH)
+    echo "${ENV_VAR_EXPORTS//'export '/}" > $UNIT_ENV_FILE
 fi
 
 INSTALL_SERVER=true
@@ -241,10 +250,10 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     pip install -r requirements.txt
 
     # Install inotify tools
-    sudo apt install inotify-tools
+    sudo apt -y install inotify-tools
 
     # Configure MySQL
-    echo 'NOTE: Setup root account according to root_account entry in config/config.json'
+    echo 'NOTE: Setup with root password according to root_account entry in config/config.json'
     sudo mysql_secure_installation
 
     # Set time zone
@@ -256,6 +265,9 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Use index.php as index file
     APACHE_CONF_PATH=/etc/apache2/apache2.conf
     echo -e "\nDirectoryIndex index.php" | sudo tee -a $APACHE_CONF_PATH
+
+    APACHE_ENV_PATH=/etc/apache2/envvars
+    echo -e "\nsource $BM_ENV_PATH" | sudo tee -a $APACHE_ENV_PATH
 
     # Add main user to www-data group
     sudo adduser $SERVER_USER $WEB_GROUP
@@ -279,8 +291,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
 	DocumentRoot $BM_SITE_ROOT
 	ErrorLog $APACHE_ERROR_LOG_PATH
 	CustomLog $APACHE_LOG_DIR/access.log combined
-</VirtualHost>
-" > /etc/apache2/sites-available/$SITE_NAME.conf
+</VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME
 fi
 
