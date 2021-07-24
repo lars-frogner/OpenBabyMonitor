@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import time
 import control
 
 MODE = 'audiostream'
@@ -13,7 +14,8 @@ def stream_audio():
 
 
 def stream_audio_with_settings():
-    pass
+    while True:
+        time.sleep(0.1)
 
 
 if __name__ == '__main__':
