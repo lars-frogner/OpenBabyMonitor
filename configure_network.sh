@@ -2,6 +2,9 @@
 set -x
 set -e
 
+BM_PATH=$(dirname $(readlink -f $0))
+SERVER_CONTROL_PATH=$BM_PATH/site/servercontrol
+
 AP_DIR=~/.netconf_ap # Directory for configurations files set up for wireless access point mode
 CLIENT_DIR=~/.netconf_client # Directory for configurations files set up for wireless client mode
 ORIG_DIR=~/.netconf_orig # For backup of original configuration files
@@ -102,7 +105,6 @@ net.ipv6.conf.all.disable_ipv6=1
 
 # Generate script for activating access point mode
 echo "#!/bin/bash
-set -x
 set -e
 
 AP_DIR=$AP_DIR
@@ -111,12 +113,11 @@ sudo ln -svfn {$AP_DIR,}/etc/dhcpcd.conf
 sudo systemctl enable hostapd
 sudo systemctl enable dnsmasq
 sudo systemctl reboot
-" > activate_ap_mode.sh
-chmod +x activate_ap_mode.sh
+" > $SERVER_CONTROL_PATH/activate_ap_mode.sh
+chmod +x $SERVER_CONTROL_PATH/activate_ap_mode.sh
 
 # Generate script for activating client mode
 echo "#!/bin/bash
-set -x
 set -e
 
 CLIENT_DIR=$CLIENT_DIR
@@ -125,8 +126,8 @@ sudo ln -svfn {$CLIENT_DIR,}/etc/dhcpcd.conf
 sudo systemctl disable hostapd
 sudo systemctl disable dnsmasq
 sudo systemctl reboot
-" > activate_client_mode.sh
-chmod +x activate_client_mode.sh
+" > $SERVER_CONTROL_PATH/activate_client_mode.sh
+chmod +x $SERVER_CONTROL_PATH/activate_client_mode.sh
 
 # Start in access point mode
-./activate_ap_mode.sh
+$SERVER_CONTROL_PATH/activate_ap_mode.sh
