@@ -39,27 +39,24 @@ PHP_TIMEZONE=Europe/Oslo
 APACHE_LOG_DIR=/var/log/apache2
 APACHE_ERROR_LOG_PATH=$APACHE_LOG_DIR/error.log
 
-BM_PATH=$(dirname $(readlink -f $0))
-BM_ENV_PATH=$BM_PATH/babymonitor_env.sh
-BM_SITE_ROOT=/var/www/babymonitor
-BM_LINKED_SITE_ROOT=$BM_PATH/site/public
-BM_PICAM_PATH=$BM_PATH/picam
+BM_DIR=$(dirname $(readlink -f $0))
+BM_ENV_PATH=$BM_DIR/babymonitor_env.sh
+BM_SITE_DIR=/var/www/babymonitor
+BM_LINKED_SITE_DIR=$BM_DIR/site/public
+BM_PICAM_DIR=$BM_DIR/picam
 BM_PICAM_LOG_PATH=/var/log/picam.log
-BM_SHAREDMEM_PATH=/run/shm
-BM_PICAM_OUTPUT_PATH=$BM_SHAREDMEM_PATH/hls
-BM_PICAM_LINKED_OUTPUT_PATH=$BM_LINKED_SITE_ROOT/hls
+BM_SHAREDMEM_DIR=/run/shm
+BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/hls
+BM_PICAM_LINKED_STREAM_DIR=$BM_LINKED_SITE_DIR/hls
 
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
     touch $BM_ENV_PATH
-    echo "export BM_PATH=$BM_PATH" >> $BM_ENV_PATH
-    echo "export BM_SITE_ROOT=$BM_SITE_ROOT" >> $BM_ENV_PATH
-    echo "export BM_LINKED_SITE_ROOT=$BM_LINKED_SITE_ROOT" >> $BM_ENV_PATH
-    echo "export BM_PICAM_PATH=$BM_PICAM_PATH" >> $BM_ENV_PATH
+    echo "export BM_DIR=$BM_DIR" >> $BM_ENV_PATH
+    echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_PATH
     echo "export BM_PICAM_LOG_PATH=$BM_PICAM_LOG_PATH" >> $BM_ENV_PATH
-    echo "export BM_SHAREDMEM_PATH=$BM_SHAREDMEM_PATH" >> $BM_ENV_PATH
-    echo "export BM_PICAM_OUTPUT_PATH=$BM_PICAM_OUTPUT_PATH" >> $BM_ENV_PATH
-    echo "export BM_PICAM_LINKED_OUTPUT_PATH=$BM_PICAM_LINKED_OUTPUT_PATH" >> $BM_ENV_PATH
+    echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_PATH
+    echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_PATH
 fi
 
 UPDATE=true
@@ -121,8 +118,8 @@ if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
     cd /tmp
     wget $DOWNLOAD_URL
     unzip $FILENAME
-    mkdir -p $BM_LINKED_SITE_ROOT/library/bootstrap
-    mv $FILENAME_ROOT/* $BM_LINKED_SITE_ROOT/library/bootstrap/
+    mkdir -p $BM_LINKED_SITE_DIR/library/bootstrap
+    mv $FILENAME_ROOT/* $BM_LINKED_SITE_DIR/library/bootstrap/
     rm  -r $FILENAME $FILENAME_ROOT
     cd -
 fi
@@ -141,8 +138,8 @@ if [[ "$INSTALL_VIDEOJS" = true ]]; then
     fi
     cd /tmp
     wget $DOWNLOAD_URL
-    mkdir -p $BM_LINKED_SITE_ROOT/library/video-js
-    unzip $FILENAME -d $BM_LINKED_SITE_ROOT/library/video-js
+    mkdir -p $BM_LINKED_SITE_DIR/library/video-js
+    unzip $FILENAME -d $BM_LINKED_SITE_DIR/library/video-js
     rm $FILENAME
     cd -
 fi
@@ -153,17 +150,21 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     sudo apt -y install libharfbuzz0b libfontconfig1
 
     # Create directories and symbolic links
-    sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $PERMISSIONS $BM_PICAM_PATH{,/archive} $BM_SHAREDMEM_PATH/{rec,hooks,state}
+    sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $PERMISSIONS $BM_PICAM_DIR{,/archive} $BM_SHAREDMEM_DIR/{rec,hooks,state}
 
-    ln -sfn {$BM_PICAM_PATH,$BM_SHAREDMEM_PATH/rec}/archive
-    ln -sfn {$BM_SHAREDMEM_PATH,$BM_PICAM_PATH}/rec
-    ln -sfn {$BM_SHAREDMEM_PATH,$BM_PICAM_PATH}/hooks
-    ln -sfn {$BM_SHAREDMEM_PATH,$BM_PICAM_PATH}/state
+    ln -sfn {$BM_PICAM_DIR,$BM_SHAREDMEM_DIR/rec}/archive
+    ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/rec
+    ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/hooks
+    ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/state
 
-    sudo ln -s $BM_PICAM_OUTPUT_PATH $BM_PICAM_LINKED_OUTPUT_PATH
+    sudo ln -s $BM_PICAM_STREAM_DIR $BM_PICAM_LINKED_STREAM_DIR
 
     sudo touch $BM_PICAM_LOG_PATH
     sudo chown $SERVER_USER:$WEB_GROUP $BM_PICAM_LOG_PATH
+
+    echo "#!/bin/bash
+sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
+" > $BM_PICAM_DIR/create_sharedmem_dirs.sh
 
     # Install picam binary
     PICAM_VERSION=1.4.9
@@ -178,7 +179,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     cd /tmp
     wget $DOWNLOAD_URL
     tar -xvf $FILENAME
-    mv $FILENAME_ROOT/picam $BM_PICAM_PATH/
+    mv $FILENAME_ROOT/picam $BM_PICAM_DIR/
     rm -r $FILENAME $FILENAME_ROOT
     cd -
 fi
@@ -186,7 +187,7 @@ fi
 SETUP_SERVICES=true
 if [[ "$SETUP_SERVICES" = true ]]; then
     UNIT_DIR=/lib/systemd/system
-    LINKED_UNIT_DIR=$BM_PATH/control/services
+    LINKED_UNIT_DIR=$BM_DIR/control/services
     UNIT_ENV_FILE=$LINKED_UNIT_DIR/envvars
     SYSTEMCTL=/usr/bin/systemctl
 
@@ -198,7 +199,8 @@ Description=Babymonitor root startup script
 
 [Service]
 Type=forking
-ExecStart=$BM_PATH/control/root_startup.sh
+EnvironmentFile=$UNIT_ENV_FILE
+ExecStart=$BM_DIR/control/root_startup.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH
 
 [Install]
@@ -218,7 +220,7 @@ Type=oneshot
 User=$SERVER_USER
 Group=$WEB_GROUP
 EnvironmentFile=$UNIT_ENV_FILE
-ExecStart=$BM_PATH/control/startup.py
+ExecStart=$BM_DIR/control/startup.py
 StandardError=append:$APACHE_ERROR_LOG_PATH
 
 [Install]
@@ -242,7 +244,7 @@ Type=simple
 User=$SERVER_USER
 Group=$WEB_GROUP
 EnvironmentFile=$UNIT_ENV_FILE
-ExecStart=$BM_PATH/control/$SERVICE.py
+ExecStart=$BM_DIR/control/$SERVICE.py
 StandardError=append:$APACHE_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
 
         sudo ln -sfn {$LINKED_UNIT_DIR,$UNIT_DIR}/$SERVICE_FILENAME
@@ -291,11 +293,11 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     sudo adduser $SERVER_USER $WEB_GROUP
 
     # Ensure permissions are correct in project folder
-    sudo chmod -R $PERMISSIONS $BM_PATH
-    sudo chown -R $SERVER_USER:$WEB_GROUP $BM_PATH
+    sudo chmod -R $PERMISSIONS $BM_DIR
+    sudo chown -R $SERVER_USER:$WEB_GROUP $BM_DIR
 
     # Link site folder to default Apache site root
-    sudo ln -s $BM_LINKED_SITE_ROOT $BM_SITE_ROOT
+    sudo ln -s $BM_LINKED_SITE_DIR $BM_SITE_DIR
 
     # Remove default site
     sudo a2dissite 000-default
@@ -304,9 +306,9 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     sudo rm -f /etc/apache2/sites-available/default-ssl.conf
 
     # Setup new site
-    SITE_NAME=$(basename $BM_SITE_ROOT)
+    SITE_NAME=$(basename $BM_SITE_DIR)
     echo "<VirtualHost *:80>
-	DocumentRoot $BM_SITE_ROOT
+	DocumentRoot $BM_SITE_DIR
 	ErrorLog $APACHE_ERROR_LOG_PATH
 	CustomLog $APACHE_LOG_DIR/access.log combined
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
@@ -315,5 +317,5 @@ fi
 
 INITIALIZE_DATABASE=true
 if [[ "$INITIALIZE_DATABASE" = true ]]; then
-    $BM_PATH/site/config/init/init_database.sh
+    $BM_DIR/site/config/init/init_database.sh
 fi
