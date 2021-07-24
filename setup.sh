@@ -196,9 +196,7 @@ Description=Babymonitor startup script
 After=mysqld.service
 
 [Service]
-Type=simple
-User=$SERVER_USER
-Group=$WEB_GROUP
+Type=forking
 ExecStart=$BM_PATH/control/startup.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH
 

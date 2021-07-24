@@ -5,4 +5,4 @@ SERVER_CONTROL_DIR=$SCRIPT_DIR/../site/servercontrol
 
 $SCRIPT_DIR/startup.py
 $SERVER_CONTROL_DIR/process_flag.sh
-$SERVER_CONTROL_DIR/monitor_flag.sh
+$SERVER_CONTROL_DIR/monitor_flag.sh &
