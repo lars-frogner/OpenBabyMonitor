@@ -27,7 +27,8 @@ def stream_video_with_settings(full_hd=False, audio=True):
             '--time', '--alsadev', mic_id
         ] + resolution_args + audio_args,
                               stdout=log_file,
-                              stderr=log_file)
+                              stderr=log_file,
+                              cwd=picam_path)
 
 
 if __name__ == '__main__':
