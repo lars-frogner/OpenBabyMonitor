@@ -66,6 +66,7 @@ UPDATE=true
 if [[ "$UPDATE" = true ]]; then
     sudo apt -y update
     sudo apt -y dist-upgrade
+    sudo apt -y install ntp # Time server
 fi
 
 SETUP_BASH_CONFIG=true
@@ -195,10 +196,10 @@ Description=Babymonitor startup script
 After=mysqld.service
 
 [Service]
-Type=oneshot
+Type=simple
 User=$SERVER_USER
 Group=$WEB_GROUP
-ExecStart=$BM_PATH/control/startup.py
+ExecStart=$BM_PATH/control/startup.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH
 
 [Install]
@@ -240,6 +241,9 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Install required Python packages
     sudo apt -y install python-pip
     pip install -r requirements.txt
+
+    # Install inotify tools
+    sudo apt install inotify-tools
 
     # Configure MySQL
     echo 'NOTE: Setup root account according to root_account entry in config/config.json'
