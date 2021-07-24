@@ -192,15 +192,33 @@ if [[ "$SETUP_SERVICES" = true ]]; then
 
     mkdir -p $LINKED_UNIT_DIR
 
+    ROOT_STARTUP_SERVICE_FILENAME=bm_root_startup.service
+    echo "[Unit]
+Description=Babymonitor root startup script
+
+[Service]
+Type=forking
+ExecStart=$BM_PATH/control/root_startup.sh
+StandardError=append:$APACHE_ERROR_LOG_PATH
+
+[Install]
+WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$ROOT_STARTUP_SERVICE_FILENAME
+
+    sudo ln -sfn {$LINKED_UNIT_DIR,$UNIT_DIR}/$ROOT_STARTUP_SERVICE_FILENAME
+
+    sudo systemctl enable $ROOT_STARTUP_SERVICE_FILENAME
+
     STARTUP_SERVICE_FILENAME=bm_startup.service
     echo "[Unit]
 Description=Babymonitor startup script
 After=mysqld.service
 
 [Service]
-Type=forking
+Type=oneshot
+User=$SERVER_USER
+Group=$WEB_GROUP
 EnvironmentFile=$UNIT_ENV_FILE
-ExecStart=$BM_PATH/control/startup.sh
+ExecStart=$BM_PATH/control/startup.py
 StandardError=append:$APACHE_ERROR_LOG_PATH
 
 [Install]
