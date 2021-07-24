@@ -116,7 +116,7 @@ if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
         FILENAME="bootstrap-${BOOTSTRAP_VERSION}-dist.zip"
         DOWNLOAD_URL="https://github.com/twbs/bootstrap/releases/download/v${BOOTSTRAP_VERSION}/$FILENAME"
     fi
-    FILENAME_ROOT="${FILENAME%%.*}"
+    FILENAME_ROOT="${FILENAME%%.zip}"
     cd /tmp
     wget $DOWNLOAD_URL
     unzip $FILENAME
@@ -173,7 +173,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
         FILENAME="picam-${PICAM_VERSION}-binary.tar.xz"
         DOWNLOAD_URL="https://github.com/iizukanao/picam/releases/download/v${PICAM_VERSION}/$FILENAME"
     fi
-    FILENAME_ROOT="${FILENAME%%.*}"
+    FILENAME_ROOT="${FILENAME%%.tar.xz}"
     cd /tmp
     wget $DOWNLOAD_URL
     tar -xvf $FILENAME
