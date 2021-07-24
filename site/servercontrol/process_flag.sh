@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 
-FLAG_PATH=.flag
+SCRIPT_DIR=$(dirname $(readlink -f $0))
+FLAG_PATH=$SCRIPT_DIR/.flag
 
-AP_MODE_CMD=./activate_ap_mode.sh
-CLIENT_MODE_CMD=./activate_client_mode.sh
+AP_MODE_CMD=$SCRIPT_DIR/activate_ap_mode.sh
+CLIENT_MODE_CMD=$SCRIPT_DIR/activate_client_mode.sh
 REBOOT_CMD=systemctl reboot
 
 AP_MODE_FLAG=activate_ap_mode
