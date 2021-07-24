@@ -15,6 +15,7 @@ class Database:
                                                   password=password,
                                                   database=name,
                                                   **extra_config)
+        self.connection.autocommit = True
 
         self.cursor = self.connection.cursor(dictionary=True)
 

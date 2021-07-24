@@ -6,6 +6,7 @@ function connectToAccount($host, $user, $password) {
   if ($connection->connect_error) {
     bm_error("Connection to account for user $user failed: " . $connection->connect_error);
   }
+  $connection->autocommit(true);
   return $connection;
 }
 
@@ -105,7 +106,7 @@ function updateValuesInTable($database, $table_name, $column_values, $condition_
   }
   $update_values = "UPDATE $table_name SET $updates WHERE $condition";
   if (!$database->query($update_values)) {
-    bm_error("Could update values in table $table_name: " . $database->error);
+    bm_error("Could not update values in table $table_name: " . $database->error);
   }
 }
 
