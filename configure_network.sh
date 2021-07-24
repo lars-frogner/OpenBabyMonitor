@@ -35,7 +35,7 @@ mkdir -v $AP_DIR $CLIENT_DIR $ORIG_DIR
 mkdir -v {$AP_DIR,$CLIENT_DIR,$ORIG_DIR}/etc
 cp -v {,$AP_DIR}/etc/dhcpcd.conf
 cp -v {,$CLIENT_DIR}/etc/dhcpcd.conf
-sudo mv -v {,$ORIG_DIR}/etc/dhcpcd.conf
+cp -v {,$ORIG_DIR}/etc/dhcpcd.conf
 
 # Set static IP for access point mode
 echo "
@@ -62,7 +62,7 @@ sudo mv -v {,$ORIG_DIR}/etc/dnsmasq.conf
 IP_START=2
 IP_END=20
 LEASE_TIME=24h
-ALIAS=babymonitor
+ALIAS=babymonitor.local
 echo "interface=$INTERFACE
 dhcp-range=$AP_IP_ROOT.$IP_START,$AP_IP_ROOT.$IP_END,255.255.255.0,$LEASE_TIME
 domain=wlan
@@ -107,12 +107,20 @@ net.ipv6.conf.all.disable_ipv6=1
 echo "#!/bin/bash
 set -e
 
+# If called manually over SSH, make sure the script is allowed
+# to finish even if the terminal disconnects by calling as
+# nohup $SERVER_CONTROL_PATH/activate_ap_mode.sh &
+
 AP_DIR=$AP_DIR
 
-sudo ln -svfn {$AP_DIR,}/etc/dhcpcd.conf
-sudo systemctl enable hostapd
+sudo rm -f /etc/dhcpcd.conf
+sudo ln -s {\$AP_DIR,}/etc/dhcpcd.conf
+sudo systemctl daemon-reload
+sudo service dhcpcd restart
 sudo systemctl enable dnsmasq
-sudo systemctl reboot
+sudo systemctl enable hostapd
+sudo systemctl start dnsmasq
+sudo systemctl start hostapd
 " > $SERVER_CONTROL_PATH/activate_ap_mode.sh
 chmod +x $SERVER_CONTROL_PATH/activate_ap_mode.sh
 
@@ -120,14 +128,26 @@ chmod +x $SERVER_CONTROL_PATH/activate_ap_mode.sh
 echo "#!/bin/bash
 set -e
 
+# If called manually over SSH, make sure the script is allowed
+# to finish even if the terminal disconnects by calling as
+# nohup $SERVER_CONTROL_PATH/activate_client_mode.sh &
+
 CLIENT_DIR=$CLIENT_DIR
 
-sudo ln -svfn {$CLIENT_DIR,}/etc/dhcpcd.conf
-sudo systemctl disable hostapd
+sudo systemctl stop dnsmasq
+sudo systemctl stop hostapd
 sudo systemctl disable dnsmasq
-sudo systemctl reboot
+sudo systemctl disable hostapd
+sudo rm -f /etc/dhcpcd.conf
+sudo ln -s {\$CLIENT_DIR,}/etc/dhcpcd.conf
+sudo systemctl daemon-reload
+sudo service dhcpcd restart
 " > $SERVER_CONTROL_PATH/activate_client_mode.sh
 chmod +x $SERVER_CONTROL_PATH/activate_client_mode.sh
 
 # Start in access point mode
-$SERVER_CONTROL_PATH/activate_ap_mode.sh
+echo "Start access point mode by running the following command:
+nohup $SERVER_CONTROL_PATH/activate_ap_mode.sh &
+
+Start client mode by running the following command:
+nohup $SERVER_CONTROL_PATH/activate_client_mode.sh &"
