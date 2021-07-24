@@ -19,10 +19,16 @@ def read_settings(mode, config=None, database=None):
     if config is None:
         config = get_config()
 
-    full_settings, settings = zip(
-        *[(setting, setting.split(mode + '_')[1])
-          for setting in config['database']['tables']['settings']['types']
-          if setting.startswith(mode + '_')])
+    settings = [
+        (setting, setting.split(mode + '_')[1])
+        for setting in config['database']['tables']['settings']['types']
+        if setting.startswith(mode + '_')
+    ]
+
+    if len(settings) == 0:
+        return {}
+
+    full_settings, settings = zip(*settings)
 
     if database is None:
         database = get_database(config)
