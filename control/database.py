@@ -6,11 +6,8 @@ class Database:
     def from_config(config):
         db_info = config['database']
         account_info = db_info['account']
-        return Database(account_info['host'],
-                        account_info['user'],
-                        account_info['password'],
-                        db_info['name'],
-                        unix_socket='/Applications/MAMP/tmp/mysql/mysql.sock')
+        return Database(account_info['host'], account_info['user'],
+                        account_info['password'], db_info['name'])
 
     def __init__(self, host, user, password, name, **extra_config):
         self.connection = mysql.connector.connect(host=host,
