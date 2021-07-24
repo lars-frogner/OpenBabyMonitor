@@ -35,8 +35,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
         <div id="mode_content_video" <?php echo ($mode != VIDEOSTREAM_MODE) ? HIDDEN_STYLE : '' ?>>
           <video-js id=example-video width=1080 height=720 class="vjs-default-skin" controls>
-            <!-- <source src="hls/index.m3u8" type="application/x-mpegURL"> -->
-            <source src="media/test.mp4" type="video/mp4">
+            <source src="hls/index.m3u8" type="application/x-mpegURL">
           </video-js>
         </div>
 
