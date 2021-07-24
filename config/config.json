@@ -39,27 +39,27 @@
     "modes": {
         "standby": {
             "value": 0,
-            "start_command": "sudo systemctl start bm_standby.service",
+            "start_command": "sudo systemctl start bm_standby",
             "stop_command": null,
             "restart_command": null
         },
         "listen": {
             "value": 1,
-            "start_command": "sudo systemctl start bm_listen.service",
-            "stop_command": "sudo systemctl stop bm_listen.service",
-            "restart_command": "sudo systemctl restart bm_listen.service"
+            "start_command": "sudo systemctl start bm_listen",
+            "stop_command": "sudo systemctl stop bm_listen",
+            "restart_command": "sudo systemctl restart bm_listen"
         },
         "audiostream": {
             "value": 2,
-            "start_command": "sudo systemctl start bm_audiostream.service",
-            "stop_command": "sudo systemctl stop bm_audiostream.service",
-            "restart_command": "sudo systemctl restart bm_audiostream.service"
+            "start_command": "sudo systemctl start bm_audiostream",
+            "stop_command": "sudo systemctl stop bm_audiostream",
+            "restart_command": "sudo systemctl restart bm_audiostream"
         },
         "videostream": {
             "value": 3,
-            "start_command": "sudo systemctl start bm_videostream.service",
-            "stop_command": "sudo systemctl stop bm_videostream.service",
-            "restart_command": "sudo systemctl restart bm_videostream.service"
+            "start_command": "sudo systemctl start bm_videostream",
+            "stop_command": "sudo systemctl stop bm_videostream",
+            "restart_command": "sudo systemctl restart bm_videostream"
         }
     },
     "control": {
