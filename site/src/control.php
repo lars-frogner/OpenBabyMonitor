@@ -49,6 +49,19 @@ function updateCurrentMode($database, $new_mode) {
   updateValuesInTable($database, 'modes', array('id' => 0, 'current' => $new_mode), "id");
 }
 
+function waitForFile($file_path) {
+  $initial_timestamp = time();
+  $elapsed_time = 0;
+  while (!file_exists($file_path) || filemtime($file_path) <= $initial_timestamp) {
+    usleep(MODE_QUERY_INTERVAL);
+    $elapsed_time += MODE_QUERY_INTERVAL;
+    if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
+      bm_warning("Wait for update of $file_path timed out");
+      return;
+    }
+  }
+}
+
 function switchMode($database, $new_mode) {
   $current_mode = readCurrentMode($database);
   if ($current_mode == $new_mode) {
@@ -58,5 +71,8 @@ function switchMode($database, $new_mode) {
   waitForModeSwitch($database, STANDBY_MODE);
   startMode($new_mode);
   waitForModeSwitch($database, $new_mode);
+  if (!is_null(MODE_WAIT_FOR_FILE_PATHS[$new_mode])) {
+    waitForFile(MODE_WAIT_FOR_FILE_PATHS[$new_mode]);
+  }
   return MODE_SWITCH_OK;
 }

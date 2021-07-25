@@ -48,6 +48,7 @@ BM_PICAM_LOG_PATH=/var/log/picam.log
 BM_SHAREDMEM_DIR=/run/shm
 BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/hls
 BM_PICAM_LINKED_STREAM_DIR=$BM_LINKED_SITE_DIR/hls
+BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
 
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
@@ -57,6 +58,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_PICAM_LOG_PATH=$BM_PICAM_LOG_PATH" >> $BM_ENV_PATH
     echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_PATH
     echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_PATH
+    echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_PATH
 fi
 
 UPDATE=true
@@ -311,6 +313,9 @@ if [[ "$INSTALL_SERVER" = true ]]; then
 	DocumentRoot $BM_SITE_DIR
 	ErrorLog $APACHE_ERROR_LOG_PATH
 	CustomLog $APACHE_LOG_DIR/access.log combined
+
+    SetEnv BM_PICAM_STREAM_FILE $BM_PICAM_STREAM_FILE
+
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME
 fi

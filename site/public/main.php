@@ -34,9 +34,8 @@ define('HIDDEN_STYLE', 'style="display: none;"');
         </div>
 
         <div id="mode_content_video" <?php echo ($mode != VIDEOSTREAM_MODE) ? HIDDEN_STYLE : '' ?>>
-          <video-js id=example-video width=1080 height=720 class="vjs-default-skin" controls>
-            <source src="hls/index.m3u8" type="application/x-mpegURL">
-          </video-js>
+          <!-- <video id="video_stream_0" class="video-js" width=1080 height=720 controls>
+          </video> -->
         </div>
 
         <div id="mode_content_standby" <?php echo ($mode != STANDBY_MODE) ? HIDDEN_STYLE : '' ?>>
@@ -75,12 +74,15 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   require_once(TEMPLATES_PATH . '/video-js_js.php');
   ?>
 
-  <script>
-    var player = videojs('example-video');
-    player.play();
-  </script>
-
   <script src="js/main.js"></script>
+
+  <?php
+  if ($mode == VIDEOSTREAM_MODE) {
+  ?><script>
+      create_video_element(1080, 720);
+    </script><?php
+            }
+              ?>
 
 </body>
 
