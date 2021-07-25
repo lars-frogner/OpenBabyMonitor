@@ -222,7 +222,7 @@ Type=oneshot
 User=$SERVER_USER
 Group=$WEB_GROUP
 EnvironmentFile=$UNIT_ENV_FILE
-ExecStart=$BM_DIR/control/startup.py
+ExecStart=$BM_DIR/control/startup.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH
 
 [Install]
@@ -238,6 +238,7 @@ WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
     do
         SERVICE_ROOT_NAME=bm_$SERVICE
         SERVICE_FILENAME=$SERVICE_ROOT_NAME.service
+
         echo "[Unit]
 Description=Babymonitor $SERVICE service
 
@@ -246,7 +247,7 @@ Type=simple
 User=$SERVER_USER
 Group=$WEB_GROUP
 EnvironmentFile=$UNIT_ENV_FILE
-ExecStart=$BM_DIR/control/$SERVICE.py
+ExecStart=$BM_DIR/control/$SERVICE.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
 
         sudo ln -sfn {$LINKED_UNIT_DIR,$UNIT_DIR}/$SERVICE_FILENAME
