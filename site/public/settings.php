@@ -18,9 +18,13 @@ redirectIfLoggedOut('index.php');
       <?php require_once(TEMPLATES_PATH . '/navbar.php'); ?>
     </header>
 
-    <main class="flex-grow-1 overflow-auto">
+    <main class="d-flex flex-column flex-grow-1 overflow-auto justify-content-center">
     </main>
   </div>
 </body>
+
+<?php
+require_once(TEMPLATES_PATH . '/bootstrap_js.php');
+?>
 
 </html>
