@@ -4,11 +4,7 @@ require_once(dirname(__DIR__) . '/config/mode_config.php');
 require_once(__DIR__ . '/database.php');
 
 function readCurrentMode($database) {
-  $result = readValuesFromTable($database, 'modes', 'current', 'id = 0');
-  if (empty($result)) {
-    bm_error('Modes not present in database');
-  }
-  return $result[0]['current'];
+  return readValuesFromTable($database, 'modes', 'current');
 }
 
 function startMode($mode) {
