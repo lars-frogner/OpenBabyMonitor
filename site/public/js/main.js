@@ -1,14 +1,17 @@
+const MODE_CONTENT_VIDEO_ID = 'mode_content_video';
+const VIDEO_STREAM_PARENT_ID = MODE_CONTENT_VIDEO_ID + '_box';
+const VIDEO_STREAM_DIV_ID = 'video_stream';
+const VIDEO_STREAM_ID = VIDEO_STREAM_DIV_ID + '_html5_api';
+const VIDEO_STREAM_SRC = 'hls/index.m3u8';
+const VIDEO_STREAM_TYPE = 'application/x-mpegURL';
+
 const MODE_RADIO_IDS = ['mode_radio_standby', 'mode_radio_listen', 'mode_radio_audio', 'mode_radio_video'];
-const MODE_CONTENT_IDS = ['mode_content_standby', 'mode_content_listen', 'mode_content_audio', 'mode_content_video'];
+const MODE_CONTENT_IDS = ['mode_content_standby', 'mode_content_listen', 'mode_content_audio', MODE_CONTENT_VIDEO_ID];
 
 const WAITING_CONTENT_ID = 'mode_content_waiting';
 
 const ERROR_CONTENT_ID = 'mode_content_error';
 const ERROR_CONTENT_MESSAGE_ID = 'mode_content_error_message';
-
-const VIDEO_STREAM_ID = 'video_stream';
-const VIDEO_STREAM_SRC = 'hls/index.m3u8';
-const VIDEO_STREAM_TYPE = 'application/x-mpegURL';
 
 function requestModeChange(radio) {
     var data = new URLSearchParams();
@@ -33,7 +36,6 @@ function indicateWaiting() {
 }
 
 function handleModeChangeResponse(checked_radio_id, response_text) {
-    console.log(response_text);
     switch (response_text) {
         case '0':
             setVisibleContent(getContentIdByRadioId(checked_radio_id));
@@ -65,7 +67,7 @@ function setVisibleContent(visible_content_id) {
     } else {
         hideElement(waiting_content);
     }
-    if (visible_content_id == 'mode_content_video') {
+    if (visible_content_id == MODE_CONTENT_VIDEO_ID) {
         show_video_stream_player();
     } else {
         hide_video_stream_player();
@@ -98,26 +100,24 @@ function showElement(element) {
     element.style.display = 'block';
 }
 
-function create_video_element(width, height) {
+function create_video_element() {
     var video_element = document.createElement('video');
-    video_element.id = VIDEO_STREAM_ID;
-    video_element.className = 'video-js vjs-default-skin';
-    video_element.width = width;
-    video_element.height = height;
+    video_element.id = VIDEO_STREAM_DIV_ID;
+    video_element.className = 'video-js vjs-default-skin vjs-big-play-centered vjs-fill';
     video_element.controls = true;
     hideElement(video_element);
-    document.getElementById('mode_content_video').appendChild(video_element);
-    var player = videojs(video_element, { autoplay: 'now' }, function () {
+    document.getElementById(VIDEO_STREAM_PARENT_ID).appendChild(video_element);
+    videojs(video_element, { autoplay: 'now', preload: 'metadata', responsive: true }, function () {
         this.src({ src: VIDEO_STREAM_SRC, type: VIDEO_STREAM_TYPE });
-        var div_element = document.getElementById(VIDEO_STREAM_ID); // New parent element of the video element created by video-js
-        var video_element = document.getElementById(VIDEO_STREAM_ID + '_html5_api'); // The actual video element
+        var div_element = document.getElementById(VIDEO_STREAM_DIV_ID); // New parent element of the video element created by video-js
+        var video_element = document.getElementById(VIDEO_STREAM_ID); // The actual video element
         showElement(div_element);
         showElement(video_element);
     });
 }
 
 function show_video_stream_player() {
-    create_video_element(1080, 720);
+    create_video_element();
 }
 
 function hide_video_stream_player() {

@@ -22,31 +22,42 @@ define('HIDDEN_STYLE', 'style="display: none;"');
       <?php require_once(TEMPLATES_PATH . '/navbar.php'); ?>
     </header>
 
-    <main class="d-flex flex-grow-1 overflow-auto justify-content-center">
+    <main id="main" class="d-flex flex-column flex-grow-1 overflow-auto justify-content-center">
 
-      <div class="d-flex flex-column justify-content-center">
-        <div id="mode_content_listen" <?php echo ($mode != LISTEN_MODE) ? HIDDEN_STYLE : '' ?>>
+      <div id="mode_content_listen" <?php echo ($mode != LISTEN_MODE) ? HIDDEN_STYLE : '' ?>>
+        <div class="d-flex flex-row justify-content-center">
           <p>Listen</p>
         </div>
+      </div>
 
-        <div id="mode_content_audio" <?php echo ($mode != AUDIOSTREAM_MODE) ? HIDDEN_STYLE : '' ?>>
+      <div id="mode_content_audio" <?php echo ($mode != AUDIOSTREAM_MODE) ? HIDDEN_STYLE : '' ?>>
+        <div class="d-flex flex-row justify-content-center">
           <p>Audio</p>
         </div>
+      </div>
 
-        <div id="mode_content_video" <?php echo ($mode != VIDEOSTREAM_MODE) ? HIDDEN_STYLE : '' ?>>
-          <!-- <video id="video_stream_0" class="video-js" width=1080 height=720 controls>
-          </video> -->
+      <div id="mode_content_video" class="h-100" <?php echo ($mode != VIDEOSTREAM_MODE) ? HIDDEN_STYLE : '' ?>>
+        <div id="mode_content_video_box" class="d-flex flex-row justify-content-center h-100">
         </div>
+      </div>
 
-        <div id="mode_content_standby" <?php echo ($mode != STANDBY_MODE) ? HIDDEN_STYLE : '' ?>>
+      <div id="mode_content_standby" <?php echo ($mode != STANDBY_MODE) ? HIDDEN_STYLE : '' ?>>
+        <div class="d-flex flex-row justify-content-center">
           <p>Standby</p>
         </div>
+      </div>
 
-        <div id="mode_content_waiting" class="spinner-grow text-dark" <?php echo HIDDEN_STYLE; ?>></div>
+      <div id="mode_content_waiting" <?php echo HIDDEN_STYLE; ?>>
+        <div class="d-flex flex-row justify-content-center">
+          <span class="spinner-grow text-dark"></span>
+        </div>
+      </div>
 
-        <div id="mode_content_error" class="text-center" <?php echo HIDDEN_STYLE; ?>>
-          <div id="mode_content_error_message" class="alert alert-danger">Error</div>
-          <a class="btn btn-secondary" href="main.php">Refresh</a>
+      <div id="mode_content_error" <?php echo HIDDEN_STYLE; ?>>
+        <div class="d-flex flex-row justify-content-center text-center">
+          <span id="mode_content_error_message" class="alert alert-danger">Error
+          </span>
+          <a class=" btn btn-secondary" href="main.php">Refresh</a>
         </div>
       </div>
 
@@ -79,7 +90,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   <?php
   if ($mode == VIDEOSTREAM_MODE) {
   ?><script>
-      create_video_element(1080, 720);
+      create_video_element();
     </script><?php
             }
               ?>
