@@ -10,26 +10,47 @@ function connectToAccount($host, $user, $password) {
   return $connection;
 }
 
+function dropUserIfExists($connection, $user) {
+  if (!$connection->query("DROP USER IF EXISTS $user;")) {
+    bm_error("Could not drop user $user: " . $connection->error);
+  }
+}
+
 function createUserIfMissing($connection, $host, $user, $password) {
   if (!$connection->query("CREATE USER IF NOT EXISTS '$user'@'$host' IDENTIFIED BY '$password';")) {
     bm_error("Could not create user $user: " . $connection->error);
   }
 }
 
+function databaseExists($connection, $name) {
+  $result = $connection->query("SHOW DATABASES LIKE '$name';");
+  if (!$result) {
+    bm_error("Could not check if database $name exists: " . $connection->error);
+  }
+  $result = $result->fetch_all(MYSQLI_ASSOC);
+  return count($result) > 0;
+}
+
+function dropDatabaseIfExists($connection, $name) {
+  if (!$connection->query("DROP DATABASE IF EXISTS $name;")) {
+    bm_error("Could not drop database $name: " . $connection->error);
+  }
+}
+
 function createDatabaseIfMissing($connection, $name) {
-  if (!$connection->query("CREATE DATABASE IF NOT EXISTS $name")) {
+  if (!$connection->query("CREATE DATABASE IF NOT EXISTS $name;")) {
     bm_error("Could not create database $name: " . $connection->error);
   }
 }
 
 function grantUserAllPrivilegesOnDatabase($connection, $host, $user, $name) {
-  if (!$connection->query("GRANT ALL PRIVILEGES ON $name.* TO '$user'@'$host'")) {
+  if (!$connection->query("GRANT ALL PRIVILEGES ON $name.* TO '$user'@'$host';")) {
     bm_error("Could not grant user $user privileges on database $name: " . $connection->error);
   }
 }
 
 function useDatabase($connection, $name) {
-  if (!$connection->query("USE $name")) {
+  if (!$connection->query("USE $name;")) {
     bm_error("Could not use database $name: " . $connection->error);
   }
 }
@@ -52,7 +73,7 @@ function createTableIfMissing($database, $table_name, $columns) {
   if (count($columns) > 0) {
     $entries = substr($entries, 0, -2);
   }
-  $create_table = "CREATE TABLE IF NOT EXISTS $table_name ($entries)";
+  $create_table = "CREATE TABLE IF NOT EXISTS $table_name ($entries);";
   if (!$database->query($create_table)) {
     bm_error("Could not create table for $table_name: " . $database->error);
   }
@@ -79,7 +100,7 @@ function insertValuesIntoTable($database, $table_name, $column_values) {
     $values = substr($values, 0, -2);
     $updates = substr($updates, 0, -2);
   }
-  $insert_values = "INSERT INTO $table_name ($names) VALUES($values) ON DUPLICATE KEY UPDATE $updates";
+  $insert_values = "INSERT INTO $table_name ($names) VALUES($values) ON DUPLICATE KEY UPDATE $updates;";
   if (!$database->query($insert_values)) {
     bm_error("Could not insert values into table $table_name: " . $database->error);
   }
@@ -104,19 +125,40 @@ function updateValuesInTable($database, $table_name, $column_values, $condition_
   if (count($column_values) > 1) {
     $updates = substr($updates, 0, -2);
   }
-  $update_values = "UPDATE $table_name SET $updates WHERE $condition";
+  $update_values = "UPDATE $table_name SET $updates WHERE $condition;";
   if (!$database->query($update_values)) {
     bm_error("Could not update values in table $table_name: " . $database->error);
   }
 }
 
-function readValuesFromTable($database, $table_name, $columns, $condition) {
-  if (is_array($columns)) {
-    $columns = join(', ', $columns);
-  }
-  $result = $database->query("SELECT $columns FROM $table_name WHERE $condition");
+function readValuesFromTable($database, $table_name, $columns, $condition = 'id = 0') {
+  $multiple_columns = is_array($columns);
+  $column_string = $multiple_columns ? join(', ', $columns) : $columns;
+
+  $result = $database->query("SELECT $column_string FROM $table_name WHERE $condition;");
   if (!$result) {
-    bm_error("Could not select $columns from table $table_name: " . $database->error);
+    bm_error("Could not select $column_string from table $table_name: " . $database->error);
   }
-  return $result->fetch_all(MYSQLI_ASSOC);
+  $result = $result->fetch_all(MYSQLI_ASSOC);
+
+  if (empty($result)) {
+    bm_error("Column(s) $column_string not present in table $table_name");
+  } else {
+    if ($multiple_columns) {
+      $result =
+        array_map(function ($values) use ($columns) {
+          return array_map(function ($name) use ($values) {
+            return $values[$name];
+          }, $columns);
+        }, $result);
+    } else {
+      $result = array_map(function ($values) use ($columns) {
+        return $values[$columns];
+      }, $result);
+    }
+    if ($condition == 'id = 0') {
+      $result = $result[0];
+    }
+  }
+  return $result;
 }
