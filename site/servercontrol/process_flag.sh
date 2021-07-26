@@ -7,10 +7,12 @@ FLAG_PATH=$SCRIPT_DIR/.flag
 AP_MODE_CMD=$SCRIPT_DIR/activate_ap_mode.sh
 CLIENT_MODE_CMD=$SCRIPT_DIR/activate_client_mode.sh
 REBOOT_CMD='systemctl reboot'
+SHUTDOWN_CMD='shutdown -h now'
 
 AP_MODE_FLAG=activate_ap_mode
 CLIENT_MODE_FLAG=activate_client_mode
 REBOOT_FLAG=reboot
+SHUTDOWN_FLAG=shutdown
 
 if [[ ! -f "$FLAG_PATH" ]]; then
     exit 0
@@ -31,6 +33,10 @@ case $FLAG in
 
   $REBOOT_FLAG)
     eval $REBOOT_CMD
+    ;;
+
+  $SHUTDOWN_FLAG)
+    eval $SHUTDOWN_CMD
     ;;
 
   *)
