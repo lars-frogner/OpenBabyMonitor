@@ -18,10 +18,12 @@ $root_connection = connectToAccount($root_account_info['host'], $root_db_user, $
 $account_info = $database_info['account'];
 $db_user = $account_info['user'];
 echo "Creating new user $db_user\n";
+dropDatabaseIfExists($root_connection, $db_user);
 createUserIfMissing($root_connection, $account_info['host'], $db_user, $account_info['password']);
 
 $db_name = $database_info['name'];
 echo "Creating new database $db_name\n";
+dropDatabaseIfExists($root_connection, $db_name);
 createDatabaseIfMissing($root_connection, $db_name);
 useDatabase($root_connection, $db_name);
 
