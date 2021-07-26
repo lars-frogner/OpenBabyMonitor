@@ -6,7 +6,7 @@ FLAG_PATH=$SCRIPT_DIR/.flag
 
 AP_MODE_CMD=$SCRIPT_DIR/activate_ap_mode.sh
 CLIENT_MODE_CMD=$SCRIPT_DIR/activate_client_mode.sh
-REBOOT_CMD=systemctl reboot
+REBOOT_CMD='systemctl reboot'
 
 AP_MODE_FLAG=activate_ap_mode
 CLIENT_MODE_FLAG=activate_client_mode
@@ -22,15 +22,15 @@ rm $FLAG_PATH
 case $FLAG in
 
   $AP_MODE_FLAG)
-    $AP_MODE_CMD
+    eval $AP_MODE_CMD
     ;;
 
   $CLIENT_MODE_FLAG)
-    $CLIENT_MODE_CMD
+    eval $CLIENT_MODE_CMD
     ;;
 
   $REBOOT_FLAG)
-    $REBOOT_CMD
+    eval $REBOOT_CMD
     ;;
 
   *)
