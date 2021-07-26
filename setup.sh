@@ -65,7 +65,33 @@ UPDATE=true
 if [[ "$UPDATE" = true ]]; then
     sudo apt -y update
     sudo apt -y dist-upgrade
-    sudo apt -y install ntp # Time server
+fi
+
+INSTALL_PACKAGES=true
+if [[ "$INSTALL_PACKAGES" = true ]]; then
+    sudo apt -y install unzip
+
+    # Install time server
+    sudo apt -y install ntp
+
+    # Install inotify for flag monitoring
+    sudo apt -y install inotify-tools
+
+    sudo apt -y install git
+
+    sudo apt -y install python3 python3-pip
+
+    # Install Apache, PHP and MySQL (MariaDB)
+    sudo apt -y install apache2 mariadb-server php php-mysql libapache2-mod-php
+
+    # Install dependencies for picam
+    sudo apt -y install libharfbuzz0b libfontconfig1
+
+    # Install ffmpeg for audio streaming
+    sudo apt -y install ffmpeg
+
+    # Install required Python packages
+    pip3 install -r requirements.txt
 fi
 
 SETUP_BASH_CONFIG=true
@@ -106,8 +132,6 @@ fi
 
 INSTALL_BOOTSTRAP=true
 if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
-    sudo apt -y install unzip
-
     BOOTSTRAP_VERSION=5.0.2
     if [[ "$BOOTSTRAP_VERSION" = "latest" ]]; then
         DOWNLOAD_URL=$(curl https://api.github.com/repos/twbs/bootstrap/releases/latest | grep browser_download_url | grep dist.zip | cut -d '"' -f 4)
@@ -128,8 +152,6 @@ fi
 
 INSTALL_VIDEOJS=true
 if [[ "$INSTALL_VIDEOJS" = true ]]; then
-    sudo apt -y install unzip
-
     VIDEOJS_VERSION=7.13.3
     if [[ "$VIDEOJS_VERSION" = "latest" ]]; then
         DOWNLOAD_URL=$(curl https://api.github.com/repos/videojs/video.js/releases/latest | grep browser_download_url | grep .zip | cut -d '"' -f 4)
@@ -148,9 +170,6 @@ fi
 
 INSTALL_PICAM=true
 if [[ "$INSTALL_PICAM" = true ]]; then
-    # Install dependencies
-    sudo apt -y install libharfbuzz0b libfontconfig1
-
     # Create directories and symbolic links
     sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $PERMISSIONS $BM_PICAM_DIR{,/archive} $BM_SHAREDMEM_DIR/{rec,hooks,state}
 
@@ -265,16 +284,6 @@ fi
 
 INSTALL_SERVER=true
 if [[ "$INSTALL_SERVER" = true ]]; then
-    # Install Apache, PHP and MySQL (MariaDB)
-    sudo apt -y install apache2 mariadb-server php php-mysql libapache2-mod-php
-
-    # Install required Python packages
-    sudo apt -y install python-pip
-    pip install -r requirements.txt
-
-    # Install inotify tools
-    sudo apt -y install inotify-tools
-
     # Configure MySQL
     echo 'NOTE: Setup with root password according to root_account entry in config/config.json'
     sudo mysql_secure_installation
