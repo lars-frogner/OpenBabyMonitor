@@ -16,5 +16,5 @@ function storeHashedPassword($database, $hashed_password) {
 }
 
 function readHashedPassword($database) {
-  return readValuesFromTable($database, 'password', 'hash');
+  return readValuesFromTable($database, 'password', 'hash', true);
 }

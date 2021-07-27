@@ -106,7 +106,7 @@ function insertValuesIntoTable($database, $table_name, $column_values) {
   }
 }
 
-function updateValuesInTable($database, $table_name, $column_values, $condition_key) {
+function updateValuesInTable($database, $table_name, $column_values, $condition_key = 'id') {
   $updates = '';
   $condition = NULL;
   foreach ($column_values as $name => $value) {
@@ -115,6 +115,10 @@ function updateValuesInTable($database, $table_name, $column_values, $condition_
     } else {
       if (is_string($value) && $value != 'NULL') {
         $value = "'$value'";
+      } elseif ($value === null) {
+        $value = 'NULL';
+      } elseif ($value === false) {
+        $value = 0;
       }
       $updates = $updates . "$name = $value, ";
     }
@@ -131,7 +135,7 @@ function updateValuesInTable($database, $table_name, $column_values, $condition_
   }
 }
 
-function readValuesFromTable($database, $table_name, $columns, $condition = 'id = 0') {
+function readValuesFromTable($database, $table_name, $columns, $return_with_numeric_keys = false, $condition = 'id = 0') {
   $multiple_columns = is_array($columns);
   $column_string = $multiple_columns ? join(', ', $columns) : $columns;
 
@@ -143,7 +147,8 @@ function readValuesFromTable($database, $table_name, $columns, $condition = 'id 
 
   if (empty($result)) {
     bm_error("Column(s) $column_string not present in table $table_name");
-  } else {
+  }
+  if ($return_with_numeric_keys) {
     if ($multiple_columns) {
       $result =
         array_map(function ($values) use ($columns) {
@@ -156,9 +161,44 @@ function readValuesFromTable($database, $table_name, $columns, $condition = 'id 
         return $values[$columns];
       }, $result);
     }
-    if ($condition == 'id = 0') {
-      $result = $result[0];
-    }
+  }
+  if ($condition == 'id = 0') {
+    $result = $result[0];
   }
   return $result;
+}
+
+function getColumnNames($column_entries, $drop_id_column = true) {
+  if ($drop_id_column) {
+    unset($column_entries['id']);
+  }
+  return array_keys($column_entries);
+}
+
+function createColumnValueMap($columns, $values, $values_are_sequential = true, $include_id_column = true) {
+  if ($include_id_column) {
+    $column_values = array('id' => 0);
+  }
+  if (is_array($columns) && is_array($values)) {
+    if ($values_are_sequential) {
+      if (count($columns) != count($values)) {
+        bm_error('Number of column names and values must be the same');
+      }
+      for ($idx = 0; $idx < count($columns); $idx++) {
+        $column_values[$idx] = $values[$idx];
+      }
+    } else {
+      foreach ($columns as $name) {
+        if (!key_exists($name, $values)) {
+          bm_error("No value given for column $name");
+        }
+        $column_values[$name] = $values[$name];
+      }
+    }
+  } elseif (!is_array($columns) && !is_array($values)) {
+    $column_values[$columns] = $values;
+  } else {
+    bm_error('Number of column names and values must be the same');
+  }
+  return $column_values;
 }

@@ -4,7 +4,7 @@ require_once(dirname(__DIR__) . '/config/mode_config.php');
 require_once(__DIR__ . '/database.php');
 
 function readCurrentMode($database) {
-  return readValuesFromTable($database, 'modes', 'current');
+  return readValuesFromTable($database, 'modes', 'current', true);
 }
 
 function startMode($mode) {
@@ -42,7 +42,7 @@ function waitForModeSwitch($database, $new_mode) {
 }
 
 function updateCurrentMode($database, $new_mode) {
-  updateValuesInTable($database, 'modes', array('id' => 0, 'current' => $new_mode), "id");
+  updateValuesInTable($database, 'modes', createColumnValueMap('current', $new_mode));
 }
 
 function waitForFile($file_path) {
