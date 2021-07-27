@@ -145,6 +145,37 @@ sudo service dhcpcd restart
 " > $SERVER_CONTROL_DIR/activate_client_mode.sh
 chmod +x $SERVER_CONTROL_DIR/activate_client_mode.sh
 
+echo "#!/bin/bash
+
+if [[ -z \"$(ip r | grep default)\" ]]; then
+    echo 0
+    exit
+fi
+ROUTER_IP=\$(ip r | grep default | sed -n \"s/^default via \([0-9\.]*\).*$/\1/p\")
+ping -c 1 \"\$ROUTER_IP\" > /dev/null 2>&1
+if [[ \"\$?\" = \"0\" ]]; then
+    echo 1
+else
+    echo 0
+fi
+" > $SERVER_CONTROL_DIR/connected_to_external_network.sh
+chmod +x $SERVER_CONTROL_DIR/connected_to_external_network.sh
+
+echo "#!/bin/bash
+
+systemctl is-active --quiet hostapd
+HOSTAPD_STATE=\"\$?\"
+systemctl is-active --quiet dnsmasq
+DNSMASQ_STATE=\"\$?\"
+
+if [[ \"\$HOSTAPD_STATE\" = \"0\" && \"\$DNSMASQ_STATE\" = \"0\" ]]; then
+    echo 1
+else
+    echo 0
+fi
+" > $SERVER_CONTROL_DIR/access_point_active.sh
+chmod +x $SERVER_CONTROL_DIR/access_point_active.sh
+
 # Start in access point mode
 echo "Start access point mode by running the following command:
 nohup $SERVER_CONTROL_DIR/activate_ap_mode.sh &
