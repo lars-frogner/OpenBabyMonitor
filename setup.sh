@@ -40,7 +40,9 @@ APACHE_LOG_DIR=/var/log/apache2
 APACHE_ERROR_LOG_PATH=$APACHE_LOG_DIR/error.log
 
 BM_DIR=$(dirname $(readlink -f $0))
-BM_ENV_PATH=$BM_DIR/babymonitor_env.sh
+BM_ENV_DIR=$BM_DIR/env
+BM_ENV_EXPORTS_PATH=$BM_ENV_DIR/envvar_exports
+BM_ENV_PATH=$BM_ENV_DIR/envvars
 BM_SITE_DIR=/var/www/babymonitor
 BM_LINKED_SITE_DIR=$BM_DIR/site/public
 BM_PICAM_DIR=$BM_DIR/picam
@@ -52,13 +54,21 @@ BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
 
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
-    touch $BM_ENV_PATH
-    echo "export BM_DIR=$BM_DIR" >> $BM_ENV_PATH
-    echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_PATH
-    echo "export BM_PICAM_LOG_PATH=$BM_PICAM_LOG_PATH" >> $BM_ENV_PATH
-    echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_PATH
-    echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_PATH
-    echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_PATH
+    mkdir -p $BM_ENV_DIR
+
+    touch $BM_ENV_EXPORTS_PATH
+    echo "export BM_DIR=$BM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_LOG_PATH=$BM_PICAM_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SERVER_ACTION_DIR=$BM_SERVER_ACTION_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_FILE" >> $BM_ENV_EXPORTS_PATH
+
+    # Copy environment variables (without 'export') into environment file for services and PHP
+    ENV_VAR_EXPORTS=$(cat $BM_ENV_EXPORTS_PATH)
+    echo "${ENV_VAR_EXPORTS//'export '/}" > $BM_ENV_PATH
 fi
 
 UPDATE=true
@@ -209,7 +219,6 @@ SETUP_SERVICES=true
 if [[ "$SETUP_SERVICES" = true ]]; then
     UNIT_DIR=/lib/systemd/system
     LINKED_UNIT_DIR=$BM_DIR/control/services
-    UNIT_ENV_FILE=$LINKED_UNIT_DIR/envvars
     SYSTEMCTL=/usr/bin/systemctl
 
     mkdir -p $LINKED_UNIT_DIR
@@ -220,7 +229,7 @@ Description=Babymonitor root startup script
 
 [Service]
 Type=forking
-EnvironmentFile=$UNIT_ENV_FILE
+EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/root_startup.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH
 
@@ -240,7 +249,7 @@ After=mysqld.service
 Type=oneshot
 User=$SERVER_USER
 Group=$WEB_GROUP
-EnvironmentFile=$UNIT_ENV_FILE
+EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/startup.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH
 
@@ -265,7 +274,7 @@ Description=Babymonitor $SERVICE service
 Type=simple
 User=$SERVER_USER
 Group=$WEB_GROUP
-EnvironmentFile=$UNIT_ENV_FILE
+EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/$SERVICE.sh
 StandardError=append:$APACHE_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
 
@@ -276,10 +285,6 @@ StandardError=append:$APACHE_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAM
 
     # Allow users in web group to manage the mode services without providing a password
     echo -e "${CMD_ALIAS%,}\n%$WEB_GROUP ALL = NOPASSWD: BM_MODES" | sudo tee /etc/sudoers.d/$WEB_GROUP
-
-    # Copy environment variables (without 'export') into environment file for services
-    ENV_VAR_EXPORTS=$(cat $BM_ENV_PATH)
-    echo "${ENV_VAR_EXPORTS//'export '/}" > $UNIT_ENV_FILE
 fi
 
 INSTALL_SERVER=true
@@ -297,9 +302,6 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Use index.php as index file
     APACHE_CONF_PATH=/etc/apache2/apache2.conf
     echo -e "\nDirectoryIndex index.php" | sudo tee -a $APACHE_CONF_PATH
-
-    APACHE_ENV_PATH=/etc/apache2/envvars
-    echo -e "\nsource $BM_ENV_PATH" | sudo tee -a $APACHE_ENV_PATH
 
     # Add main user to www-data group
     sudo adduser $SERVER_USER $WEB_GROUP
@@ -323,9 +325,6 @@ if [[ "$INSTALL_SERVER" = true ]]; then
 	DocumentRoot $BM_SITE_DIR
 	ErrorLog $APACHE_ERROR_LOG_PATH
 	CustomLog $APACHE_LOG_DIR/access.log combined
-
-    SetEnv BM_PICAM_STREAM_FILE $BM_PICAM_STREAM_FILE
-
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME
 fi

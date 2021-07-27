@@ -1,5 +1,6 @@
 <?php
 include_once(__DIR__ . '/error_config.php');
+require_once(__DIR__ . '/env_config.php');
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/database_config.php');
 require_once(__DIR__ . '/control_config.php');
