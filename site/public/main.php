@@ -19,7 +19,10 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 <body class="mb-0">
   <div class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
     <header>
-      <?php require_once(TEMPLATES_PATH . '/navbar.php'); ?>
+      <?php
+      require_once(TEMPLATES_PATH . '/utils.php');
+      echo render(TEMPLATES_PATH . '/navbar.php', array('logout_text' => 'Enheten står ikke i standby. Den vil fortsette i nåværende modus selv om du logger ut.'));
+      ?>
     </header>
 
     <main id="main" class="d-flex flex-column flex-grow-1 overflow-auto justify-content-center">
@@ -83,17 +86,43 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   <?php
   require_once(TEMPLATES_PATH . '/bootstrap_js.php');
   require_once(TEMPLATES_PATH . '/video-js_js.php');
+  require_once(TEMPLATES_PATH . '/jquery_js.php');
   ?>
+
+  <script src="js/utils.js"></script>
+
+  <script>
+    function updateLogoutModalText(mode) {
+      var modal_body = $('#' + LOGOUT_MODAL_ID + MODAL_BODY_ID_TAIL);
+      if (mode != <?php echo STANDBY_MODE; ?>) {
+        showElement(modal_body);
+      } else {
+        hideElement(modal_body);
+      }
+    }
+  </script>
+
+  <script>
+    var _current_mode = <?php echo $mode; ?>;
+    updateLogoutModalText(_current_mode);
+
+    function setCurrentMode(mode) {
+      _current_mode = mode;
+      updateLogoutModalText(mode);
+    }
+
+    function getCurrentMode(mode) {
+      return _current_mode;
+    }
+  </script>
 
   <script src="js/main.js"></script>
 
-  <?php
-  if ($mode == VIDEOSTREAM_MODE) {
-  ?><script>
+  <?php if ($mode == VIDEOSTREAM_MODE) { ?>
+    <script>
       create_video_element();
-    </script><?php
-            }
-              ?>
+    </script>
+  <?php } ?>
 
 </body>
 

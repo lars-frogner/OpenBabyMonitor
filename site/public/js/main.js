@@ -22,7 +22,7 @@ function requestModeChange(radio) {
         body: data
     })
         .then(response => response.text())
-        .then(response_text => handleModeChangeResponse(radio.id, response_text))
+        .then(response_text => handleModeChangeResponse(radio.id, radio.value, response_text))
         .catch(error => {
             console.log(error)
         });
@@ -35,14 +35,15 @@ function indicateWaiting() {
     setVisibleContent(WAITING_CONTENT_ID);
 }
 
-function handleModeChangeResponse(checked_radio_id, response_text) {
+function handleModeChangeResponse(checked_radio_id, checked_radio_value, response_text) {
     switch (response_text) {
         case '0':
             setVisibleContent(getContentIdByRadioId(checked_radio_id));
             setDisabledForModeRadios(false);
+            setCurrentMode(checked_radio_value);
             break;
         default:
-            document.getElementById(ERROR_CONTENT_MESSAGE_ID).innerHTML = response_text;
+            $('#' + ERROR_CONTENT_MESSAGE_ID).innerHTML = response_text;
             setVisibleContent(ERROR_CONTENT_ID);
             break;
     }
@@ -50,18 +51,18 @@ function handleModeChangeResponse(checked_radio_id, response_text) {
 
 function setDisabledForModeRadios(is_disabled) {
     MODE_RADIO_IDS.forEach(radio_id => {
-        document.getElementById(radio_id).disabled = is_disabled;
+        $('#' + radio_id).disabled = is_disabled;
     });
 }
 
 function setVisibleContent(visible_content_id) {
-    const error_content = document.getElementById(ERROR_CONTENT_ID);
+    const error_content = $('#' + ERROR_CONTENT_ID);
     if (visible_content_id == ERROR_CONTENT_ID) {
         showElement(error_content);
     } else {
         hideElement(error_content);
     }
-    const waiting_content = document.getElementById(WAITING_CONTENT_ID);
+    const waiting_content = $('#' + WAITING_CONTENT_ID);
     if (visible_content_id == WAITING_CONTENT_ID) {
         showElement(waiting_content);
     } else {
@@ -73,7 +74,7 @@ function setVisibleContent(visible_content_id) {
         hide_video_stream_player();
     }
     MODE_CONTENT_IDS.forEach(content_id => {
-        const content = document.getElementById(content_id);
+        const content = $('#' + content_id);
         if (content_id == visible_content_id) {
             showElement(content);
         } else {
@@ -92,25 +93,17 @@ function getContentIdByRadioId(radio_id) {
     }
 }
 
-function hideElement(element) {
-    element.style.display = 'none';
-}
-
-function showElement(element) {
-    element.style.display = 'block';
-}
-
 function create_video_element() {
     var video_element = document.createElement('video');
     video_element.id = VIDEO_STREAM_DIV_ID;
     video_element.className = 'video-js vjs-default-skin vjs-big-play-centered vjs-fill';
     video_element.controls = true;
     hideElement(video_element);
-    document.getElementById(VIDEO_STREAM_PARENT_ID).appendChild(video_element);
+    $('#' + VIDEO_STREAM_PARENT_ID).appendChild(video_element);
     videojs(video_element, { autoplay: 'now', preload: 'metadata', responsive: true }, function () {
         this.src({ src: VIDEO_STREAM_SRC, type: VIDEO_STREAM_TYPE });
-        var div_element = document.getElementById(VIDEO_STREAM_DIV_ID); // New parent element of the video element created by video-js
-        var video_element = document.getElementById(VIDEO_STREAM_ID); // The actual video element
+        var div_element = $('#' + VIDEO_STREAM_DIV_ID); // New parent element of the video element created by video-js
+        var video_element = $('#' + VIDEO_STREAM_ID); // The actual video element
         showElement(div_element);
         showElement(video_element);
     });

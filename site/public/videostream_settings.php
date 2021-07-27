@@ -27,13 +27,13 @@ if (isset($_POST['submit'])) {
 
 <body>
   <header>
-    <?php require_once(TEMPLATES_PATH . '/navbar.php'); ?>
+    <?php require_once(TEMPLATES_PATH . '/navbar_settings.php'); ?>
   </header>
 
   <main>
     <div class="container">
       <h1>Video settings</h1>
-      <form action="" method="post">
+      <form id="videostream_settings_form" action="" method="post">
         <div class="mb-3">
           <label class="form-label" for="resolution_select">Resolution</label>
           <select name="vertical_resolution" class="form-select" id="resolution_select">
@@ -56,6 +56,15 @@ if (isset($_POST['submit'])) {
 
 <?php
 require_once(TEMPLATES_PATH . '/bootstrap_js.php');
+require_once(TEMPLATES_PATH . '/jquery_js.php');
 ?>
+
+<script src="js/utils.js"></script>
+<script src="js/jquery_utils.js"></script>
+<script src="js/navbar_settings.js"></script>
+
+<script>
+  handleModalTexts('videostream_settings_form');
+</script>
 
 </html>

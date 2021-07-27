@@ -14,20 +14,29 @@ redirectIfLoggedOut('index.php');
 
 <body>
   <header>
-    <?php require_once(TEMPLATES_PATH . '/navbar.php'); ?>
+    <?php require_once(TEMPLATES_PATH . '/navbar_settings.php'); ?>
   </header>
 
   <main>
     <div class="container">
       <h1>Listen settings</h1>
-      <form>
-        <button type="submit" class="btn btn-primary">Submit</button>
+      <form id="listen_settings_form" action="" method="post">
+        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
       </form>
   </main>
 </body>
 
 <?php
 require_once(TEMPLATES_PATH . '/bootstrap_js.php');
+require_once(TEMPLATES_PATH . '/jquery_js.php');
 ?>
+
+<script src="js/utils.js"></script>
+<script src="js/jquery_utils.js"></script>
+<script src="js/navbar_settings.js"></script>
+
+<script>
+  handleModalTexts('listen_settings_form');
+</script>
 
 </html>
