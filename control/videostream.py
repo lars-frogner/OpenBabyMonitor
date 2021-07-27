@@ -5,6 +5,7 @@ import subprocess
 import control
 
 MODE = 'videostream'
+HORIZONTAL_RESOLUTIONS = {480: 640, 720: 1280, 1080: 1920}
 
 
 def stream_video():
@@ -12,14 +13,22 @@ def stream_video():
     control.enter_mode(MODE, stream_video_with_settings)
 
 
-def stream_video_with_settings(full_hd=False, audio=True):
+def stream_video_with_settings(vertical_resolution=720, capture_audio=True):
     mic_id = os.environ['BM_MIC_ID']
     picam_path = os.environ['BM_PICAM_DIR']
     picam_log_path = os.environ['BM_PICAM_LOG_PATH']
     picam_output_path = os.environ['BM_PICAM_STREAM_DIR']
 
-    resolution_args = ['-w', '1920', '-h', '1080'] if full_hd else []
-    audio_args = ['--noaudio'] if not audio else []
+    assert vertical_resolution in HORIZONTAL_RESOLUTIONS, \
+        'Vertical resolution ({}) is not one of {}'.format(
+        vertical_resolution, ', '.join(list(HORIZONTAL_RESOLUTIONS.keys())))
+    resolution_args = [
+        '-w',
+        str(HORIZONTAL_RESOLUTIONS[vertical_resolution]), '-h',
+        str(vertical_resolution)
+    ]
+
+    audio_args = ['--noaudio'] if not capture_audio else []
 
     with open(picam_log_path, 'a') as log_file:
         subprocess.check_call([

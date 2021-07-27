@@ -12,22 +12,22 @@
         },
         "name": "babymonitor",
         "tables": {
-            "settings": {
+            "videostream_settings": {
                 "types": {
                     "id": "TINYINT UNSIGNED PRIMARY KEY",
-                    "videostream_full_hd": "BOOLEAN NOT NULL",
-                    "videostream_audio": "BOOLEAN NOT NULL"
+                    "vertical_resolution": "INT UNSIGNED NOT NULL",
+                    "capture_audio": "BOOLEAN NOT NULL"
                 },
                 "initial_values": {
                     "id": 0,
-                    "videostream_full_hd": false,
-                    "videostream_audio": true
+                    "vertical_resolution": 720,
+                    "capture_audio": true
                 }
             },
             "modes": {
                 "types": {
                     "id": "TINYINT UNSIGNED PRIMARY KEY",
-                    "current": "TINYINT NOT NULL"
+                    "current": "TINYINT UNSIGNED NOT NULL"
                 },
                 "initial_values": {
                     "id": 0,
@@ -69,5 +69,12 @@
     "control": {
         "mode_query_interval": 1e-2,
         "mode_switch_timeout": 5.0
+    },
+    "vertical_resolution": {
+        "values": {
+            "480p": 480,
+            "720p": 720,
+            "1080p": 1080
+        }
     }
 }
