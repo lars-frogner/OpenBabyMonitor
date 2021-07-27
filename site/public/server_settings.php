@@ -12,15 +12,18 @@ redirectIfLoggedOut('index.php');
   ?>
 </head>
 
-<body class="mb-0">
-  <div class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
-    <header>
-      <?php require_once(TEMPLATES_PATH . '/navbar.php'); ?>
-    </header>
+<body>
+  <header>
+    <?php require_once(TEMPLATES_PATH . '/navbar.php'); ?>
+  </header>
 
-    <main class="d-flex flex-column flex-grow-1 overflow-auto justify-content-center">
-    </main>
-  </div>
+  <main>
+    <div class="container">
+      <h1>Server settings</h1>
+      <form>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+  </main>
 </body>
 
 <?php
