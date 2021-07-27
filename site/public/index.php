@@ -20,8 +20,8 @@ redirectIfLoggedIn('main.php');
     ?>
     <form action="" method="post">
       <h1 class="h3 mb-3 fw-normal">Vennligst logg inn</h1>
-      <label for="pwd" class="visually-hidden">Passord</label>
-      <input type="password" id="pwd" name="password" class="form-control" placeholder="Passord" required>
+      <label class="visually-hidden" for="password">Passord</label>
+      <input type="password" name="password" class="form-control" id="password" placeholder="Passord" required>
       <button type="submit" name="submit" class="w-100 btn btn-lg btn-primary">Logg inn</button>
     </form>
   </main>
