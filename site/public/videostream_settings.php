@@ -2,18 +2,6 @@
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 
-?>
-
-<!DOCTYPE html>
-<html>
-
-<head>
-  <?php
-  require_once(TEMPLATES_PATH . '/head_common.php');
-  ?>
-</head>
-
-<?php
 $table_name = 'videostream_settings';
 $setting_names = getColumnNames($_CONFIG['database']['tables'][$table_name]['types']);
 if (isset($_POST['submit'])) {
@@ -27,6 +15,15 @@ if (isset($_POST['submit'])) {
   extract($values);
 }
 ?>
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <?php
+  require_once(TEMPLATES_PATH . '/head_common.php');
+  ?>
+</head>
 
 <body>
   <header>
