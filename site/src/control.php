@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__DIR__) . '/config/error_config.php');
-require_once(dirname(__DIR__) . '/config/mode_config.php');
+require_once(dirname(__DIR__) . '/config/control_config.php');
 require_once(__DIR__ . '/database.php');
 
 function readCurrentMode($database) {

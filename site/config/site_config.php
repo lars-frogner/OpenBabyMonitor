@@ -2,7 +2,7 @@
 include_once(__DIR__ . '/error_config.php');
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/database_config.php');
-require_once(__DIR__ . '/mode_config.php');
+require_once(__DIR__ . '/control_config.php');
 require_once(SRC_PATH . '/security.php');
 require_once(SRC_PATH . '/session.php');
 require_once(SRC_PATH . '/database.php');

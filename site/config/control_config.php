@@ -28,7 +28,10 @@ define('MODE_STOP_COMMANDS', $_MODE_STOP_COMMANDS);
 define('MODE_RESTART_COMMANDS', $_MODE_RESTART_COMMANDS);
 define('MODE_WAIT_FOR_FILE_PATHS', $_MODE_WAIT_FOR_FILE_PATHS);
 
-define('MODE_QUERY_INTERVAL', intval($_CONFIG['control']['mode_query_interval'] * 1e6)); // In microseconds
-define('MODE_SWITCH_TIMEOUT', intval($_CONFIG['control']['mode_switch_timeout'] * 1e6));
-
 define('MODE_SWITCH_OK', 0);
+
+$_CONTROL_INFO = $_CONFIG['control'];
+define('MODE_QUERY_INTERVAL', intval($_CONTROL_INFO['mode_query_interval'] * 1e6)); // In microseconds
+define('MODE_SWITCH_TIMEOUT', intval($_CONTROL_INFO['mode_switch_timeout'] * 1e6));
+
+define('SERVER_ACTION_COMMANDS', $_CONTROL_INFO['server_actions']['commands']);
