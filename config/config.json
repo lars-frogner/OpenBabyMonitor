@@ -68,7 +68,15 @@
     },
     "control": {
         "mode_query_interval": 1e-2,
-        "mode_switch_timeout": 5.0
+        "mode_switch_timeout": 5.0,
+        "server_actions": {
+            "commands": {
+                "activate_ap_mode": "echo activate_ap_mode > $BM_SERVER_ACTION_FILE",
+                "activate_client_mode": "echo activate_client_mode > $BM_SERVER_ACTION_FILE",
+                "reboot": "echo reboot > $BM_SERVER_ACTION_FILE",
+                "shutdown": "echo shutdown > $BM_SERVER_ACTION_FILE"
+            }
+        }
     },
     "vertical_resolution": {
         "values": {

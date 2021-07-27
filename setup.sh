@@ -32,7 +32,8 @@ set -e
 SERVER_USER=pi
 WEB_USER=www-data
 WEB_GROUP=www-data
-PERMISSIONS=750
+READ_PERMISSIONS=750
+WRITE_PERMISSIONS=770
 
 PHP_TIMEZONE=Europe/Oslo
 
@@ -51,6 +52,8 @@ BM_SHAREDMEM_DIR=/run/shm
 BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/hls
 BM_PICAM_LINKED_STREAM_DIR=$BM_LINKED_SITE_DIR/hls
 BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
+BM_SERVER_ACTION_DIR=$BM_DIR/site/servercontrol/.hook
+BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
 
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
@@ -181,7 +184,7 @@ fi
 INSTALL_PICAM=true
 if [[ "$INSTALL_PICAM" = true ]]; then
     # Create directories and symbolic links
-    sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $PERMISSIONS $BM_PICAM_DIR{,/archive} $BM_SHAREDMEM_DIR/{rec,hooks,state}
+    sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $READ_PERMISSIONS $BM_PICAM_DIR{,/archive} $BM_SHAREDMEM_DIR/{rec,hooks,state}
 
     ln -sfn {$BM_PICAM_DIR,$BM_SHAREDMEM_DIR/rec}/archive
     ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/rec
@@ -194,7 +197,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     sudo chown $SERVER_USER:$WEB_GROUP $BM_PICAM_LOG_PATH
 
     echo "#!/bin/bash
-sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
+sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $READ_PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
 " > $BM_PICAM_DIR/create_sharedmem_dirs.sh
 
     # Install picam binary
@@ -307,8 +310,12 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     sudo adduser $SERVER_USER $WEB_GROUP
 
     # Ensure permissions are correct in project folder
-    sudo chmod -R $PERMISSIONS $BM_DIR
+    sudo chmod -R $READ_PERMISSIONS $BM_DIR
     sudo chown -R $SERVER_USER:$WEB_GROUP $BM_DIR
+
+    # Create folders where the group has write permissions
+    mkdir -p $BM_SERVER_ACTION_DIR
+    sudo chmod $WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
 
     # Link site folder to default Apache site root
     sudo ln -s $BM_LINKED_SITE_DIR $BM_SITE_DIR

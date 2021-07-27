@@ -25,13 +25,16 @@ function redirectIfLoggedOut($destination) {
   }
 }
 
-function logout($destination) {
+function logout($destination, $exit_command = null) {
   session_start();
   session_destroy();
-  redirectTo($destination);
+  redirectTo($destination, $exit_command);
 }
 
-function redirectTo($destination) {
+function redirectTo($destination, $exit_command = null) {
   header('LOCATION:' . $destination);
+  if (!is_null($exit_command)) {
+    $exit_command();
+  }
   exit();
 }

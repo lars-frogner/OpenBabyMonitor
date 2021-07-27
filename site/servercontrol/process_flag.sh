@@ -2,7 +2,6 @@
 set -e
 
 SCRIPT_DIR=$(dirname $(readlink -f $0))
-FLAG_PATH=$SCRIPT_DIR/.flag
 
 AP_MODE_CMD=$SCRIPT_DIR/activate_ap_mode.sh
 CLIENT_MODE_CMD=$SCRIPT_DIR/activate_client_mode.sh
@@ -14,12 +13,12 @@ CLIENT_MODE_FLAG=activate_client_mode
 REBOOT_FLAG=reboot
 SHUTDOWN_FLAG=shutdown
 
-if [[ ! -f "$FLAG_PATH" ]]; then
+if [[ ! -f "$BM_SERVER_ACTION_FILE" ]]; then
     exit 0
 fi
 
-FLAG=$(cat $FLAG_PATH)
-rm $FLAG_PATH
+FLAG=$(cat $BM_SERVER_ACTION_FILE)
+rm $BM_SERVER_ACTION_FILE
 
 case $FLAG in
 

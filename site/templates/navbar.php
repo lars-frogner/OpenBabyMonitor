@@ -21,6 +21,12 @@
         <li class="nav-item">
           <a class="nav-link" href="logout.php">Logg ut</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="reboot.php">Restart</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="shutdown.php">Slå av</a>
+        </li>
       </ul>
     </div>
   </div>
