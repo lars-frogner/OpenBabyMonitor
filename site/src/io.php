@@ -12,3 +12,16 @@ function readJSON($filepath) {
   }
   return $json_data;
 }
+
+function readLines($filepath) {
+  $f = fopen($filepath, 'r');
+  if ($f) {
+    while (($line = fgets($f)) !== false) {
+      $lines[] = $line;
+    }
+    fclose($f);
+  } else {
+    bm_error("Could not open $filepath");
+  }
+  return $lines;
+}
