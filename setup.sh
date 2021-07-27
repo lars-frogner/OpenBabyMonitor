@@ -181,6 +181,18 @@ if [[ "$INSTALL_VIDEOJS" = true ]]; then
     cd -
 fi
 
+INSTALL_JQUERY=true
+if [[ "$INSTALL_JQUERY" = true ]]; then
+    JQUERY_VERSION=3.6.0
+    FILENAME=jquery-$JQUERY_VERSION.min.js
+    DOWNLOAD_URL=https://code.jquery.com/$FILENAME
+    cd /tmp
+    wget $DOWNLOAD_URL
+    mkdir -p $BM_LINKED_SITE_DIR/library
+    mv $FILENAME $BM_LINKED_SITE_DIR/library/jquery.min.js
+    cd -
+fi
+
 INSTALL_PICAM=true
 if [[ "$INSTALL_PICAM" = true ]]; then
     # Create directories and symbolic links
