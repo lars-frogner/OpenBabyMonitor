@@ -176,6 +176,26 @@ fi
 " > $SERVER_CONTROL_DIR/access_point_active.sh
 chmod +x $SERVER_CONTROL_DIR/access_point_active.sh
 
+echo "#!/bin/bash
+
+SERVER_CONTROL_DIR=$SERVER_CONTROL_DIR
+
+ACCESS_POINT_ACTIVE=\$(\$SERVER_CONTROL_DIR/access_point_active.sh)
+
+if [[ \"\$ACCESS_POINT_ACTIVE\" = \"0\" ]]; then
+
+    CONNECTED_TO_NETWORK=\$(\$SERVER_CONTROL_DIR/connected_to_external_network.sh)
+
+    if [[ \"\$CONNECTED_TO_NETWORK\" = \"0\" ]]; then
+        echo activate_ap_mode > \$SERVER_CONTROL_DIR/.hook/flag
+    fi
+fi
+" > $SERVER_CONTROL_DIR/ensure_connection.sh
+chmod +x $SERVER_CONTROL_DIR/ensure_connection.sh
+
+# Check connection every 5 minutes
+(crontab -l; echo "*/5 * * * * $SERVER_CONTROL_DIR/ensure_connection.sh") | crontab -
+
 # Start in access point mode
 echo "Start access point mode by running the following command:
 nohup $SERVER_CONTROL_DIR/activate_ap_mode.sh &
