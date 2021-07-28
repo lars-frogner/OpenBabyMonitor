@@ -43,7 +43,10 @@ function handleModeChangeResponse(checked_radio_id, checked_radio_value, respons
             setCurrentMode(checked_radio_value);
             break;
         default:
-            $('#' + ERROR_CONTENT_MESSAGE_ID).innerHTML = response_text;
+            if (response_text == '') {
+                response_text = 'An error occured on the server.'
+            }
+            $('#' + ERROR_CONTENT_MESSAGE_ID).html(response_text);
             setVisibleContent(ERROR_CONTENT_ID);
             break;
     }
@@ -51,22 +54,22 @@ function handleModeChangeResponse(checked_radio_id, checked_radio_value, respons
 
 function setDisabledForModeRadios(is_disabled) {
     MODE_RADIO_IDS.forEach(radio_id => {
-        $('#' + radio_id).disabled = is_disabled;
+        $('#' + radio_id).prop('disabled', is_disabled);
     });
 }
 
 function setVisibleContent(visible_content_id) {
-    const error_content = $('#' + ERROR_CONTENT_ID);
+    var error_content = $('#' + ERROR_CONTENT_ID);
     if (visible_content_id == ERROR_CONTENT_ID) {
-        showElement(error_content);
+        error_content.show();
     } else {
-        hideElement(error_content);
+        error_content.hide();
     }
-    const waiting_content = $('#' + WAITING_CONTENT_ID);
+    var waiting_content = $('#' + WAITING_CONTENT_ID);
     if (visible_content_id == WAITING_CONTENT_ID) {
-        showElement(waiting_content);
+        waiting_content.show();
     } else {
-        hideElement(waiting_content);
+        waiting_content.hide();
     }
     if (visible_content_id == MODE_CONTENT_VIDEO_ID) {
         show_video_stream_player();
@@ -74,11 +77,11 @@ function setVisibleContent(visible_content_id) {
         hide_video_stream_player();
     }
     MODE_CONTENT_IDS.forEach(content_id => {
-        const content = $('#' + content_id);
+        var content = $('#' + content_id);
         if (content_id == visible_content_id) {
-            showElement(content);
+            content.show();
         } else {
-            hideElement(content);
+            content.hide();
         }
     });
 }
@@ -94,18 +97,15 @@ function getContentIdByRadioId(radio_id) {
 }
 
 function create_video_element() {
-    var video_element = document.createElement('video');
-    video_element.id = VIDEO_STREAM_DIV_ID;
-    video_element.className = 'video-js vjs-default-skin vjs-big-play-centered vjs-fill';
-    video_element.controls = true;
-    hideElement(video_element);
-    $('#' + VIDEO_STREAM_PARENT_ID).appendChild(video_element);
-    videojs(video_element, { autoplay: 'now', preload: 'metadata', responsive: true }, function () {
+    var video_element = $('<video></video>')
+        .addClass('video-js vjs-default-skin vjs-big-play-centered vjs-fill')
+        .prop({ id: VIDEO_STREAM_DIV_ID, controls: true })
+        .hide();
+    $('#' + VIDEO_STREAM_PARENT_ID).append(video_element);
+    videojs(video_element.get(0), { autoplay: 'now', preload: 'metadata', responsive: true }, function () {
         this.src({ src: VIDEO_STREAM_SRC, type: VIDEO_STREAM_TYPE });
-        var div_element = $('#' + VIDEO_STREAM_DIV_ID); // New parent element of the video element created by video-js
-        var video_element = $('#' + VIDEO_STREAM_ID); // The actual video element
-        showElement(div_element);
-        showElement(video_element);
+        $('#' + VIDEO_STREAM_DIV_ID).show(); // New parent element of the video element created by video-js
+        $('#' + VIDEO_STREAM_ID).show(); // The actual video element
     });
 }
 

@@ -31,7 +31,6 @@ require_once(TEMPLATES_PATH . '/bootstrap_js.php');
 require_once(TEMPLATES_PATH . '/jquery_js.php');
 ?>
 
-<script src="js/utils.js"></script>
 <script src="js/jquery_utils.js"></script>
 <script src="js/navbar_settings.js"></script>
 

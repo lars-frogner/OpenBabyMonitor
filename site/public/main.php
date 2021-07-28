@@ -89,15 +89,13 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   require_once(TEMPLATES_PATH . '/jquery_js.php');
   ?>
 
-  <script src="js/utils.js"></script>
-
   <script>
     function updateLogoutModalText(mode) {
       var modal_body = $('#' + LOGOUT_MODAL_ID + MODAL_BODY_ID_TAIL);
       if (mode != <?php echo STANDBY_MODE; ?>) {
-        showElement(modal_body);
+        modal_body.show();
       } else {
-        hideElement(modal_body);
+        modal_body.hide();
       }
     }
   </script>

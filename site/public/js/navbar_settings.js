@@ -1,22 +1,22 @@
 
 function actOnModalTexts(action) {
     [LOGOUT_MODAL_ID, REBOOT_MODAL_ID, SHUTDOWN_MODAL_ID].forEach(modal_id => {
-        action(document.getElementById(modal_id + MODAL_BODY_ID_TAIL));
+        action($('#' + modal_id + MODAL_BODY_ID_TAIL));
     });
     [AP_MODAL_ID, CLIENT_MODAL_ID].forEach(modal_id => {
-        var element = document.getElementById(modal_id + MODAL_BODY_TEXT_ID_TAIL);
-        if (element) {
+        var element = $('#' + modal_id + MODAL_BODY_TEXT_ID_TAIL);
+        if (element.length) {
             action(element);
         }
     });
 }
 
 function showModalTexts() {
-    actOnModalTexts(showElement);
+    actOnModalTexts(function (el) { el.show() });
 }
 
 function hideModalTexts() {
-    actOnModalTexts(hideElement);
+    actOnModalTexts(function (el) { el.hide() });
 }
 
 function updateModalTextsBasedOnFormChange(form_id) {
