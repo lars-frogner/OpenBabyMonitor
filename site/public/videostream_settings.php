@@ -2,6 +2,8 @@
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 
+$mode = readCurrentMode($_DATABASE);
+
 $table_name = 'videostream_settings';
 $setting_names = getColumnNames($_CONFIG['database']['tables'][$table_name]['types']);
 if (isset($_POST['submit'])) {
@@ -27,7 +29,10 @@ if (isset($_POST['submit'])) {
 
 <body>
   <header>
-    <?php require_once(TEMPLATES_PATH . '/navbar_settings.php'); ?>
+    <?php
+    require_once(TEMPLATES_PATH . '/navbar.php');
+    require_once(TEMPLATES_PATH . '/confirmation_modal.php');
+    ?>
   </header>
 
   <main>
@@ -59,11 +64,14 @@ require_once(TEMPLATES_PATH . '/bootstrap_js.php');
 require_once(TEMPLATES_PATH . '/jquery_js.php');
 ?>
 
-<script src="js/jquery_utils.js"></script>
-<script src="js/navbar_settings.js"></script>
-
 <script>
-  handleModalTexts('videostream_settings_form');
+  const SETTINGS_FORM_ID = 'videostream_settings_form';
+  const STANDBY_MODE = <?php echo STANDBY_MODE; ?>;
+  const INITIAL_MODE = <?php echo $mode; ?>;
 </script>
+<script src="js/jquery_utils.js"></script>
+<script src="js/confirmation_modal.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/navbar_settings.js"></script>
 
 </html>

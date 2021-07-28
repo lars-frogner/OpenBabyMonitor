@@ -1,46 +1,24 @@
+const SETTINGS_MODAL_WARNING_TEXT = 'Merk at du har endringer i innstillingene som ikke er lagret.';
+const settingsFormHasChanged = () => { return elementHasChangedSinceCapture(SETTINGS_FORM_ID); };
+const MODAL_ADDITIONAL_SETTER = { text: SETTINGS_MODAL_WARNING_TEXT, showText: settingsFormHasChanged };
+const LOGOUT_MODAL_WARNING_TEXT = 'Enheten står ikke i standby. Den vil fortsette i nåværende modus selv om du logger ut.';
 
-function actOnModalTexts(action) {
-    [LOGOUT_MODAL_ID, REBOOT_MODAL_ID, SHUTDOWN_MODAL_ID].forEach(modal_id => {
-        action($('#' + modal_id + MODAL_BODY_ID_TAIL));
-    });
-    [AP_MODAL_ID, CLIENT_MODAL_ID].forEach(modal_id => {
-        var element = $('#' + modal_id + MODAL_BODY_TEXT_ID_TAIL);
-        if (element.length) {
-            action(element);
-        }
-    });
-}
-
-function showModalTexts() {
-    actOnModalTexts(function (el) { el.show() });
-}
-
-function hideModalTexts() {
-    actOnModalTexts(function (el) { el.hide() });
-}
-
-function updateModalTextsBasedOnFormChange(form_id) {
-    if (elementHasChangedSinceCapture(form_id)) {
-        showModalTexts();
-    } else {
-        hideModalTexts()
-    }
-}
-
-function registerModalTextUpdate(form_id) {
-    [LOGOUT_NAV_LINK_ID, REBOOT_NAV_LINK_ID, SHUTDOWN_NAV_LINK_ID, AP_NAV_LINK_ID, CLIENT_NAV_LINK_ID].forEach(nav_link_id => {
-        $('#' + nav_link_id).click(function () {
-            updateModalTextsBasedOnFormChange(form_id);
-        });
-    });
-}
-
-function handleModalTexts(form_id) {
-    captureElementState(form_id);
-    updateModalTextsBasedOnFormChange(form_id);
-    $('#' + form_id).submit(function () {
-        captureElementState(form_id);
+$(function () {
+    $('#' + SETTINGS_FORM_ID).submit(function () {
+        captureElementState(SETTINGS_FORM_ID);
         return true;
     });
-    registerModalTextUpdate(form_id)
-}
+    captureElementState(SETTINGS_FORM_ID);
+    connectNavbarLinkToModal(MODES_NAV_LINK_ID, Object.assign({}, MODES_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
+    connectNavbarLinkToModal(LISTEN_SETTINGS_NAV_LINK_ID, Object.assign({}, LISTEN_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
+    connectNavbarLinkToModal(AUDIOSTREAM_SETTINGS_NAV_LINK_ID, Object.assign({}, AUDIOSTREAM_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
+    connectNavbarLinkToModal(VIDEOSTREAM_SETTINGS_NAV_LINK_ID, Object.assign({}, VIDEOSTREAM_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
+    connectNavbarLinkToModal(SERVER_SETTINGS_NAV_LINK_ID, Object.assign({}, SERVER_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
+    connectNavbarLinkToModal(LOGOUT_NAV_LINK_ID, LOGOUT_MODAL_BASE_PROPERTIES, [{ text: LOGOUT_MODAL_WARNING_TEXT, showText: () => { return INITIAL_MODE != STANDBY_MODE; } }, MODAL_ADDITIONAL_SETTER]);
+    connectNavbarLinkToModal(REBOOT_NAV_LINK_ID, REBOOT_MODAL_BASE_PROPERTIES, MODAL_ADDITIONAL_SETTER);
+    connectNavbarLinkToModal(SHUTDOWN_NAV_LINK_ID, SHUTDOWN_MODAL_BASE_PROPERTIES, MODAL_ADDITIONAL_SETTER);
+    connectNavbarLinkToModal(AP_NAV_LINK_ID, AP_MODAL_BASE_PROPERTIES, [AP_MODAL_BASE_BODY_SETTER, MODAL_ADDITIONAL_SETTER]);
+    connectNavbarLinkToModal(CLIENT_NAV_LINK_ID, CLIENT_MODAL_BASE_PROPERTIES, [CLIENT_MODAL_BASE_BODY_SETTER, MODAL_ADDITIONAL_SETTER]);
+    setDisabledForNavbar(false);
+});
+

@@ -1,6 +1,8 @@
 <?php
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
+
+$mode = readCurrentMode($_DATABASE);
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +16,10 @@ redirectIfLoggedOut('index.php');
 
 <body>
   <header>
-    <?php require_once(TEMPLATES_PATH . '/navbar_settings.php'); ?>
+    <?php
+    require_once(TEMPLATES_PATH . '/navbar.php');
+    require_once(TEMPLATES_PATH . '/confirmation_modal.php');
+    ?>
   </header>
 
   <main>
@@ -31,11 +36,14 @@ require_once(TEMPLATES_PATH . '/bootstrap_js.php');
 require_once(TEMPLATES_PATH . '/jquery_js.php');
 ?>
 
-<script src="js/jquery_utils.js"></script>
-<script src="js/navbar_settings.js"></script>
-
 <script>
-  handleModalTexts('server_settings_form');
+  const SETTINGS_FORM_ID = 'server_settings_form';
+  const STANDBY_MODE = <?php echo STANDBY_MODE; ?>;
+  const INITIAL_MODE = <?php echo $mode; ?>;
 </script>
+<script src="js/jquery_utils.js"></script>
+<script src="js/confirmation_modal.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/navbar_settings.js"></script>
 
 </html>

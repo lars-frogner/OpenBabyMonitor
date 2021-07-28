@@ -20,8 +20,8 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   <div class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
     <header>
       <?php
-      require_once(TEMPLATES_PATH . '/utils.php');
-      echo render(TEMPLATES_PATH . '/navbar.php', array('logout_text' => 'Enheten står ikke i standby. Den vil fortsette i nåværende modus selv om du logger ut.'));
+      require_once(TEMPLATES_PATH . '/navbar.php');
+      require_once(TEMPLATES_PATH . '/confirmation_modal.php');
       ?>
     </header>
 
@@ -58,9 +58,11 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
       <div id="mode_content_error" <?php echo HIDDEN_STYLE; ?>>
         <div class="d-flex flex-row justify-content-center text-center">
-          <span id="mode_content_error_message" class="alert alert-danger">Error
-          </span>
-          <a class=" btn btn-secondary" href="main.php">Refresh</a>
+          <div class="row">
+            <span id="mode_content_error_message" class="alert alert-danger">Error
+            </span>
+            <a class=" btn btn-secondary" href="main.php">Refresh</a>
+          </div>
         </div>
       </div>
 
@@ -68,16 +70,16 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
     <footer class="d-flex flex-grow-0 flex-shrink-1 justify-content-center">
       <div class="btn-group">
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_listen" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == LISTEN_MODE) ? 'checked' : '' ?> value="<?php echo LISTEN_MODE ?>">
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_listen" autocomplete="off" disabled <?php echo ($mode == LISTEN_MODE) ? 'checked' : '' ?> value="<?php echo LISTEN_MODE ?>">
         <label class="btn btn-outline-primary" for="mode_radio_listen">Listen</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_audio" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == AUDIOSTREAM_MODE) ? 'checked' : '' ?> value="<?php echo AUDIOSTREAM_MODE ?>">
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_audio" autocomplete="off" disabled <?php echo ($mode == AUDIOSTREAM_MODE) ? 'checked' : '' ?> value="<?php echo AUDIOSTREAM_MODE ?>">
         <label class="btn btn-outline-primary" for="mode_radio_audio">Audio</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_video" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == VIDEOSTREAM_MODE) ? 'checked' : '' ?> value="<?php echo VIDEOSTREAM_MODE ?>">
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_video" autocomplete="off" disabled <?php echo ($mode == VIDEOSTREAM_MODE) ? 'checked' : '' ?> value="<?php echo VIDEOSTREAM_MODE ?>">
         <label class="btn btn-outline-primary" for="mode_radio_video">Video</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_standby" autocomplete="off" onchange="requestModeChange(this);" <?php echo ($mode == STANDBY_MODE) ? 'checked' : '' ?> value="<?php echo STANDBY_MODE ?>">
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_standby" autocomplete="off" disabled <?php echo ($mode == STANDBY_MODE) ? 'checked' : '' ?> value="<?php echo STANDBY_MODE ?>">
         <label class="btn btn-outline-primary" for="mode_radio_standby">Standby</label>
       </div>
     </footer>
@@ -90,37 +92,14 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   ?>
 
   <script>
-    function updateLogoutModalText(mode) {
-      var modal_body = $('#' + LOGOUT_MODAL_ID + MODAL_BODY_ID_TAIL);
-      if (mode != <?php echo STANDBY_MODE; ?>) {
-        modal_body.show();
-      } else {
-        modal_body.hide();
-      }
-    }
+    const STANDBY_MODE = <?php echo STANDBY_MODE; ?>;
+    const VIDEOSTREAM_MODE = <?php echo VIDEOSTREAM_MODE; ?>;
+    const INITIAL_MODE = <?php echo $mode; ?>;
   </script>
-
-  <script>
-    var _current_mode = <?php echo $mode; ?>;
-    updateLogoutModalText(_current_mode);
-
-    function setCurrentMode(mode) {
-      _current_mode = mode;
-      updateLogoutModalText(mode);
-    }
-
-    function getCurrentMode(mode) {
-      return _current_mode;
-    }
-  </script>
-
+  <script src="js/confirmation_modal.js"></script>
+  <script src="js/navbar.js"></script>
+  <script src="js/navbar_main.js"></script>
   <script src="js/main.js"></script>
-
-  <?php if ($mode == VIDEOSTREAM_MODE) { ?>
-    <script>
-      create_video_element();
-    </script>
-  <?php } ?>
 
 </body>
 

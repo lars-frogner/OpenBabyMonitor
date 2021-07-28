@@ -1,4 +1,3 @@
-
 function captureElementState(id) {
     $('#' + id).data('serialize', $('#' + id).serialize());
 }
