@@ -74,7 +74,8 @@
                 "activate_ap_mode": "echo activate_ap_mode > $BM_SERVER_ACTION_FILE",
                 "activate_client_mode": "echo activate_client_mode > $BM_SERVER_ACTION_FILE",
                 "reboot": "echo reboot > $BM_SERVER_ACTION_FILE",
-                "shutdown": "echo shutdown > $BM_SERVER_ACTION_FILE"
+                "shutdown": "echo shutdown > $BM_SERVER_ACTION_FILE",
+                "set_timestamp": "echo \"set_timestamp $TIMESTAMP\" > $BM_SERVER_ACTION_FILE"
             }
         }
     },
