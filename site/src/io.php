@@ -17,7 +17,7 @@ function readLines($filepath) {
   $f = fopen($filepath, 'r');
   if ($f) {
     while (($line = fgets($f)) !== false) {
-      $lines[] = $line;
+      $lines[] = str_replace("\n", '', $line);
     }
     fclose($f);
   } else {
