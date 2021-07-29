@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__DIR__) . '/config/error_config.php');
+require_once(dirname(__DIR__) . '/config/env_config.php');
 require_once(dirname(__DIR__) . '/config/control_config.php');
 require_once(__DIR__ . '/database.php');
 
@@ -73,13 +74,13 @@ function switchMode($database, $new_mode) {
   return MODE_SWITCH_OK;
 }
 
-function executeServerControlAction($action) {
+function executeServerControlAction($action, $argument_env_name = null, $argument_value = null) {
   if (!key_exists($action, SERVER_ACTION_COMMANDS)) {
     bm_error("Invalid server action $action");
   }
   $output = null;
   $result_code = null;
-  exec(ENVVAR_ASSIGNMENT . SERVER_ACTION_COMMANDS[$action], $output, $result_code);
+  exec(ENVVAR_ASSIGNMENT . ((is_null($argument_env_name) || is_null($argument_value)) ? '' : "$argument_env_name=$argument_value; ") . SERVER_ACTION_COMMANDS[$action], $output, $result_code);
   if ($result_code != 0) {
     bm_error("Server action command failed with error code $result_code:\n" . join("\n", $output));
   }
