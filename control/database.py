@@ -19,6 +19,9 @@ class Database:
 
         self.cursor = self.connection.cursor(dictionary=True)
 
+    def __enter__(self):
+        return self
+
     def update_values_in_table(self,
                                table_name,
                                column_values,
@@ -64,5 +67,5 @@ class Database:
     def close(self):
         self.connection.close()
 
-    def __del__(self):
+    def __exit__(self, *args):
         self.close()

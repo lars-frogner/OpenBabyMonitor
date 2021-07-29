@@ -6,7 +6,9 @@ MODE = 'standby'
 
 
 def set_standby():
-    control.update_mode_in_database(MODE)
+    config = control.get_config()
+    with control.get_database(config) as database:
+        control.update_mode_in_database(MODE, config, database)
 
 
 if __name__ == '__main__':
