@@ -10,6 +10,12 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 <html>
 
 <head>
+  <script>
+    const SERVER_TIMESTAMP = <?php echo microtime(true); ?> * 1e3; // Milliseconds
+    const CLIENT_TIMESTAMP = Date.now(); // Milliseconds
+  </script>
+  <script src="js/sync_time.js"></script>
+
   <?php
   require_once(TEMPLATES_PATH . '/head_common.php');
   require_once(TEMPLATES_PATH . '/video-js_css.php');
