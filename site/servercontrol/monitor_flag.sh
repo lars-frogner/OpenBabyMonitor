@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 SCRIPT_DIR=$(dirname $(readlink -f $0))
 FLAG_FILENAME=$(basename $BM_SERVER_ACTION_FILE)
