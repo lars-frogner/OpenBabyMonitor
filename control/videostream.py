@@ -13,7 +13,23 @@ def stream_video():
     control.enter_mode(MODE, stream_video_with_settings)
 
 
-def stream_video_with_settings(vertical_resolution=720, capture_audio=True):
+def stream_video_with_settings(vertical_resolution=720,
+                               framerate=30,
+                               use_variable_framerate=False,
+                               rotation=0,
+                               flip_horizontally=False,
+                               flip_vertically=False,
+                               exposure_mode='off',
+                               metering='average',
+                               exposure_value_compensation=0,
+                               exposure_time=None,
+                               iso=None,
+                               white_balance_mode='auto',
+                               red_gain=None,
+                               blue_gain=None,
+                               capture_audio=True,
+                               volume=1.0,
+                               show_time=True):
     mic_id = os.environ['BM_MIC_ID']
     picam_path = os.environ['BM_PICAM_DIR']
     picam_log_path = os.environ['BM_PICAM_LOG_PATH']

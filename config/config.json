@@ -74,11 +74,189 @@
         "client": "Managed"
     },
     "videostream_settings": {
-    "vertical_resolution": {
-        "values": {
-            "480p": 480,
-            "720p": 720,
-            "1080p": 1080
+        "vertical_resolution": {
+            "group": "quality",
+            "name": "vertical_resolution",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 720,
+            "values": {
+                "480p": 480,
+                "720p": 720,
+                "1080p": 1080
+            }
+        },
+        "framerate": {
+            "group": "video",
+            "name": "framerate",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 30,
+            "range": {
+                "min": 1,
+                "max": 60,
+                "step": 1
+            }
+        },
+        "use_variable_framerate": {
+            "group": "video",
+            "name": "use_variable_framerate",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": false
+        },
+        "rotation": {
+            "group": "orientation",
+            "name": "rotation",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 0,
+            "values": {
+                "0°": 0,
+                "90°": 90,
+                "180°": 180,
+                "270°": 270
+            }
+        },
+        "flip_horizontally": {
+            "group": "orientation",
+            "name": "flip_horizontally",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": false
+        },
+        "flip_vertically": {
+            "group": "orientation",
+            "name": "flip_vertically",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": false
+        },
+        "exposure_mode": {
+            "group": "brightness",
+            "name": "exposure_mode",
+            "type": "VARCHAR(12) NOT NULL",
+            "initial_value": "off",
+            "values": {
+                "off": "off",
+                "auto": "auto",
+                "night": "night",
+                "nightpreview": "nightpreview",
+                "backlight": "backlight",
+                "spotlight": "spotlight",
+                "sports": "sports",
+                "snow": "snow",
+                "beach": "beach",
+                "verylong": "verylong",
+                "fixedfps": "fixedfps",
+                "antishake": "antishake",
+                "fireworks": "fireworks",
+                "largeaperture": "largeaperture",
+                "smallaperture": "smallaperture"
+            }
+        },
+        "metering": {
+            "group": "brightness",
+            "name": "metering",
+            "type": "VARCHAR(7) NOT NULL",
+            "initial_value": "average",
+            "values": {
+                "average": "average",
+                "spot": "spot",
+                "matrix": "matrix",
+                "backlit": "backlit"
+            }
+        },
+        "exposure_value_compensation": {
+            "group": "brightness",
+            "name": "exposure_value_compensation",
+            "type": "INT NOT NULL",
+            "initial_value": 0,
+            "range": {
+                "min": -24,
+                "max": 24,
+                "step": 0.2
+            }
+        },
+        "exposure_time": {
+            "group": "brightness",
+            "name": "exposure_time",
+            "type": "INT UNSIGNED",
+            "initial_value": null,
+            "range": {
+                "min": 2,
+                "max": 1000,
+                "step": 2
+            }
+        },
+        "iso": {
+            "group": "brightness",
+            "name": "iso",
+            "type": "INT UNSIGNED",
+            "initial_value": null,
+            "range": {
+                "min": 100,
+                "max": 800,
+                "step": 10
+            }
+        },
+        "white_balance_mode": {
+            "group": "color",
+            "name": "white_balance_mode",
+            "type": "VARCHAR(12) NOT NULL",
+            "initial_value": "auto",
+            "values": {
+                "off": "off",
+                "auto": "auto",
+                "sun": "sun",
+                "cloudy": "cloudy",
+                "shade": "shade",
+                "tungsten": "tungsten",
+                "fluorescent": "fluorescent",
+                "incandescent": "incandescent",
+                "flash": "flash",
+                "horizon": "horizon",
+                "greyworld": "greyworld"
+            }
+        },
+        "red_gain": {
+            "group": "color",
+            "name": "red_gain",
+            "type": "FLOAT",
+            "initial_value": null,
+            "range": {
+                "min": 0.0,
+                "max": 8.0,
+                "step": 0.1
+            }
+        },
+        "blue_gain": {
+            "group": "color",
+            "name": "blue_gain",
+            "type": "FLOAT",
+            "initial_value": null,
+            "range": {
+                "min": 0.0,
+                "max": 8.0,
+                "step": 0.1
+            }
+        },
+        "capture_audio": {
+            "group": "audio",
+            "name": "capture_audio",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "volume": {
+            "group": "audio",
+            "name": "volume",
+            "type": "FLOAT NOT NULL",
+            "initial_value": 1.0,
+            "range": {
+                "min": 0.1,
+                "max": 10.0,
+                "step": 0.1
+            }
+        },
+        "show_time": {
+            "group": "info",
+            "name": "show_time",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
         }
     }
 }
