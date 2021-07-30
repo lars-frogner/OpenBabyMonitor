@@ -9,13 +9,12 @@ $mode = readCurrentMode($_DATABASE);
 $setting_type = 'videostream';
 $table_name = $setting_type . '_settings';
 if (isset($_POST['submit'])) {
+  $settings_edited = true;
   unset($_POST['submit']);
   $values = convertSettingValues($setting_type, $_POST);
   updateValuesInTable($_DATABASE, $table_name, withPrimaryKey($values));
-  if ($mode == MODE_VALUES[$setting_type]) {
-    restartCurrentMode($_DATABASE);
-  }
 } else {
+  $settings_edited = false;
   $values = readValuesFromTable($_DATABASE, $table_name, readTableColumnNamesFromConfig($table_name));
 }
 ?>
@@ -55,9 +54,12 @@ require_once(TEMPLATES_PATH . '/jquery_js.php');
 
 <script>
   const SETTINGS_FORM_ID = 'videostream_settings_form';
+  const SETTINGS_EDITED = <?php echo $settings_edited ? 'true' : 'false'; ?>;
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
+  const SITE_MODE = <?php echo MODE_VALUES[$setting_type]; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
 </script>
+<script src="js/settings.js"></script>
 <script src="js/jquery_utils.js"></script>
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>

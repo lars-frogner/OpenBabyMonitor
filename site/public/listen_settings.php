@@ -41,6 +41,7 @@ require_once(TEMPLATES_PATH . '/jquery_js.php');
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
 </script>
+<script src="js/settings.js"></script>
 <script src="js/jquery_utils.js"></script>
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
