@@ -20,7 +20,7 @@ function generateInputs($setting_type, $setting_values) {
 }
 
 function generateSelect($setting, $setting_name, $initial_value) {
-  $id = $setting_name . '_select';
+  $id = $setting_name;
   $name = $setting['name'];
   $values = $setting['values'];
 
@@ -36,7 +36,7 @@ function generateSelect($setting, $setting_name, $initial_value) {
 }
 
 function generateRange($setting, $setting_name, $initial_value) {
-  $id = $setting_name . '_range';
+  $id = $setting_name;
   $value_id = $id . '_value';
   $name = $setting['name'];
   $min = $setting['range']['min'];
@@ -47,7 +47,7 @@ function generateRange($setting, $setting_name, $initial_value) {
   line("  <label class=\"form-label\" for=\"$id\">$name</label>");
   line('  <div class="row">');
   line('    <div class="col-sm-11">');
-  line("      <input type=\"range\" name=\"$setting_name\" class=\"form-range\" value=\"$initial_value\" min=\"$min\" max=\"$max\" step=\"$step\" id=\"$id \" oninput=\"$('#' + '$value_id').value = this.value;\">");
+  line("      <input type=\"range\" name=\"$setting_name\" class=\"form-range\" value=\"$initial_value\" min=\"$min\" max=\"$max\" step=\"$step\" id=\"$id\" oninput=\"$('#' + '$value_id').value = this.value;\">");
   line('    </div>');
   line("    <output class=\"col-sm-1\" id=\"$value_id\">$initial_value</output>");
   line('  </div>');
@@ -55,7 +55,7 @@ function generateRange($setting, $setting_name, $initial_value) {
 }
 
 function generateCheckbox($setting, $setting_name, $initial_value) {
-  $id = $setting_name . '_check';
+  $id = $setting_name;
   $name = $setting['name'];
   $value = $initial_value ? ' checked' : '';
   line('<div class="mb-3 form-check">');
