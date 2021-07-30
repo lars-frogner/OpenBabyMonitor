@@ -45,15 +45,18 @@ nohook wpa_supplicant
 " >> $AP_DIR/etc/dhcpcd.conf
 
 # Set static IP for client mode
-CLIENT_IP=$(ip -o -4 addr list $INTERFACE | awk '{print $4}' | cut -d/ -f1)
-ROUTER_IP=$(ip r | grep default | sed -n "s/^default via \([0-9\.]*\).*$/\1/p")
-DNS_IP=$(sudo sed -n "s/^nameserver \([0-9\.]*\).*$/\1/p" /etc/resolv.conf | head -n 1)
-echo "
-interface $INTERFACE
-static ip_address=$CLIENT_IP/24
-static routers=$ROUTER_IP
-static domain_name_servers=$DNS_IP
-" >> $CLIENT_DIR/etc/dhcpcd.conf
+STATIC_IP=false
+if [[ "$STATIC_IP" = true ]]; then
+    CLIENT_IP=$(ip -o -4 addr list $INTERFACE | awk '{print $4}' | cut -d/ -f1)
+    ROUTER_IP=$(ip r | grep default | sed -n "s/^default via \([0-9\.]*\).*$/\1/p")
+    DNS_IP=$(sudo sed -n "s/^nameserver \([0-9\.]*\).*$/\1/p" /etc/resolv.conf | head -n 1)
+    echo "
+    interface $INTERFACE
+    static ip_address=$CLIENT_IP/24
+    static routers=$ROUTER_IP
+    static domain_name_servers=$DNS_IP
+    " >> $CLIENT_DIR/etc/dhcpcd.conf
+fi
 
 # Backup dnsmasq.conf
 sudo mv -v {,$ORIG_DIR}/etc/dnsmasq.conf
@@ -152,7 +155,7 @@ if [[ -z \"$(ip r | grep default)\" ]]; then
     exit
 fi
 ROUTER_IP=\$(ip r | grep default | sed -n \"s/^default via \([0-9\.]*\).*$/\1/p\")
-ping -c 1 \"\$ROUTER_IP\" > /dev/null 2>&1
+ping -c 20 \"\$ROUTER_IP\" > /dev/null 2>&1
 if [[ \"\$?\" = \"0\" ]]; then
     echo 1
 else
@@ -160,6 +163,11 @@ else
 fi
 " > $SERVER_CONTROL_DIR/connected_to_external_network.sh
 chmod +x $SERVER_CONTROL_DIR/connected_to_external_network.sh
+
+echo "#!/bin/bash
+echo \$(/usr/sbin/iwconfig $INTERFACE | grep Mode | sed -n \"s/.*Mode:\([A-Za-z-]*\).*/\1/p\")
+" > $SERVER_CONTROL_DIR/get_wireless_operating_mode.sh
+chmod +x $SERVER_CONTROL_DIR/get_wireless_operating_mode.sh
 
 echo "#!/bin/bash
 
@@ -184,17 +192,19 @@ ACCESS_POINT_ACTIVE=\$(\$SERVER_CONTROL_DIR/access_point_active.sh)
 
 if [[ \"\$ACCESS_POINT_ACTIVE\" = \"0\" ]]; then
 
-    CONNECTED_TO_NETWORK=\$(\$SERVER_CONTROL_DIR/connected_to_external_network.sh)
+    CONNECTED_TO_NETWORK_FIRST=\$(\$SERVER_CONTROL_DIR/connected_to_external_network.sh)
+    sleep 1m
+    CONNECTED_TO_NETWORK_SECOND=\$(\$SERVER_CONTROL_DIR/connected_to_external_network.sh)
 
-    if [[ \"\$CONNECTED_TO_NETWORK\" = \"0\" ]]; then
+    if [[ \"\$CONNECTED_TO_NETWORK_FIRST\" = \"0\" && \"\$CONNECTED_TO_NETWORK_SECOND\" = \"0\" ]]; then
         echo activate_ap_mode > \$SERVER_CONTROL_DIR/.hook/flag
     fi
 fi
 " > $SERVER_CONTROL_DIR/ensure_connection.sh
 chmod +x $SERVER_CONTROL_DIR/ensure_connection.sh
 
-# Check connection every 5 minutes
-(crontab -l; echo "*/5 * * * * $SERVER_CONTROL_DIR/ensure_connection.sh") | crontab -
+# Check connection every 10 minutes
+(crontab -l; echo "*/10 * * * * $SERVER_CONTROL_DIR/ensure_connection.sh") | crontab -
 
 # Start in access point mode
 echo "Start access point mode by running the following command:

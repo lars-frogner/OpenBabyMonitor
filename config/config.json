@@ -83,6 +83,11 @@
             "release": "touch $BM_MODE_LOCK_FILE"
         }
     },
+    "wireless_modes": {
+        "access_point": "Master",
+        "client": "Managed"
+    },
+    "videostream_settings": {
     "vertical_resolution": {
         "values": {
             "480p": 480,
