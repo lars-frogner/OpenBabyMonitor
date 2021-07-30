@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(dirname(__DIR__) . '/config/env_config.php');
+require_once(dirname(__DIR__) . '/config/database_config.php');
 require_once(dirname(__DIR__) . '/config/control_config.php');
 require_once(__DIR__ . '/database.php');
 
@@ -8,24 +9,67 @@ function readCurrentMode($database) {
   return readValuesFromTable($database, 'modes', 'current', true);
 }
 
+function acquireModeLock() {
+  waitForModeLock();
+  $output = null;
+  $result_code = null;
+  exec(ENVVAR_ASSIGNMENT . SERVER_LOCK_COMMANDS['acquire'], $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Lock acquisition command failed with error code $result_code:\n" . join("\n", $output));
+  }
+}
+
+function releaseModeLock() {
+  $output = null;
+  $result_code = null;
+  exec(ENVVAR_ASSIGNMENT . SERVER_LOCK_COMMANDS['release'], $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Lock release command failed with error code $result_code:\n" . join("\n", $output));
+  }
+}
+
+function waitForModeLock() {
+  $result = waitForFileToExist(getenv('BM_MODE_LOCK_FILE'));
+  if ($result == MODE_ACTION_TIMED_OUT) {
+    releaseModeLock();
+  }
+}
+
 function startMode($mode) {
-  if (!is_null(MODE_START_COMMANDS[$mode])) {
+  $mode_start_command = getModeAttributes('start_command', MODE_NAMES[$mode]);
+  if (!is_null($mode_start_command)) {
     $output = null;
     $result_code = null;
-    exec(MODE_START_COMMANDS[$mode], $output, $result_code);
+    exec($mode_start_command, $output, $result_code);
     if ($result_code != 0) {
+      releaseModeLock();
       bm_error("Request for mode start failed with error code $result_code:\n" . join("\n", $output));
     }
   }
 }
 
 function stopMode($mode) {
-  if (!is_null(MODE_STOP_COMMANDS[$mode])) {
+  $mode_stop_command = getModeAttributes('stop_command', MODE_NAMES[$mode]);
+  if (!is_null($mode_stop_command)) {
     $output = null;
     $result_code = null;
-    exec(MODE_STOP_COMMANDS[$mode], $output, $result_code);
+    exec($mode_stop_command, $output, $result_code);
     if ($result_code != 0) {
+      releaseModeLock();
       bm_error("Request for mode stop failed with error code $result_code:\n" . join("\n", $output));
+    }
+  }
+}
+
+function restartMode($mode) {
+  $mode_restart_command = getModeAttributes('restart_command', MODE_NAMES[$mode]);
+  if (!is_null($mode_restart_command)) {
+    $output = null;
+    $result_code = null;
+    exec($mode_restart_command, $output, $result_code);
+    if ($result_code != 0) {
+      releaseModeLock();
+      bm_error("Request for mode restart failed with error code $result_code:\n" . join("\n", $output));
     }
   }
 }
@@ -36,17 +80,31 @@ function waitForModeSwitch($database, $new_mode) {
     usleep(MODE_QUERY_INTERVAL);
     $elapsed_time += MODE_QUERY_INTERVAL;
     if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
-      updateCurrentMode($database, STANDBY_MODE);
+      updateCurrentMode($database, MODE_VALUES['standby']);
+      releaseModeLock();
       bm_error('Request for mode switch timed out');
     }
   }
 }
 
 function updateCurrentMode($database, $new_mode) {
-  updateValuesInTable($database, 'modes', createColumnValueMap('current', $new_mode));
+  updateValuesInTable($database, 'modes', withPrimaryKey(array('current' => $new_mode)));
 }
 
-function waitForFile($file_path) {
+function waitForFileToExist($file_path) {
+  $elapsed_time = 0;
+  while (!file_exists($file_path)) {
+    usleep(MODE_QUERY_INTERVAL);
+    $elapsed_time += MODE_QUERY_INTERVAL;
+    if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
+      bm_warning("Wait for creation of $file_path timed out");
+      return MODE_ACTION_TIMED_OUT;
+    }
+  }
+  return MODE_ACTION_OK;
+}
+
+function waitForFileUpdate($file_path) {
   $initial_timestamp = time();
   $elapsed_time = 0;
   while (!file_exists($file_path) || filemtime($file_path) <= $initial_timestamp) {
@@ -54,24 +112,32 @@ function waitForFile($file_path) {
     $elapsed_time += MODE_QUERY_INTERVAL;
     if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
       bm_warning("Wait for update of $file_path timed out");
-      return;
+      return MODE_ACTION_TIMED_OUT;
     }
   }
+  return MODE_ACTION_OK;
 }
 
-function switchMode($database, $new_mode) {
+function switchMode($database, $new_mode, $skip_if_same = true) {
   $current_mode = readCurrentMode($database);
-  if ($current_mode == $new_mode) {
-    return MODE_SWITCH_OK;
+  if ($current_mode == $new_mode && ($skip_if_same || $current_mode == MODE_VALUES['standby'])) {
+    return MODE_ACTION_OK;
   }
+  acquireModeLock();
   stopMode($current_mode);
-  waitForModeSwitch($database, STANDBY_MODE);
+  waitForModeSwitch($database, MODE_VALUES['standby']);
   startMode($new_mode);
   waitForModeSwitch($database, $new_mode);
-  if (!is_null(MODE_WAIT_FOR_FILE_PATHS[$new_mode])) {
-    waitForFile(MODE_WAIT_FOR_FILE_PATHS[$new_mode]);
+  $wait_for_file_path = getWaitForFilePath(MODE_NAMES[$new_mode]);
+  if (!is_null($wait_for_file_path)) {
+    waitForFileUpdate($wait_for_file_path);
   }
-  return MODE_SWITCH_OK;
+  releaseModeLock();
+  return MODE_ACTION_OK;
+}
+
+function restartCurrentMode($database) {
+  switchMode($database, readCurrentMode($database), false);
 }
 
 function executeServerControlAction($action, $argument_env_name = null, $argument_value = null) {

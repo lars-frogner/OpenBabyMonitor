@@ -2,6 +2,7 @@
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 
+waitForModeLock();
 $mode = readCurrentMode($_DATABASE);
 define('HIDDEN_STYLE', 'style="display: none;"');
 ?>

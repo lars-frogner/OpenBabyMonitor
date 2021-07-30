@@ -54,6 +54,8 @@ BM_PICAM_LINKED_STREAM_DIR=$BM_LINKED_SITE_DIR/hls
 BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
 BM_SERVER_ACTION_DIR=$BM_DIR/site/servercontrol/.hook
 BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
+BM_MODE_LOCK_DIR=$BM_DIR/control/.lock
+BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/free
 
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
@@ -68,6 +70,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_DIR=$BM_SERVER_ACTION_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_MODE_LOCK_FILE=$BM_MODE_LOCK_FILE" >> $BM_ENV_EXPORTS_PATH
 
     # Copy environment variables (without 'export') into environment file for services and PHP
     ENV_VAR_EXPORTS=$(cat $BM_ENV_EXPORTS_PATH)
@@ -326,8 +329,9 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     sudo chown -R $SERVER_USER:$WEB_GROUP $BM_DIR
 
     # Create folders where the group has write permissions
-    mkdir -p $BM_SERVER_ACTION_DIR
+    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR
     sudo chmod $WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
+    sudo chmod $WRITE_PERMISSIONS $BM_MODE_LOCK_DIR
 
     # Link site folder to default Apache site root
     sudo ln -s $BM_LINKED_SITE_DIR $BM_SITE_DIR

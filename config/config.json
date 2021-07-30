@@ -77,6 +77,10 @@
                 "shutdown": "echo shutdown > $BM_SERVER_ACTION_FILE",
                 "set_timestamp": "echo \"set_timestamp $TIMESTAMP\" > $BM_SERVER_ACTION_FILE"
             }
+        },
+        "lock_commands": {
+            "acquire": "rm -f $BM_MODE_LOCK_FILE",
+            "release": "touch $BM_MODE_LOCK_FILE"
         }
     },
     "vertical_resolution": {
