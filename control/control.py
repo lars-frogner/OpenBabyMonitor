@@ -17,11 +17,10 @@ def get_database(config):
 
 def read_settings(mode, config, database):
     table_name = mode + '_settings'
-    if table_name not in config['database']['tables']:
+    if table_name not in config:
         return {}
 
-    settings = list(config['database']['tables'][table_name]['types'].keys())
-    settings.remove('id')
+    settings = list(config[table_name].keys())
 
     values = database.read_values_from_table(table_name, settings)
 
@@ -30,7 +29,9 @@ def read_settings(mode, config, database):
 
 def update_mode_in_database(mode, config, database):
     database.update_values_in_table(
-        'modes', dict(id=0, current=config['modes'][mode]['value']))
+        'modes',
+        dict(id=0,
+             current=config['modes']['current']['values'][mode]['value']))
 
 
 def handle_shutdown(*args):

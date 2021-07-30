@@ -34,24 +34,24 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
     <main id="main" class="d-flex flex-column flex-grow-1 overflow-auto justify-content-center">
 
-      <div id="mode_content_listen" <?php echo ($mode != LISTEN_MODE) ? HIDDEN_STYLE : '' ?>>
+      <div id="mode_content_listen" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : '' ?>>
         <div class="d-flex flex-row justify-content-center">
           <p>Listen</p>
         </div>
       </div>
 
-      <div id="mode_content_audio" <?php echo ($mode != AUDIOSTREAM_MODE) ? HIDDEN_STYLE : '' ?>>
+      <div id="mode_content_audio" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
         <div class="d-flex flex-row justify-content-center">
           <p>Audio</p>
         </div>
       </div>
 
-      <div id="mode_content_video" class="h-100" <?php echo ($mode != VIDEOSTREAM_MODE) ? HIDDEN_STYLE : '' ?>>
+      <div id="mode_content_video" class="h-100" <?php echo ($mode != MODE_VALUES['videostream']) ? HIDDEN_STYLE : '' ?>>
         <div id="mode_content_video_box" class="d-flex flex-row justify-content-center h-100">
         </div>
       </div>
 
-      <div id="mode_content_standby" <?php echo ($mode != STANDBY_MODE) ? HIDDEN_STYLE : '' ?>>
+      <div id="mode_content_standby" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
         <div class="d-flex flex-row justify-content-center">
           <p>Standby</p>
         </div>
@@ -77,16 +77,16 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
     <footer class="d-flex flex-grow-0 flex-shrink-1 justify-content-center">
       <div class="btn-group">
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_listen" autocomplete="off" disabled <?php echo ($mode == LISTEN_MODE) ? 'checked' : '' ?> value="<?php echo LISTEN_MODE ?>">
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_listen" autocomplete="off" disabled <?php echo ($mode == MODE_VALUES['listen']) ? 'checked' : '' ?> value="<?php echo MODE_VALUES['listen'] ?>">
         <label class="btn btn-outline-primary" for="mode_radio_listen">Listen</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_audio" autocomplete="off" disabled <?php echo ($mode == AUDIOSTREAM_MODE) ? 'checked' : '' ?> value="<?php echo AUDIOSTREAM_MODE ?>">
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_audio" autocomplete="off" disabled <?php echo ($mode == MODE_VALUES['audiostream']) ? 'checked' : '' ?> value="<?php echo MODE_VALUES['audiostream'] ?>">
         <label class="btn btn-outline-primary" for="mode_radio_audio">Audio</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_video" autocomplete="off" disabled <?php echo ($mode == VIDEOSTREAM_MODE) ? 'checked' : '' ?> value="<?php echo VIDEOSTREAM_MODE ?>">
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_video" autocomplete="off" disabled <?php echo ($mode == MODE_VALUES['videostream']) ? 'checked' : '' ?> value="<?php echo MODE_VALUES['videostream'] ?>">
         <label class="btn btn-outline-primary" for="mode_radio_video">Video</label>
 
-        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_standby" autocomplete="off" disabled <?php echo ($mode == STANDBY_MODE) ? 'checked' : '' ?> value="<?php echo STANDBY_MODE ?>">
+        <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_standby" autocomplete="off" disabled <?php echo ($mode == MODE_VALUES['standby']) ? 'checked' : '' ?> value="<?php echo MODE_VALUES['standby'] ?>">
         <label class="btn btn-outline-primary" for="mode_radio_standby">Standby</label>
       </div>
     </footer>
@@ -99,8 +99,8 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   ?>
 
   <script>
-    const STANDBY_MODE = <?php echo STANDBY_MODE; ?>;
-    const VIDEOSTREAM_MODE = <?php echo VIDEOSTREAM_MODE; ?>;
+    const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
+    const VIDEOSTREAM_MODE = <?php echo MODE_VALUES['videostream']; ?>;
     const INITIAL_MODE = <?php echo $mode; ?>;
   </script>
   <script src="js/confirmation_modal.js"></script>

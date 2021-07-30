@@ -11,59 +11,45 @@
             "password": ""
         },
         "name": "babymonitor",
-        "tables": {
-            "videostream_settings": {
-                "types": {
-                    "id": "TINYINT UNSIGNED PRIMARY KEY",
-                    "vertical_resolution": "INT UNSIGNED NOT NULL",
-                    "capture_audio": "BOOLEAN NOT NULL"
-                },
-                "initial_values": {
-                    "id": 0,
-                    "vertical_resolution": 720,
-                    "capture_audio": true
-                }
-            },
-            "modes": {
-                "types": {
-                    "id": "TINYINT UNSIGNED PRIMARY KEY",
-                    "current": "TINYINT UNSIGNED NOT NULL"
-                },
-                "initial_values": {
-                    "id": 0,
-                    "current": 0
-                }
-            }
+        "key": {
+            "type": "TINYINT UNSIGNED PRIMARY KEY",
+            "value": 0
         }
     },
     "modes": {
-        "standby": {
-            "value": 0,
-            "start_command": "sudo systemctl start bm_standby",
-            "stop_command": null,
-            "restart_command": null,
-            "wait_for_file": null
-        },
-        "listen": {
-            "value": 1,
-            "start_command": "sudo systemctl start bm_listen",
-            "stop_command": "sudo systemctl stop bm_listen",
-            "restart_command": "sudo systemctl restart bm_listen",
-            "wait_for_file": null
-        },
-        "audiostream": {
-            "value": 2,
-            "start_command": "sudo systemctl start bm_audiostream",
-            "stop_command": "sudo systemctl stop bm_audiostream",
-            "restart_command": "sudo systemctl restart bm_audiostream",
-            "wait_for_file": null
-        },
-        "videostream": {
-            "value": 3,
-            "start_command": "sudo systemctl start bm_videostream",
-            "stop_command": "sudo systemctl stop bm_videostream",
-            "restart_command": "sudo systemctl restart bm_videostream",
-            "wait_for_file": "BM_PICAM_STREAM_FILE"
+        "current": {
+            "type": "TINYINT UNSIGNED NOT NULL",
+            "initial_value": 0,
+            "values": {
+                "standby": {
+                    "value": 0,
+                    "start_command": "sudo systemctl start bm_standby",
+                    "stop_command": null,
+                    "restart_command": null,
+                    "wait_for_file": null
+                },
+                "listen": {
+                    "value": 1,
+                    "start_command": "sudo systemctl start bm_listen",
+                    "stop_command": "sudo systemctl stop bm_listen",
+                    "restart_command": "sudo systemctl restart bm_listen",
+                    "wait_for_file": null
+                },
+                "audiostream": {
+                    "value": 2,
+                    "start_command": "sudo systemctl start bm_audiostream",
+                    "stop_command": "sudo systemctl stop bm_audiostream",
+                    "restart_command": "sudo systemctl restart bm_audiostream",
+                    "wait_for_file": null
+                },
+                "videostream": {
+                    "value": 3,
+                    "start_command": "sudo systemctl start bm_videostream",
+                    "stop_command": "sudo systemctl stop bm_videostream",
+                    "restart_command": "sudo systemctl restart bm_videostream",
+                    "wait_for_file": "BM_PICAM_STREAM_FILE"
+                }
+            }
         }
     },
     "control": {

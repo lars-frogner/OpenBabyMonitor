@@ -38,7 +38,7 @@ require_once(TEMPLATES_PATH . '/jquery_js.php');
 
 <script>
   const SETTINGS_FORM_ID = 'audiostream_settings_form';
-  const STANDBY_MODE = <?php echo STANDBY_MODE; ?>;
+  const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
 </script>
 <script src="js/jquery_utils.js"></script>

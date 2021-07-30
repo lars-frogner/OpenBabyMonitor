@@ -167,38 +167,3 @@ function readValuesFromTable($database, $table_name, $columns, $return_with_nume
   }
   return $result;
 }
-
-function getColumnNames($column_entries, $drop_id_column = true) {
-  if ($drop_id_column) {
-    unset($column_entries['id']);
-  }
-  return array_keys($column_entries);
-}
-
-function createColumnValueMap($columns, $values, $values_are_sequential = true, $include_id_column = true) {
-  if ($include_id_column) {
-    $column_values = array('id' => 0);
-  }
-  if (is_array($columns) && is_array($values)) {
-    if ($values_are_sequential) {
-      if (count($columns) != count($values)) {
-        bm_error('Number of column names and values must be the same');
-      }
-      for ($idx = 0; $idx < count($columns); $idx++) {
-        $column_values[$idx] = $values[$idx];
-      }
-    } else {
-      foreach ($columns as $name) {
-        if (!key_exists($name, $values)) {
-          bm_error("No value given for column $name");
-        }
-        $column_values[$name] = $values[$name];
-      }
-    }
-  } elseif (!is_array($columns) && !is_array($values)) {
-    $column_values[$columns] = $values;
-  } else {
-    bm_error('Number of column names and values must be the same');
-  }
-  return $column_values;
-}

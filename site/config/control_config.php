@@ -1,34 +1,33 @@
 <?php
 require_once(__DIR__ . '/config.php');
+require_once(__DIR__ . '/env_config.php');
 
-$_MODES_INFO = $_CONFIG['modes'];
-define('STANDBY_MODE', $_MODES_INFO['standby']['value']);
-define('LISTEN_MODE', $_MODES_INFO['listen']['value']);
-define('AUDIOSTREAM_MODE', $_MODES_INFO['audiostream']['value']);
-define('VIDEOSTREAM_MODE', $_MODES_INFO['videostream']['value']);
-
-define('MODE_VALUES', array('standby' => STANDBY_MODE, 'listen' => LISTEN_MODE, 'audiostream' => AUDIOSTREAM_MODE, 'videostream' => VIDEOSTREAM_MODE));
-
-$_MODE_START_COMMANDS = array();
-$_MODE_STOP_COMMANDS = array();
-$_MODE_RESTART_COMMANDS = array();
-$_MODE_WAIT_FOR_FILE_PATHS = array();
-foreach (MODE_VALUES as $mode => $value) {
-  $_MODE_START_COMMANDS[$value] = $_MODES_INFO[$mode]['start_command'];
-  $_MODE_STOP_COMMANDS[$value] = $_MODES_INFO[$mode]['stop_command'];
-  $_MODE_RESTART_COMMANDS[$value] = $_MODES_INFO[$mode]['restart_command'];
-  $wait_for_file_entry = $_MODES_INFO[$mode]['wait_for_file'];
-  if (!is_null($wait_for_file_entry) && getenv($wait_for_file_entry)) {
-    $wait_for_file_entry = getenv($wait_for_file_entry);
+function getModeAttributes($attribute_name, $mode_name = null, $converter = null) {
+  global $_CONFIG;
+  if (is_null($mode_name)) {
+    $attributes = array();
+    foreach ($_CONFIG['modes']['current']['values'] as $mode_name => $content) {
+      $attribute = $content[$attribute_name];
+      $attributes[$mode_name] = is_callable($converter) ? $converter($attribute) : $attribute;
+    }
+    return $attributes;
+  } else {
+    $attribute = $_CONFIG['modes']['current']['values'][$mode_name][$attribute_name];
+    return is_callable($converter) ? $converter($attribute) : $attribute;
   }
-  $_MODE_WAIT_FOR_FILE_PATHS[$value] = $wait_for_file_entry;
 }
-define('MODE_START_COMMANDS', $_MODE_START_COMMANDS);
-define('MODE_STOP_COMMANDS', $_MODE_STOP_COMMANDS);
-define('MODE_RESTART_COMMANDS', $_MODE_RESTART_COMMANDS);
-define('MODE_WAIT_FOR_FILE_PATHS', $_MODE_WAIT_FOR_FILE_PATHS);
 
-define('MODE_SWITCH_OK', 0);
+function getWaitForFilePath($mode_name) {
+  return getModeAttributes('wait_for_file', $mode_name, function ($f) {
+    return (!is_null($f) && getenv($f)) ? getenv($f) : $f;
+  });
+}
+
+define('MODE_VALUES', getModeAttributes('value'));
+define('MODE_NAMES', array_flip(MODE_VALUES));
+
+define('MODE_ACTION_OK', 0);
+define('MODE_ACTION_TIMED_OUT', 1);
 
 $_CONTROL_INFO = $_CONFIG['control'];
 define('MODE_QUERY_INTERVAL', intval($_CONTROL_INFO['mode_query_interval'] * 1e6)); // In microseconds

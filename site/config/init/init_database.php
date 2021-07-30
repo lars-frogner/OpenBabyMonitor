@@ -1,6 +1,7 @@
 <?php
 include_once(dirname(__DIR__) . '/error_config.php');
 include_once(dirname(__DIR__) . '/config.php');
+include_once(dirname(__DIR__) . '/database_config.php');
 require_once(SRC_PATH . '/database.php');
 require_once(SRC_PATH . '/security.php');
 
@@ -44,13 +45,11 @@ echo "Storing password hash in database $db_name\n";
 createPasswordTableIfMissing($database, strlen($hashed_password));
 storeHashedPassword($database, $hashed_password);
 
-foreach ($database_info['tables'] as $table_name => $table_info) {
+foreach (array('modes', 'videostream_settings') as $table_name) {
   echo "Creating table $table_name in database $db_name\n";
-  createTableIfMissing($database, $table_name, $table_info['types']);
-  if (array_key_exists('initial_values', $table_info)) {
-    echo "Writing initial values to table $table_name in database $db_name\n";
-    insertValuesIntoTable($database, $table_name, $table_info['initial_values']);
-  }
+  createTableIfMissing($database, $table_name, readTableColumnsTypesFromConfig($table_name));
+  echo "Writing initial values to table $table_name in database $db_name\n";
+  insertValuesIntoTable($database, $table_name, readTableInitialValuesFromConfig($table_name));
 }
 
 echo "Closing connection to database $db_name\n";
