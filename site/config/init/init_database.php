@@ -47,7 +47,7 @@ storeHashedPassword($database, $hashed_password);
 
 foreach (array('modes', 'videostream_settings') as $table_name) {
   echo "Creating table $table_name in database $db_name\n";
-  createTableIfMissing($database, $table_name, readTableColumnsTypesFromConfig($table_name));
+  createTableIfMissing($database, $table_name, readTableColumnsFromConfig($table_name));
   echo "Writing initial values to table $table_name in database $db_name\n";
   insertValuesIntoTable($database, $table_name, readTableInitialValuesFromConfig($table_name));
 }

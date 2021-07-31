@@ -10,7 +10,7 @@ function readTableColumnNamesFromConfig($table_name) {
   return array_keys($_CONFIG[$table_name]);
 }
 
-function readTableColumnsTypesFromConfig($table_name) {
+function readTableColumnsFromConfig($table_name) {
   global $_CONFIG;
   global $_DATABASE_INFO;
   $columns = array('id' => $_DATABASE_INFO['key']['type']);
