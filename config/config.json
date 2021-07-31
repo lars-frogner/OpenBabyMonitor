@@ -258,5 +258,14 @@
             "type": "BOOLEAN NOT NULL",
             "initial_value": true
         }
+    },
+    "videostream_groups": {
+        "quality": "quality",
+        "video": "video",
+        "orientation": "orientation",
+        "brightness": "brightness",
+        "color": "color",
+        "audio": "audio",
+        "info": "info"
     }
 }

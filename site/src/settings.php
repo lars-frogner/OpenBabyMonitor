@@ -30,3 +30,18 @@ function convertSettingValues($setting_type, $string_values) {
   }
   return $values;
 }
+
+function groupSettingValues($setting_type, $values) {
+  $group_names = getSettingGroups($setting_type);
+  $grouped_values = array();
+  foreach ($group_names as $group => $group_name) {
+    $settings_in_group = getSettingAttributes($setting_type, 'group', null, function ($attributes) use ($group) {
+      return $attributes['group'] == $group;
+    });
+    $grouped_values[$group] = array();
+    foreach ($settings_in_group as $setting_name => $group) {
+      $grouped_values[$group][$setting_name] = $values[$setting_name];
+    }
+  }
+  return $grouped_values;
+}

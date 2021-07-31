@@ -5,18 +5,32 @@ function line($string) {
   echo $string . "\n";
 }
 
-function generateInputs($setting_type, $setting_values) {
+function generateInputs($setting_type, $grouped_setting_values) {
   $settings = getSettings($setting_type);
-  foreach ($setting_values as $setting_name => $initial_value) {
-    $setting = $settings[$setting_name];
-    if (array_key_exists('values', $setting)) {
-      generateSelect($setting, $setting_name, $initial_value);
-    } elseif (array_key_exists('range', $setting)) {
-      generateRange($setting, $setting_name, $initial_value);
-    } else {
-      generateCheckbox($setting, $setting_name, $initial_value);
+  $group_names = getSettingGroups($setting_type);
+  foreach ($grouped_setting_values as $group => $content) {
+    generateGroupStart($group_names[$group]);
+    foreach ($content as $setting_name => $initial_value) {
+      $setting = $settings[$setting_name];
+      if (array_key_exists('values', $setting)) {
+        generateSelect($setting, $setting_name, $initial_value);
+      } elseif (array_key_exists('range', $setting)) {
+        generateRange($setting, $setting_name, $initial_value);
+      } else {
+        generateCheckbox($setting, $setting_name, $initial_value);
+      }
     }
+    generateGroupEnd();
   }
+}
+
+function generateGroupStart($name) {
+  line('<div class="col-lg">');
+  line("<h2>$name</h2>");
+}
+
+function generateGroupEnd() {
+  line('</div>');
 }
 
 function generateSelect($setting, $setting_name, $initial_value) {
@@ -25,6 +39,8 @@ function generateSelect($setting, $setting_name, $initial_value) {
   $values = $setting['values'];
 
   line('<div class="mb-3">');
+  line('  <div class="row">');
+  line('    <div class="col-10">');
   line("  <label class=\"form-label\" for=\"$id\">$name</label>");
   line("  <select name=\"$setting_name\" class=\"form-select\" id=\"$id\">");
   foreach ($values as $name => $value) {
@@ -32,6 +48,8 @@ function generateSelect($setting, $setting_name, $initial_value) {
     line("    <option value=\"$value\"$selected>$name</option>");
   }
   line('  </select>');
+  line('  </div>');
+  line('  </div>');
   line('</div>');
 }
 
@@ -45,11 +63,13 @@ function generateRange($setting, $setting_name, $initial_value) {
 
   line('<div class="mb-3">');
   line("  <label class=\"form-label\" for=\"$id\">$name</label>");
-  line('  <div class="row">');
-  line('    <div class="col-sm-11">');
+  line('  <div class="row flex-nowrap">');
+  line('    <div class="col-10">');
   line("      <input type=\"range\" name=\"$setting_name\" class=\"form-range\" value=\"$initial_value\" min=\"$min\" max=\"$max\" step=\"$step\" id=\"$id\" oninput=\"$('#' + '$value_id').prop('value', this.value);\">");
   line('    </div>');
-  line("    <output class=\"col-sm-1\" id=\"$value_id\">$initial_value</output>");
+  line('    <div class="col-1">');
+  line("      <output id=\"$value_id\">$initial_value</output>");
+  line('    </div>');
   line('  </div>');
   line('</div>');
 }

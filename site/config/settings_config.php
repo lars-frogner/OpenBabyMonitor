@@ -6,6 +6,11 @@ function getSettings($setting_type) {
   return $_CONFIG[$setting_type . '_settings'];
 }
 
+function getSettingGroups($setting_type) {
+  global $_CONFIG;
+  return $_CONFIG[$setting_type . '_groups'];
+}
+
 function getSettingAttributes($setting_type, $attribute_name, $setting_name = null, $filter = null) {
   if (is_null($setting_name)) {
     $attributes = array();

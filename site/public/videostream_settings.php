@@ -17,6 +17,7 @@ if (isset($_POST['submit'])) {
   $settings_edited = false;
   $values = readValuesFromTable($_DATABASE, $table_name, readTableColumnNamesFromConfig($table_name));
 }
+$grouped_values = groupSettingValues($setting_type, $values);
 ?>
 
 <!DOCTYPE html>
@@ -41,8 +42,14 @@ if (isset($_POST['submit'])) {
     <div class="container">
       <h1>Video settings</h1>
       <form id="videostream_settings_form" action="" method="post">
-        <?php generateInputs($setting_type, $values); ?>
-        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+        <div class='row'>
+          <?php generateInputs($setting_type, $grouped_values); ?>
+        </div>
+        <div class="row">
+          <div class='col'>
+            <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </div>
       </form>
   </main>
 </body>
