@@ -57,9 +57,20 @@ function generateRange($setting, $setting_name, $initial_value) {
 function generateCheckbox($setting, $setting_name, $initial_value) {
   $id = $setting_name;
   $name = $setting['name'];
-  $value = $initial_value ? ' checked' : '';
+  $name_attribute =
+    "name=\"$setting_name\"";
+  if ($initial_value) {
+    $checked = 'checked';
+    $hidden_input_name = '';
+    $checkbox_name = $name_attribute;
+  } else {
+    $checked = '';
+    $hidden_input_name =
+      $name_attribute;
+    $checkbox_name = '';
+  }
   line('<div class="mb-3 form-check">');
-  line("  <input type=\"checkbox\" name=\"$setting_name\" class=\"form-check-input\" id=\"$id\"$value>");
+  line("  <input type=\"hidden\" $hidden_input_name value=\"0\"><input type=\"checkbox\" class=\"form-check-input\" $checkbox_name value=\"1\" id=\"$id\" onclick=\"if (this.checked) { this.name = this.previousSibling.name; this.previousSibling.name = ''; } else { this.previousSibling.name = this.name; this.name = ''; }\"$checked>");
   line("  <label class=\"form-check-label\" for=\"$id\">$name</label>");
   line('</div>');
 }
