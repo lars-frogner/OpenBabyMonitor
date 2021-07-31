@@ -25,7 +25,7 @@ function generateInputs($setting_type, $grouped_setting_values) {
 }
 
 function generateGroupStart($name) {
-  line('<div class="col-lg">');
+  line('<div class="col-md">');
   line("<h2>$name</h2>");
 }
 
