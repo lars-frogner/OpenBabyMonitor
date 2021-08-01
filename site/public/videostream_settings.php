@@ -22,6 +22,7 @@ if (isset($_POST['submit'])) {
   $values = readValuesFromTable($_DATABASE, $table_name, readTableColumnNamesFromConfig($table_name));
 }
 $grouped_values = groupSettingValues($setting_type, $values);
+require_once(TEMPLATES_PATH . '/settings.php');
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +39,6 @@ $grouped_values = groupSettingValues($setting_type, $values);
     <?php
     require_once(TEMPLATES_PATH . '/navbar.php');
     require_once(TEMPLATES_PATH . '/confirmation_modal.php');
-    require_once(TEMPLATES_PATH . '/settings.php');
     ?>
   </header>
 
