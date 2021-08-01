@@ -6,7 +6,6 @@ const LOGOUT_MODAL_WARNING_TEXT = 'Enheten står ikke i standby. Den vil fortset
 $(function () {
     $('#' + SETTINGS_FORM_ID).submit(function () {
         captureElementState(SETTINGS_FORM_ID);
-        $(this).find(':input').prop('disabled', false);
         return true;
     });
     connectNavbarLinkToModal(MODES_NAV_LINK_ID, Object.assign({}, MODES_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);

@@ -99,14 +99,37 @@ function generateCheckbox($setting, $setting_name, $initial_value) {
 
 function generateBehavior($setting_type) {
   $disabled_when = getSettingAttributes($setting_type, 'disabled_when');
-  line('$(function() {');
+  $condition_statements = array();
   foreach ($disabled_when as $setting_name => $criteria) {
     foreach ($criteria as $id => $condition) {
       $operator = $condition['operator'];
       $value = $condition['value'];
-      line("$('#$id').change(function() { $('#$setting_name').prop('disabled', this.value $operator '$value'); });");
-      line("$('#$id').change();");
+      $condition_statement = "$('#$id').prop('value') $operator '$value'";
+      if (array_key_exists($setting_name, $condition_statements)) {
+        $condition_statements[$setting_name] = $condition_statements[$setting_name] . ' || ' . $condition_statement;
+      } else {
+        $condition_statements[$setting_name] =
+          $condition_statement;
+      }
     }
+  }
+  $change_statements = array();
+  foreach ($disabled_when as $setting_name => $criteria) {
+    $condition_statement = $condition_statements[$setting_name];
+    $setter_statement = "$('#$setting_name').prop('disabled', $condition_statement); ";
+    foreach ($criteria as $id => $condition) {
+      if (array_key_exists($id, $change_statements)) {
+        $change_statements[$id] = $change_statements[$id] . $setter_statement;
+      } else {
+        $change_statements[$id] =
+          $setter_statement;
+      }
+    }
+  }
+  line('$(function() {');
+  foreach ($change_statements as $id => $statement) {
+    line("$('#$id').change(function() { $statement });");
+    line("$('#$id').change();");
   }
   line('});');
 }

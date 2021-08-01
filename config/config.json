@@ -54,7 +54,7 @@
     },
     "control": {
         "mode_query_interval": 1e-2,
-        "mode_switch_timeout": 10.0,
+        "mode_switch_timeout": 15.0,
         "server_actions": {
             "commands": {
                 "activate_ap_mode": "echo activate_ap_mode > $BM_SERVER_ACTION_FILE",
@@ -76,7 +76,7 @@
     "videostream_settings": {
         "vertical_resolution": {
             "group": "quality",
-            "name": "vertical_resolution",
+            "name": "Vertikal oppløsning",
             "type": "INT UNSIGNED NOT NULL",
             "initial_value": 720,
             "values": {
@@ -87,18 +87,18 @@
         },
         "use_variable_framerate": {
             "group": "video",
-            "name": "use_variable_framerate",
+            "name": "Variabel bildefrekvens",
             "type": "BOOLEAN NOT NULL",
             "initial_value": true
         },
         "framerate": {
             "group": "video",
-            "name": "framerate",
+            "name": "Bildefrekvens",
             "type": "INT UNSIGNED NOT NULL",
             "initial_value": 30,
             "range": {
                 "min": 1,
-                "max": 60,
+                "max": 35,
                 "step": 1
             },
             "disabled_when": {
@@ -110,7 +110,7 @@
         },
         "rotation": {
             "group": "orientation",
-            "name": "rotation",
+            "name": "Rotasjon",
             "type": "INT UNSIGNED NOT NULL",
             "initial_value": 0,
             "values": {
@@ -122,49 +122,49 @@
         },
         "flip_horizontally": {
             "group": "orientation",
-            "name": "flip_horizontally",
+            "name": "Flipp horisontalt",
             "type": "BOOLEAN NOT NULL",
             "initial_value": false
         },
         "flip_vertically": {
             "group": "orientation",
-            "name": "flip_vertically",
+            "name": "Flipp vertikalt",
             "type": "BOOLEAN NOT NULL",
             "initial_value": false
         },
         "metering": {
             "group": "brightness",
-            "name": "metering",
+            "name": "Lysmåling",
             "type": "VARCHAR(7) NOT NULL",
             "initial_value": "average",
             "values": {
-                "average": "average",
-                "spot": "spot",
-                "matrix": "matrix",
-                "backlit": "backlit"
+                "Gjennomsnitt": "average",
+                "Punkt": "spot",
+                "Matrise": "matrix",
+                "Bakbelyst": "backlit"
             }
         },
         "exposure_mode": {
             "group": "brightness",
-            "name": "exposure_mode",
+            "name": "Eksponeringsmodus",
             "type": "VARCHAR(12) NOT NULL",
             "initial_value": "auto",
             "values": {
-                "off": "off",
-                "auto": "auto",
-                "night": "night",
-                "nightpreview": "nightpreview",
-                "backlight": "backlight",
-                "spotlight": "spotlight",
-                "sports": "sports",
-                "snow": "snow",
-                "beach": "beach",
-                "verylong": "verylong",
-                "fixedfps": "fixedfps",
-                "antishake": "antishake",
-                "fireworks": "fireworks",
-                "largeaperture": "largeaperture",
-                "smallaperture": "smallaperture"
+                "Auto": "auto",
+                "Manuell": "off",
+                "Natt": "night",
+                "Natt (rask)": "nightpreview",
+                "Bakbelyst": "backlight",
+                "Strobelys": "spotlight",
+                "Sport": "sports",
+                "Snø": "snow",
+                "Strand": "beach",
+                "Veldig lang": "verylong",
+                "Fast frekvens": "fixedfps",
+                "Antivibrasjon": "antishake",
+                "Fyrverkeri": "fireworks",
+                "Stor lysåpning": "largeaperture",
+                "Liten lysåpning": "smallaperture"
             },
             "disabled_when": {
                 "use_variable_framerate": {
@@ -175,7 +175,7 @@
         },
         "exposure_value_compensation": {
             "group": "brightness",
-            "name": "exposure_value_compensation",
+            "name": "Eksponeringskompensasjon",
             "type": "INT NOT NULL",
             "initial_value": 0,
             "range": {
@@ -187,12 +187,16 @@
                 "exposure_mode": {
                     "operator": "!=",
                     "value": "off"
+                },
+                "use_variable_framerate": {
+                    "operator": "==",
+                    "value": "0"
                 }
             }
         },
         "exposure_time": {
             "group": "brightness",
-            "name": "exposure_time",
+            "name": "Eksponeringstid (ms)",
             "type": "INT UNSIGNED",
             "initial_value": 100,
             "range": {
@@ -204,12 +208,16 @@
                 "exposure_mode": {
                     "operator": "!=",
                     "value": "off"
+                },
+                "use_variable_framerate": {
+                    "operator": "==",
+                    "value": "0"
                 }
             }
         },
         "iso": {
             "group": "brightness",
-            "name": "iso",
+            "name": "ISO",
             "type": "INT UNSIGNED",
             "initial_value": 400,
             "range": {
@@ -221,31 +229,35 @@
                 "exposure_mode": {
                     "operator": "!=",
                     "value": "off"
+                },
+                "use_variable_framerate": {
+                    "operator": "==",
+                    "value": "0"
                 }
             }
         },
         "white_balance_mode": {
             "group": "color",
-            "name": "white_balance_mode",
+            "name": "Hvitbalansemodus",
             "type": "VARCHAR(12) NOT NULL",
             "initial_value": "auto",
             "values": {
-                "off": "off",
-                "auto": "auto",
-                "sun": "sun",
-                "cloudy": "cloudy",
-                "shade": "shade",
-                "tungsten": "tungsten",
-                "fluorescent": "fluorescent",
-                "incandescent": "incandescent",
-                "flash": "flash",
-                "horizon": "horizon",
-                "greyworld": "greyworld"
+                "Auto": "auto",
+                "Manuell": "off",
+                "Dagslys": "sun",
+                "Overskyet": "cloudy",
+                "Skygge": "shade",
+                "Kunstlys": "tungsten",
+                "Lysstoffrør": "fluorescent",
+                "Glødepære": "incandescent",
+                "Blits": "flash",
+                "Horisont": "horizon",
+                "Gråskala": "greyworld"
             }
         },
         "red_gain": {
             "group": "color",
-            "name": "red_gain",
+            "name": "Rødt",
             "type": "FLOAT",
             "initial_value": 0.0,
             "range": {
@@ -262,7 +274,7 @@
         },
         "blue_gain": {
             "group": "color",
-            "name": "blue_gain",
+            "name": "Blått",
             "type": "FLOAT",
             "initial_value": 0.0,
             "range": {
@@ -278,14 +290,14 @@
             }
         },
         "capture_audio": {
-            "group": "audio",
+            "group": "Inkluder lyd",
             "name": "capture_audio",
             "type": "BOOLEAN NOT NULL",
             "initial_value": true
         },
         "volume": {
             "group": "audio",
-            "name": "volume",
+            "name": "Volum",
             "type": "FLOAT NOT NULL",
             "initial_value": 1.0,
             "range": {
@@ -296,18 +308,18 @@
         },
         "show_time": {
             "group": "info",
-            "name": "show_time",
+            "name": "Vis tidspunkt",
             "type": "BOOLEAN NOT NULL",
             "initial_value": true
         }
     },
     "videostream_groups": {
-        "quality": "quality",
-        "video": "video",
-        "orientation": "orientation",
-        "brightness": "brightness",
-        "color": "color",
-        "audio": "audio",
-        "info": "info"
+        "quality": "Kvalitet",
+        "video": "Video",
+        "orientation": "Orientering",
+        "brightness": "Lysstyrke",
+        "color": "Farge",
+        "audio": "Lyd",
+        "info": "Info"
     }
 }

@@ -11,8 +11,8 @@ $table_name = $setting_type . '_settings';
 if (isset($_POST['submit'])) {
   $settings_edited = true;
   unset($_POST['submit']);
-  $values = convertSettingValues($setting_type, $_POST);
-  updateValuesInTable($_DATABASE, $table_name, withPrimaryKey($values));
+  updateValuesInTable($_DATABASE, $table_name, withPrimaryKey(convertSettingValues($setting_type, $_POST)));
+  $values = readValuesFromTable($_DATABASE, $table_name, readTableColumnNamesFromConfig($table_name));
 } elseif (isset($_POST['reset'])) {
   $settings_edited = true;
   $values = readTableInitialValuesFromConfig($table_name);
@@ -44,15 +44,15 @@ $grouped_values = groupSettingValues($setting_type, $values);
 
   <main>
     <div class="container-fluid">
-      <h1 class="my-4">Video settings</h1>
+      <h1 class="my-4">Videoinnstillinger</h1>
       <form id="videostream_settings_form" action="" method="post">
         <div class='row'>
           <?php generateInputs($setting_type, $grouped_values); ?>
         </div>
         <div class="my-4">
-          <button type="submit" name="submit" class="btn btn-primary">Submit</button>
-          <button name="undo" class="btn btn-secondary" onclick="$('#videostream_settings_form').trigger('reset');">Undo</button>
-          <button type="submit" name="reset" class="btn btn-secondary">Reset</button>
+          <button type="submit" name="submit" class="btn btn-primary">Bekreft</button>
+          <button name="undo" class="btn btn-secondary" onclick="$('#videostream_settings_form').trigger('reset');">Angre</button>
+          <button type="submit" name="reset" class="btn btn-secondary">Tilbakestill</button>
         </div>
       </form>
     </div>
