@@ -93,9 +93,9 @@
         },
         "framerate": {
             "group": "video",
-            "name": "Bildefrekvens",
+            "name": "Bildefrekvens (Hz)",
             "type": "INT UNSIGNED NOT NULL",
-            "initial_value": 30,
+            "initial_value": 25,
             "range": {
                 "min": 1,
                 "max": 35,
@@ -198,10 +198,10 @@
             "group": "brightness",
             "name": "Eksponeringstid (ms)",
             "type": "INT UNSIGNED",
-            "initial_value": 100,
+            "initial_value": 200,
             "range": {
                 "min": 2,
-                "max": 1000,
+                "max": 2000,
                 "step": 2
             },
             "disabled_when": {
@@ -219,7 +219,7 @@
             "group": "brightness",
             "name": "ISO",
             "type": "INT UNSIGNED",
-            "initial_value": 400,
+            "initial_value": 800,
             "range": {
                 "min": 100,
                 "max": 800,
@@ -240,7 +240,7 @@
             "group": "color",
             "name": "Hvitbalansemodus",
             "type": "VARCHAR(12) NOT NULL",
-            "initial_value": "auto",
+            "initial_value": "greyworld",
             "values": {
                 "Auto": "auto",
                 "Manuell": "off",
@@ -259,7 +259,7 @@
             "group": "color",
             "name": "Rødt",
             "type": "FLOAT",
-            "initial_value": 0.0,
+            "initial_value": 1.0,
             "range": {
                 "min": 0.0,
                 "max": 8.0,
@@ -276,7 +276,7 @@
             "group": "color",
             "name": "Blått",
             "type": "FLOAT",
-            "initial_value": 0.0,
+            "initial_value": 1.5,
             "range": {
                 "min": 0.0,
                 "max": 8.0,
@@ -299,7 +299,7 @@
             "group": "audio",
             "name": "Volum",
             "type": "FLOAT NOT NULL",
-            "initial_value": 1.0,
+            "initial_value": 2.0,
             "range": {
                 "min": 0.1,
                 "max": 10.0,
