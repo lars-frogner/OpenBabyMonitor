@@ -8,4 +8,4 @@ $(function () {
     if (SETTINGS_EDITED && INITIAL_MODE == SITE_MODE) {
         requestModeRestart();
     }
-})
+});

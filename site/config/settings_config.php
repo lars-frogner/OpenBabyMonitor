@@ -15,10 +15,12 @@ function getSettingAttributes($setting_type, $attribute_name, $setting_name = nu
   if (is_null($setting_name)) {
     $attributes = array();
     foreach (getSettings($setting_type) as $setting_name => $content) {
-      $attribute =
-        $content[$attribute_name];
-      if (!is_callable($filter) || $filter($content)) {
-        $attributes[$setting_name] = $attribute;
+      if (array_key_exists($attribute_name, $content)) {
+        $attribute =
+          $content[$attribute_name];
+        if (!is_callable($filter) || $filter($content)) {
+          $attributes[$setting_name] = $attribute;
+        }
       }
     }
     return $attributes;

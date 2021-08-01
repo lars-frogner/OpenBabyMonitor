@@ -83,14 +83,30 @@ function generateCheckbox($setting, $setting_name, $initial_value) {
     $checked = 'checked';
     $hidden_input_name = '';
     $checkbox_name = $name_attribute;
+    $checkbox_value = '1';
   } else {
     $checked = '';
     $hidden_input_name =
       $name_attribute;
     $checkbox_name = '';
+    $checkbox_value = '0';
   }
   line('<div class="mb-3 form-check">');
-  line("  <input type=\"hidden\" $hidden_input_name value=\"0\"><input type=\"checkbox\" class=\"form-check-input\" $checkbox_name value=\"1\" id=\"$id\" onclick=\"if (this.checked) { this.name = this.previousSibling.name; this.previousSibling.name = ''; } else { this.previousSibling.name = this.name; this.name = ''; }\"$checked>");
+  line("  <input type=\"hidden\" $hidden_input_name value=\"0\"><input type=\"checkbox\" class=\"form-check-input\" $checkbox_name value=\"$checkbox_value\" id=\"$id\" onclick=\"if (this.checked) { this.value = 1; this.name = this.previousSibling.name; this.previousSibling.name = ''; } else { this.value = 0; this.previousSibling.name = this.name; this.name = ''; }\"$checked>");
   line("  <label class=\"form-check-label\" for=\"$id\">$name</label>");
   line('</div>');
+}
+
+function generateBehavior($setting_type) {
+  $disabled_when = getSettingAttributes($setting_type, 'disabled_when');
+  line('$(function() {');
+  foreach ($disabled_when as $setting_name => $criteria) {
+    foreach ($criteria as $id => $condition) {
+      $operator = $condition['operator'];
+      $value = $condition['value'];
+      line("$('#$id').change(function() { $('#$setting_name').prop('disabled', this.value $operator '$value'); });");
+      line("$('#$id').change();");
+    }
+  }
+  line('});');
 }

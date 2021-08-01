@@ -85,6 +85,12 @@
                 "1080p": 1080
             }
         },
+        "use_variable_framerate": {
+            "group": "video",
+            "name": "use_variable_framerate",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
         "framerate": {
             "group": "video",
             "name": "framerate",
@@ -94,13 +100,13 @@
                 "min": 1,
                 "max": 60,
                 "step": 1
+            },
+            "disabled_when": {
+                "use_variable_framerate": {
+                    "operator": "==",
+                    "value": "1"
+                }
             }
-        },
-        "use_variable_framerate": {
-            "group": "video",
-            "name": "use_variable_framerate",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": false
         },
         "rotation": {
             "group": "orientation",
@@ -126,11 +132,23 @@
             "type": "BOOLEAN NOT NULL",
             "initial_value": false
         },
+        "metering": {
+            "group": "brightness",
+            "name": "metering",
+            "type": "VARCHAR(7) NOT NULL",
+            "initial_value": "average",
+            "values": {
+                "average": "average",
+                "spot": "spot",
+                "matrix": "matrix",
+                "backlit": "backlit"
+            }
+        },
         "exposure_mode": {
             "group": "brightness",
             "name": "exposure_mode",
             "type": "VARCHAR(12) NOT NULL",
-            "initial_value": "off",
+            "initial_value": "auto",
             "values": {
                 "off": "off",
                 "auto": "auto",
@@ -147,18 +165,12 @@
                 "fireworks": "fireworks",
                 "largeaperture": "largeaperture",
                 "smallaperture": "smallaperture"
-            }
-        },
-        "metering": {
-            "group": "brightness",
-            "name": "metering",
-            "type": "VARCHAR(7) NOT NULL",
-            "initial_value": "average",
-            "values": {
-                "average": "average",
-                "spot": "spot",
-                "matrix": "matrix",
-                "backlit": "backlit"
+            },
+            "disabled_when": {
+                "use_variable_framerate": {
+                    "operator": "==",
+                    "value": "0"
+                }
             }
         },
         "exposure_value_compensation": {
@@ -170,28 +182,46 @@
                 "min": -24,
                 "max": 24,
                 "step": 0.2
+            },
+            "disabled_when": {
+                "exposure_mode": {
+                    "operator": "!=",
+                    "value": "off"
+                }
             }
         },
         "exposure_time": {
             "group": "brightness",
             "name": "exposure_time",
             "type": "INT UNSIGNED",
-            "initial_value": null,
+            "initial_value": 100,
             "range": {
                 "min": 2,
                 "max": 1000,
                 "step": 2
+            },
+            "disabled_when": {
+                "exposure_mode": {
+                    "operator": "!=",
+                    "value": "off"
+                }
             }
         },
         "iso": {
             "group": "brightness",
             "name": "iso",
             "type": "INT UNSIGNED",
-            "initial_value": null,
+            "initial_value": 400,
             "range": {
                 "min": 100,
                 "max": 800,
                 "step": 10
+            },
+            "disabled_when": {
+                "exposure_mode": {
+                    "operator": "!=",
+                    "value": "off"
+                }
             }
         },
         "white_balance_mode": {
@@ -217,22 +247,34 @@
             "group": "color",
             "name": "red_gain",
             "type": "FLOAT",
-            "initial_value": null,
+            "initial_value": 0.0,
             "range": {
                 "min": 0.0,
                 "max": 8.0,
                 "step": 0.1
+            },
+            "disabled_when": {
+                "white_balance_mode": {
+                    "operator": "!=",
+                    "value": "off"
+                }
             }
         },
         "blue_gain": {
             "group": "color",
             "name": "blue_gain",
             "type": "FLOAT",
-            "initial_value": null,
+            "initial_value": 0.0,
             "range": {
                 "min": 0.0,
                 "max": 8.0,
                 "step": 0.1
+            },
+            "disabled_when": {
+                "white_balance_mode": {
+                    "operator": "!=",
+                    "value": "off"
+                }
             }
         },
         "capture_audio": {

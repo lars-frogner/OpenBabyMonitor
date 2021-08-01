@@ -6,9 +6,9 @@ const LOGOUT_MODAL_WARNING_TEXT = 'Enheten står ikke i standby. Den vil fortset
 $(function () {
     $('#' + SETTINGS_FORM_ID).submit(function () {
         captureElementState(SETTINGS_FORM_ID);
+        $(this).find(':input').prop('disabled', false);
         return true;
     });
-    captureElementState(SETTINGS_FORM_ID);
     connectNavbarLinkToModal(MODES_NAV_LINK_ID, Object.assign({}, MODES_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
     connectNavbarLinkToModal(LISTEN_SETTINGS_NAV_LINK_ID, Object.assign({}, LISTEN_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
     connectNavbarLinkToModal(AUDIOSTREAM_SETTINGS_NAV_LINK_ID, Object.assign({}, AUDIOSTREAM_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
@@ -21,4 +21,3 @@ $(function () {
     connectNavbarLinkToModal(CLIENT_NAV_LINK_ID, CLIENT_MODAL_BASE_PROPERTIES, [CLIENT_MODAL_BASE_BODY_SETTER, MODAL_ADDITIONAL_SETTER]);
     setDisabledForNavbar(false);
 });
-

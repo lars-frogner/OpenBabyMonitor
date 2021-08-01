@@ -14,6 +14,7 @@ if (isset($_POST['submit'])) {
   $values = convertSettingValues($setting_type, $_POST);
   updateValuesInTable($_DATABASE, $table_name, withPrimaryKey($values));
 } elseif (isset($_POST['reset'])) {
+  $settings_edited = true;
   $values = readTableInitialValuesFromConfig($table_name);
   updateValuesInTable($_DATABASE, $table_name, $values);
 } else {
@@ -75,5 +76,13 @@ require_once(TEMPLATES_PATH . '/jquery_js.php');
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
+<script>
+  <?php generateBehavior($setting_type); ?>
+</script>
+<script>
+  $(function() {
+    captureElementState(SETTINGS_FORM_ID);
+  });
+</script>
 
 </html>
