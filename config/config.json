@@ -61,7 +61,8 @@
                 "activate_client_mode": "echo activate_client_mode > $BM_SERVER_ACTION_FILE",
                 "reboot": "echo reboot > $BM_SERVER_ACTION_FILE",
                 "shutdown": "echo shutdown > $BM_SERVER_ACTION_FILE",
-                "set_timestamp": "echo \"set_timestamp $TIMESTAMP\" > $BM_SERVER_ACTION_FILE"
+                "set_timestamp": "echo \"set_timestamp $TIMESTAMP\" > $BM_SERVER_ACTION_FILE",
+                "scan_wireless_networks": "echo scan_wireless_networks > $BM_SERVER_ACTION_FILE"
             }
         },
         "lock_commands": {
@@ -69,9 +70,12 @@
             "release": "touch $BM_MODE_LOCK_FILE"
         }
     },
-    "wireless_modes": {
-        "access_point": "Master",
-        "client": "Managed"
+    "network": {
+        "wireless_scan_results_filename": ".wireless_scan_results.json",
+        "wireless_modes": {
+            "access_point": "Master",
+            "client": "Managed"
+        }
     },
     "videostream_settings": {
         "vertical_resolution": {

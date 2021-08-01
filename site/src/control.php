@@ -3,6 +3,7 @@ require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(dirname(__DIR__) . '/config/env_config.php');
 require_once(dirname(__DIR__) . '/config/database_config.php');
 require_once(dirname(__DIR__) . '/config/control_config.php');
+require_once(__DIR__ . '/io.php');
 require_once(__DIR__ . '/database.php');
 
 function readCurrentMode($database) {
@@ -148,6 +149,12 @@ function executeServerControlAction($action, $argument_env_name = null, $argumen
   $result_code = null;
   exec(ENVVAR_ASSIGNMENT . ((is_null($argument_env_name) || is_null($argument_value)) ? '' : "$argument_env_name=$argument_value; ") . SERVER_ACTION_COMMANDS[$action], $output, $result_code);
   if ($result_code != 0) {
-    bm_error("Server action command failed with error code $result_code:\n" . join("\n", $output));
+    bm_error("Server action command $action failed with error code $result_code:\n" . join("\n", $output));
   }
+}
+
+function obtainWirelessScanResults() {
+  executeServerControlAction('scan_wireless_networks');
+  waitForFileToExist(WIRELESS_SCAN_RESULT_PATH);
+  return readJSON(WIRELESS_SCAN_RESULT_PATH);
 }

@@ -7,12 +7,14 @@ CLIENT_MODE_CMD=$SCRIPT_DIR/activate_client_mode.sh
 REBOOT_CMD='systemctl reboot'
 SHUTDOWN_CMD='shutdown -h now'
 TIMESTAMP_CMD='date +%s -s @'
+WIRELESS_SCAN_CMD="$SCRIPT_DIR/scan_wireless_networks.sh"
 
 AP_MODE_FLAG=activate_ap_mode
 CLIENT_MODE_FLAG=activate_client_mode
 REBOOT_FLAG=reboot
 SHUTDOWN_FLAG=shutdown
 TIMESTAMP_FLAG=set_timestamp
+WIRELESS_SCAN_FLAG=scan_wireless_networks
 
 if [[ ! -f "$BM_SERVER_ACTION_FILE" ]]; then
     exit 0
@@ -56,6 +58,10 @@ case $FLAG in
 
   $TIMESTAMP_FLAG)
     eval "${TIMESTAMP_CMD}${TIMESTAMP}"
+    ;;
+
+  $WIRELESS_SCAN_FLAG)
+    eval $WIRELESS_SCAN_CMD
     ;;
 
   *)

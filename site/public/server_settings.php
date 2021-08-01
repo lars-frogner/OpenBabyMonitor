@@ -3,6 +3,8 @@ require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 
 $mode = readCurrentMode($_DATABASE);
+$networks = obtainWirelessScanResults();
+require_once(TEMPLATES_PATH . '/server_settings.php');
 ?>
 
 <!DOCTYPE html>
@@ -30,11 +32,7 @@ $mode = readCurrentMode($_DATABASE);
           <div class="col">
             <div class="form-group">
               <label class="form-label h3" for="available_networks">Tilgjengelige nettverk</label>
-              <select class="form-select" size="3" id="available_networks">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-              </select>
+              <?php generateAvailableNetworksSelect($networks, 'available_networks'); ?>
             </div>
             <div class="row form-group align-items-center my-3">
               <div class="col-auto">

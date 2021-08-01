@@ -206,6 +206,17 @@ chmod +x $SERVER_CONTROL_DIR/ensure_connection.sh
 # Check connection every 10 minutes
 (crontab -l; echo "*/10 * * * * $SERVER_CONTROL_DIR/ensure_connection.sh") | crontab -
 
+echo "#!/bin/bash
+
+SERVER_CONTROL_DIR=$SERVER_CONTROL_DIR
+OUTPUT_FILE=\$SERVER_CONTROL_DIR/.wireless_scan_results.json
+
+rm -f \$OUTPUT_FILE
+sudo iwlist $INTERFACE scan | \$SERVER_CONTROL_DIR/parse_iwlist_scan.py \$OUTPUT_FILE
+chmod 750 \$OUTPUT_FILE
+" > $SERVER_CONTROL_DIR/scan_wireless_networks.sh
+chmod +x $SERVER_CONTROL_DIR/scan_wireless_networks.sh
+
 # Start in access point mode
 echo "Start access point mode by running the following command:
 nohup $SERVER_CONTROL_DIR/activate_ap_mode.sh &
