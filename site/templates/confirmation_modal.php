@@ -8,7 +8,8 @@
       <div class="modal-body" id="confirmation_modal_body">
       </div>
       <div class="modal-footer">
-        <a class="btn btn-primary" id="confirmation_modal_confirm"></a>
+        <a class="btn btn-primary" id="confirmation_modal_confirm_link"></a>
+        <button type="button" class="btn btn-primary" id="confirmation_modal_confirm_button"></button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmation_modal_dismiss"></button>
       </div>
     </div>
