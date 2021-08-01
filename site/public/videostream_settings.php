@@ -46,7 +46,7 @@ $grouped_values = groupSettingValues($setting_type, $values);
     <div class="container-fluid">
       <h1 class="my-4">Videoinnstillinger</h1>
       <form id="videostream_settings_form" action="" method="post">
-        <div class='row'>
+        <div class="row">
           <?php generateInputs($setting_type, $grouped_values); ?>
         </div>
         <div class="my-4">
