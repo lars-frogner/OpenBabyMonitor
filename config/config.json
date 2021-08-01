@@ -54,7 +54,7 @@
     },
     "control": {
         "mode_query_interval": 1e-2,
-        "mode_switch_timeout": 5.0,
+        "mode_switch_timeout": 10.0,
         "server_actions": {
             "commands": {
                 "activate_ap_mode": "echo activate_ap_mode > $BM_SERVER_ACTION_FILE",
