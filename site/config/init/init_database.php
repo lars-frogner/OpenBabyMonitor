@@ -52,5 +52,10 @@ foreach (array('modes', 'videostream_settings') as $table_name) {
   insertValuesIntoTable($database, $table_name, readTableInitialValuesFromConfig($table_name));
 }
 
+foreach (array('known_networks') as $table_name) {
+  echo "Creating table $table_name in database $db_name\n";
+  createTableIfMissing($database, $table_name, readTableColumnsFromConfig($table_name, false));
+}
+
 echo "Closing connection to database $db_name\n";
 closeConnection($database);
