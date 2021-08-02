@@ -35,6 +35,15 @@ function deleteKnownNetwork($database, $ssid) {
 }
 
 function generateAvailableNetworksSelect($available_networks, $known_networks, $connected_network, $id) {
+  function getColorClass($quality) {
+    if ($quality > 2 / 3) {
+      return 'text-success';
+    } elseif ($quality < 1 / 3) {
+      return 'text-danger';
+    } else {
+      return 'text-warning';
+    }
+  }
   $size = max(2, count($available_networks));
   uasort($available_networks, function ($a, $b) {
     return $b['quality'] <=> $a['quality'];
@@ -46,7 +55,8 @@ function generateAvailableNetworksSelect($available_networks, $known_networks, $
     $is_connected = $ssid == $connected_network;
     $name = $ssid . ($is_connected ? ' (tilkoblet)' : '');
     $is_connected = $is_connected ? 'true' : 'false';
-    line("<option value=\"$ssid\" id=\"$ssid\">$name</option>");
+    $color_class = getColorClass($data['quality']);
+    line("<option class=\"$color_class\" value=\"$ssid\" id=\"$ssid\">$name</option>");
     line("<script>$('#' + '$ssid').data('network_meta', {requires_password: $requires_password, is_known: $is_known, is_connected: $is_connected});</script>");
   }
   line('</select>');
