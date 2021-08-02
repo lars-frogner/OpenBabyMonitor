@@ -72,9 +72,19 @@
     },
     "network": {
         "wireless_scan_results_filename": ".wireless_scan_results.json",
+        "connected_network_script_filename": "get_connected_network_ssid.sh",
+        "psk_script_filename": "get_network_psk.sh",
         "wireless_modes": {
             "access_point": "Master",
             "client": "Managed"
+        }
+    },
+    "known_networks": {
+        "ssid": {
+            "type": "VARCHAR(64) PRIMARY KEY"
+        },
+        "psk": {
+            "type": "CHAR(64)"
         }
     },
     "videostream_settings": {

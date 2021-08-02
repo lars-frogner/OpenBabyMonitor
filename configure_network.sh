@@ -217,6 +217,18 @@ chmod 750 \$OUTPUT_FILE
 " > $SERVER_CONTROL_DIR/scan_wireless_networks.sh
 chmod +x $SERVER_CONTROL_DIR/scan_wireless_networks.sh
 
+echo "#!/bin/bash
+SSID=\$1
+PASSWORD=\$2
+wpa_passphrase \$SSID \$PASSWORD | sed -n \"s/^\s*psk=\([a-z0-9]*\)$/\1/p\"
+" > $SERVER_CONTROL_DIR/get_network_psk.sh
+chmod +x $SERVER_CONTROL_DIR/get_network_psk.sh
+
+echo "#!/bin/bash
+iwgetid $INTERFACE --raw
+" > $SERVER_CONTROL_DIR/get_connected_network_ssid.sh
+chmod +x $SERVER_CONTROL_DIR/get_connected_network_ssid.sh
+
 # Start in access point mode
 echo "Start access point mode by running the following command:
 nohup $SERVER_CONTROL_DIR/activate_ap_mode.sh &

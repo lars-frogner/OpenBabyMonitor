@@ -158,3 +158,30 @@ function obtainWirelessScanResults() {
   waitForFileToExist(WIRELESS_SCAN_RESULT_PATH);
   return readJSON(WIRELESS_SCAN_RESULT_PATH);
 }
+
+function obtainNetworkPSK($ssid, $password) {
+  $output = null;
+  $result_code = null;
+  exec(GET_NETWORK_PSK_SCRIPT . " $ssid $password", $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Obtaining PSK for SSID $ssid failed with error code $result_code:\n" . join("\n", $output));
+  }
+  return $output[0];
+}
+
+function obtainConnectedNetworkSSID() {
+  $output = null;
+  $result_code = null;
+  exec(GET_CONNECTED_NETWORK_SSID_SCRIPT, $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Obtaining connected network SSID failed with error code $result_code:\n" . join("\n", $output));
+  }
+  $ssid = $output[0];
+  if ($ssid == '') {
+    $ssid = null;
+  }
+  return $ssid;
+}
+
+function connectToNetwork($ssid, $psk) {
+}
