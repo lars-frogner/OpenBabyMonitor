@@ -30,13 +30,13 @@ class Database:
         condition = None
         for name, value in column_values.items():
             if name == condition_key:
-                condition = '{} = {}'.format(name, value)
+                condition = '`{}` = {}'.format(name, value)
             else:
                 if value is None:
                     value = 'NULL'
                 elif isinstance(value, str):
                     value = "'{}'".format(value)
-                updates += '{} = {}, '.format(name, value)
+                updates += '`{}` = {}, '.format(name, value)
 
         if condition is None:
             raise ValueError(
@@ -45,14 +45,14 @@ class Database:
         if len(column_values) > 1:
             updates = updates[:-2]
 
-        self.cursor.execute('UPDATE {} SET {} WHERE {}'.format(
+        self.cursor.execute('UPDATE `{}` SET {} WHERE {}'.format(
             table_name, updates, condition))
 
     def read_values_from_table(self, table_name, columns, condition='id = 0'):
         multiple_columns = hasattr(columns, '__iter__')
         column_string = ', '.join(columns) if multiple_columns else columns
 
-        self.cursor.execute('SELECT {} FROM {} WHERE {}'.format(
+        self.cursor.execute('SELECT {} FROM `{}` WHERE {}'.format(
             column_string, table_name, condition))
         result = self.cursor.fetchall()
 

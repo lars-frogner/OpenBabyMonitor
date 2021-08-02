@@ -10,20 +10,20 @@ function readTableColumnNamesFromConfig($table_name) {
   return array_keys($_CONFIG[$table_name]);
 }
 
-function readTableColumnsFromConfig($table_name) {
+function readTableColumnsFromConfig($table_name, $include_id = true) {
   global $_CONFIG;
   global $_DATABASE_INFO;
-  $columns = array('id' => $_DATABASE_INFO['key']['type']);
+  $columns = $include_id ? array('id' => $_DATABASE_INFO['key']['type']) : array();
   foreach ($_CONFIG[$table_name] as $column_name => $content) {
     $columns[$column_name] = $content['type'];
   }
   return $columns;
 }
 
-function readTableInitialValuesFromConfig($table_name) {
+function readTableInitialValuesFromConfig($table_name, $include_id = true) {
   global $_CONFIG;
   global $_DATABASE_INFO;
-  $values = array('id' => $_DATABASE_INFO['key']['value']);
+  $values = $include_id ? array('id' => $_DATABASE_INFO['key']['value']) : array();
   foreach ($_CONFIG[$table_name] as $column_name => $content) {
     $values[$column_name] = $content['initial_value'];
   }

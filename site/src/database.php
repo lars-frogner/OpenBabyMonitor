@@ -11,7 +11,7 @@ function connectToAccount($host, $user, $password) {
 }
 
 function dropUserIfExists($connection, $user) {
-  if (!$connection->query("DROP USER IF EXISTS $user;")) {
+  if (!$connection->query("DROP USER IF EXISTS `$user`;")) {
     bm_error("Could not drop user $user: " . $connection->error);
   }
 }
@@ -32,25 +32,25 @@ function databaseExists($connection, $name) {
 }
 
 function dropDatabaseIfExists($connection, $name) {
-  if (!$connection->query("DROP DATABASE IF EXISTS $name;")) {
+  if (!$connection->query("DROP DATABASE IF EXISTS `$name`;")) {
     bm_error("Could not drop database $name: " . $connection->error);
   }
 }
 
 function createDatabaseIfMissing($connection, $name) {
-  if (!$connection->query("CREATE DATABASE IF NOT EXISTS $name;")) {
+  if (!$connection->query("CREATE DATABASE IF NOT EXISTS `$name`;")) {
     bm_error("Could not create database $name: " . $connection->error);
   }
 }
 
 function grantUserAllPrivilegesOnDatabase($connection, $host, $user, $name) {
-  if (!$connection->query("GRANT ALL PRIVILEGES ON $name.* TO '$user'@'$host';")) {
+  if (!$connection->query("GRANT ALL PRIVILEGES ON `$name`.* TO `$user`@`$host`;")) {
     bm_error("Could not grant user $user privileges on database $name: " . $connection->error);
   }
 }
 
 function useDatabase($connection, $name) {
-  if (!$connection->query("USE $name;")) {
+  if (!$connection->query("USE `$name`;")) {
     bm_error("Could not use database $name: " . $connection->error);
   }
 }
@@ -68,12 +68,12 @@ function closeConnection($connection) {
 function createTableIfMissing($database, $table_name, $columns) {
   $entries = '';
   foreach ($columns as $name => $type) {
-    $entries = $entries . "$name $type, ";
+    $entries = $entries . "`$name` $type, ";
   }
   if (count($columns) > 0) {
     $entries = substr($entries, 0, -2);
   }
-  $create_table = "CREATE TABLE IF NOT EXISTS $table_name ($entries);";
+  $create_table = "CREATE TABLE IF NOT EXISTS `$table_name` ($entries);";
   if (!$database->query($create_table)) {
     bm_error("Could not create table for $table_name: " . $database->error);
   }
@@ -91,16 +91,16 @@ function insertValuesIntoTable($database, $table_name, $column_values) {
     } else if (is_string($value)) {
       $value = "'$value'";
     }
-    $names = $names . "$name, ";
+    $names = $names . "`$name`, ";
     $values = $values . "$value, ";
-    $updates = $updates . "$name = $value, ";
+    $updates = $updates . "`$name` = $value, ";
   }
   if (count($column_values) > 0) {
     $names = substr($names, 0, -2);
     $values = substr($values, 0, -2);
     $updates = substr($updates, 0, -2);
   }
-  $insert_values = "INSERT INTO $table_name ($names) VALUES($values) ON DUPLICATE KEY UPDATE $updates;";
+  $insert_values = "INSERT INTO `$table_name` ($names) VALUES($values) ON DUPLICATE KEY UPDATE $updates;";
   if (!$database->query($insert_values)) {
     bm_error("Could not insert values into table $table_name: " . $database->error);
   }
@@ -120,7 +120,7 @@ function updateValuesInTable($database, $table_name, $column_values, $condition_
       } elseif ($value === false) {
         $value = 0;
       }
-      $updates = $updates . "$name = $value, ";
+      $updates = $updates . "`$name` = $value, ";
     }
   }
   if (is_null($condition)) {
@@ -129,24 +129,35 @@ function updateValuesInTable($database, $table_name, $column_values, $condition_
   if (count($column_values) > 1) {
     $updates = substr($updates, 0, -2);
   }
-  $update_values = "UPDATE $table_name SET $updates WHERE $condition;";
+  $update_values = "UPDATE `$table_name` SET $updates WHERE $condition;";
   if (!$database->query($update_values)) {
     bm_error("Could not update values in table $table_name: " . $database->error);
   }
 }
 
-function readValuesFromTable($database, $table_name, $columns, $return_with_numeric_keys = false, $condition = 'id = 0') {
-  $multiple_columns = is_array($columns);
-  $column_string = $multiple_columns ? join(', ', $columns) : $columns;
+function deleteTableRows($database, $table_name, $condition) {
+  $result = $database->query("DELETE FROM `$table_name` WHERE $condition;");
+  if (!$result) {
+    bm_error("Could not delete rows where $condition from table $table_name: " . $database->error);
+  }
+}
 
-  $result = $database->query("SELECT $column_string FROM $table_name WHERE $condition;");
+function readValuesFromTable($database, $table_name, $columns, $return_with_numeric_keys = false, $condition = 'id = 0') {
+  $column_string = is_array($columns) ? join(', ', $columns) : $columns;
+  $multiple_columns = is_array($columns) || $columns === '*';
+
+  $command = "SELECT $column_string FROM `$table_name`" . (($condition === true) ? ';' : " WHERE $condition;");
+  $result = $database->query($command);
   if (!$result) {
     bm_error("Could not select $column_string from table $table_name: " . $database->error);
   }
   $result = $result->fetch_all(MYSQLI_ASSOC);
-
   if (empty($result)) {
-    bm_error("Column(s) $column_string not present in table $table_name");
+    bm_warning("Column(s) $column_string not present in table $table_name");
+    return $result;
+  }
+  if ($multiple_columns) {
+    $columns = array_keys($result[0]);
   }
   if ($return_with_numeric_keys) {
     if ($multiple_columns) {
@@ -162,8 +173,17 @@ function readValuesFromTable($database, $table_name, $columns, $return_with_nume
       }, $result);
     }
   }
-  if ($condition == 'id = 0') {
+  if ($condition === 'id = 0') {
     $result = $result[0];
   }
   return $result;
+}
+
+function tableKeyExists($database, $table_name, $primary_key, $key_value) {
+  $result = $database->query("SELECT EXISTS(SELECT * FROM `$table_name` WHERE `$primary_key` = $key_value);");
+  if (!$result) {
+    bm_error("Could not check if key $primary_key = $key_value exists in $table_name: " . $database->error);
+  }
+  $result = $result->fetch_all(MYSQLI_NUM);
+  return $result[0][0];
 }
