@@ -106,6 +106,7 @@ require_once(TEMPLATES_PATH . '/bootstrap_js.php');
   const DISCONNECT_BUTTON_ID = 'disconnect_button';
   const FORGET_SUBMIT_BUTTON_ID = 'forget_submit_button';
   const FORGET_BUTTON_ID = 'forget_button';
+  const DETECT_FORM_CHANGES = false;
 </script>
 <script src="js/jquery_utils.js"></script>
 <script src="js/confirmation_modal.js"></script>

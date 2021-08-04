@@ -70,6 +70,7 @@ require_once(TEMPLATES_PATH . '/jquery_js.php');
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
   const SITE_MODE = <?php echo MODE_VALUES[$setting_type]; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
+  const DETECT_FORM_CHANGES = true;
 </script>
 <script src="js/settings.js"></script>
 <script src="js/jquery_utils.js"></script>
