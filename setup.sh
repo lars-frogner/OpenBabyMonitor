@@ -18,7 +18,7 @@ set -e
 # ssh pi@raspberrypi.home # Password is raspberry (try .local if .home doesn't work)
 # echo -e "\nexport LC_ALL=en_GB.UTF-8\nexport LANGUAGE=en_GB.UTF-8\n" >> ~/.bashrc
 # sudo raspi-config
-# Change password for pi user and set hostname to "babymonitor", set time zone to Oslo and enable camera module.
+# Change password for pi user and set hostname to "babymonitor", set time zone to Oslo and enable camera module. Say yes to reboot.
 # ssh pi@babymonitor # Log in with new password
 # Note: mini USB microphone does not appear to useable without sudo for other users than pi.
 # Clone the babymonitor repository:
@@ -110,6 +110,8 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
 
     # Install required Python packages
     pip3 install -r requirements.txt
+
+    sudo apt -y autoremove
 fi
 
 SETUP_BASH_CONFIG=true
@@ -120,14 +122,16 @@ if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     sed -i "s/#alias l='ls -CF'/alias l='ls -Alh'/g" ~/.bashrc
 
     # Add alias for showing CPU temperature
-    echo -e "\nalias temp='sudo vcgencmd measure_temp'\n" >> ~/.bashrc
+    echo -e "alias temp='sudo vcgencmd measure_temp'\n" >> ~/.bashrc
 
     # Enable arrow up/down history search
     cp /etc/inputrc ~/.inputrc
     sed -i 's/# "\\e\[B": history-search-forward/"\\e[B": history-search-forward/g' ~/.inputrc
     sed -i 's/# "\\e\[A": history-search-backward/"\\e[A": history-search-backward/g' ~/.inputrc
 
-    echo -e "\nsource $BM_ENV_PATH" >> ~/.bashrc
+    echo -e "source $BM_ENV_PATH\n" >> ~/.bashrc
+
+    source ~/.bashrc
 fi
 
 DISABLE_BLUETOOTH=true
@@ -216,6 +220,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     echo "#!/bin/bash
 sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $READ_PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
 " > $BM_PICAM_DIR/create_sharedmem_dirs.sh
+    chmod $READ_PERMISSIONS $BM_PICAM_DIR/create_sharedmem_dirs.sh
 
     # Install picam binary
     PICAM_VERSION=1.4.9
