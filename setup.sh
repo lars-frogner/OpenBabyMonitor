@@ -218,7 +218,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     sudo chown $SERVER_USER:$WEB_GROUP $BM_PICAM_LOG_PATH
 
     echo "#!/bin/bash
-sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $READ_PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
+install -d -o $SERVER_USER -g $WEB_GROUP -m $READ_PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
 " > $BM_PICAM_DIR/create_sharedmem_dirs.sh
     chmod $READ_PERMISSIONS $BM_PICAM_DIR/create_sharedmem_dirs.sh
 
