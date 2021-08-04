@@ -58,27 +58,6 @@ BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
 BM_MODE_LOCK_DIR=$BM_DIR/control/.lock
 BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/free
 
-SETUP_ENV=true
-if [[ "$SETUP_ENV" = true ]]; then
-    mkdir -p $BM_ENV_DIR
-
-    touch $BM_ENV_EXPORTS_PATH
-    echo "export BM_DIR=$BM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_LOG_PATH=$BM_PICAM_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_SERVERCONTROL_DIR=$BM_SERVERCONTROL_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_SERVER_ACTION_DIR=$BM_SERVER_ACTION_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_FILE" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_MODE_LOCK_FILE=$BM_MODE_LOCK_FILE" >> $BM_ENV_EXPORTS_PATH
-
-    # Copy environment variables (without 'export') into environment file for services and PHP
-    ENV_VAR_EXPORTS=$(cat $BM_ENV_EXPORTS_PATH)
-    echo "${ENV_VAR_EXPORTS//'export '/}" > $BM_ENV_PATH
-fi
-
 UPDATE=true
 if [[ "$UPDATE" = true ]]; then
     sudo apt -y update
@@ -150,6 +129,27 @@ if [[ "$SETUP_MIC" = true ]]; then
     sudo adduser $SERVER_USER audio
     BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
     echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_PATH
+fi
+
+SETUP_ENV=true
+if [[ "$SETUP_ENV" = true ]]; then
+    mkdir -p $BM_ENV_DIR
+
+    touch $BM_ENV_EXPORTS_PATH
+    echo "export BM_DIR=$BM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_LOG_PATH=$BM_PICAM_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SERVERCONTROL_DIR=$BM_SERVERCONTROL_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SERVER_ACTION_DIR=$BM_SERVER_ACTION_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_MODE_LOCK_FILE=$BM_MODE_LOCK_FILE" >> $BM_ENV_EXPORTS_PATH
+
+    # Copy environment variables (without 'export') into environment file for services and PHP
+    ENV_VAR_EXPORTS=$(cat $BM_ENV_EXPORTS_PATH)
+    echo "${ENV_VAR_EXPORTS//'export '/}" > $BM_ENV_PATH
 fi
 
 INSTALL_BOOTSTRAP=true
