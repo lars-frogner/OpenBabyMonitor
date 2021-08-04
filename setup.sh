@@ -331,14 +331,19 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Add main user to www-data group
     sudo adduser $SERVER_USER $WEB_GROUP
 
+    # Create folders where the group has write permissions
+    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR
+
     # Ensure permissions are correct in project folder
     sudo chmod -R $READ_PERMISSIONS $BM_DIR
     sudo chown -R $SERVER_USER:$WEB_GROUP $BM_DIR
 
-    # Create folders where the group has write permissions
-    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR
+    # Set write permissions
     sudo chmod $WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
     sudo chmod $WRITE_PERMISSIONS $BM_MODE_LOCK_DIR
+
+    sudo chown $SERVER_USER:$WEB_GROUP $APACHE_ERROR_LOG_PATH
+    sudo chmod $WRITE_PERMISSIONS $APACHE_ERROR_LOG_PATH
 
     # Link site folder to default Apache site root
     sudo ln -s $BM_LINKED_SITE_DIR $BM_SITE_DIR
