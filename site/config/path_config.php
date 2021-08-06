@@ -4,4 +4,4 @@ define('SRC_PATH', realpath(__DIR__ . '/../src'));
 define('TEMPLATES_PATH', realpath(__DIR__ . '/../templates'));
 define('PUBLIC_PATH', realpath(__DIR__ . '/../public'));
 define('ENV_FILE_PATH', realpath(__DIR__ . '/../../env/envvars'));
-define('SERVER_CONTROL_DIR', realpath(__DIR__ . '/../servercontrol'));
+define('SERVERCONTROL_DIR', realpath(__DIR__ . '/../servercontrol'));

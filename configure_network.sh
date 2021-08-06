@@ -2,16 +2,27 @@
 set -x
 set -e
 
-BM_DIR=$(dirname $(readlink -f $0))
-SERVER_CONTROL_DIR=$BM_DIR/site/servercontrol
+source $BM_ENV_EXPORTS_PATH
 
-AP_DIR=~/.netconf_ap # Directory for configurations files set up for wireless access point mode
-CLIENT_DIR=~/.netconf_client # Directory for configurations files set up for wireless client mode
-ORIG_DIR=~/.netconf_orig # For backup of original configuration files
-AP_IP_ROOT=192.168.4
-INTERFACE=wlan0
-CHANNEL=7
-SSID=babymonitor
+BM_NW_AP_DIR=~/.netconf_ap # Directory for configurations files set up for wireless access point mode
+BM_NW_CLIENT_DIR=~/.netconf_client # Directory for configurations files set up for wireless client mode
+BM_NW_ORIG_DIR=~/.netconf_orig # For backup of original configuration files
+BM_NW_AP_IP_ROOT=192.168.4
+BM_NW_INTERFACE=wlan0
+BM_NW_CHANNEL=7
+BM_NW_SSID=babymonitor
+BM_NW_COUNTRY_CODE=NO
+
+SETUP_ENV=true
+if [[ "$SETUP_ENV" = true ]]; then
+    echo "export BM_NW_AP_DIR=$BM_NW_AP_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_NW_CLIENT_DIR=$BM_NW_CLIENT_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_NW_INTERFACE=$BM_NW_INTERFACE" >> $BM_ENV_EXPORTS_PATH
+
+    # Copy environment variables (without 'export') into environment file for services and PHP
+    ENV_VAR_EXPORTS=$(cat $BM_ENV_EXPORTS_PATH)
+    echo "${ENV_VAR_EXPORTS//'export '/}" > $BM_ENV_PATH
+fi
 
 stty -echo
 printf "New access point password (8-64 characters): "
@@ -29,64 +40,64 @@ sudo systemctl unmask hostapd
 sudo apt -y install dnsmasq
 
 # Create directory for modified configuration files
-mkdir -v $AP_DIR $CLIENT_DIR $ORIG_DIR
+mkdir -v $BM_NW_AP_DIR $BM_NW_CLIENT_DIR $BM_NW_ORIG_DIR
 
 # Copy and backup dhcpcd.conf
-mkdir -v {$AP_DIR,$CLIENT_DIR,$ORIG_DIR}/etc
-cp -v {,$AP_DIR}/etc/dhcpcd.conf
-cp -v {,$CLIENT_DIR}/etc/dhcpcd.conf
-cp -v {,$ORIG_DIR}/etc/dhcpcd.conf
+mkdir -v {$BM_NW_AP_DIR,$BM_NW_CLIENT_DIR,$BM_NW_ORIG_DIR}/etc
+cp -v {,$BM_NW_AP_DIR}/etc/dhcpcd.conf
+cp -v {,$BM_NW_CLIENT_DIR}/etc/dhcpcd.conf
+cp -v {,$BM_NW_ORIG_DIR}/etc/dhcpcd.conf
 
 # Set static IP for access point mode
 echo "
-interface $INTERFACE
-static ip_address=$AP_IP_ROOT.1/24
+interface $BM_NW_INTERFACE
+static ip_address=$BM_NW_AP_IP_ROOT.1/24
 nohook wpa_supplicant
-" >> $AP_DIR/etc/dhcpcd.conf
+" >> $BM_NW_AP_DIR/etc/dhcpcd.conf
 
 # Set static IP for client mode
 STATIC_IP=false
 if [[ "$STATIC_IP" = true ]]; then
-    CLIENT_IP=$(ip -o -4 addr list $INTERFACE | awk '{print $4}' | cut -d/ -f1)
+    CLIENT_IP=$(ip -o -4 addr list $BM_NW_INTERFACE | awk '{print $4}' | cut -d/ -f1)
     ROUTER_IP=$(ip r | grep default | sed -n "s/^default via \([0-9\.]*\).*$/\1/p")
     DNS_IP=$(sudo sed -n "s/^nameserver \([0-9\.]*\).*$/\1/p" /etc/resolv.conf | head -n 1)
     echo "
-    interface $INTERFACE
+    interface $BM_NW_INTERFACE
     static ip_address=$CLIENT_IP/24
     static routers=$ROUTER_IP
     static domain_name_servers=$DNS_IP
-    " >> $CLIENT_DIR/etc/dhcpcd.conf
+    " >> $BM_NW_CLIENT_DIR/etc/dhcpcd.conf
 fi
 
 # Backup dnsmasq.conf
-sudo mv -v {,$ORIG_DIR}/etc/dnsmasq.conf
+sudo mv -v {,$BM_NW_ORIG_DIR}/etc/dnsmasq.conf
 
 # Set listening interface, served IP range, lease time, domain and address for dnsmasq
 IP_START=2
 IP_END=20
 LEASE_TIME=24h
 ALIAS=babymonitor.local
-echo "interface=$INTERFACE
-dhcp-range=$AP_IP_ROOT.$IP_START,$AP_IP_ROOT.$IP_END,255.255.255.0,$LEASE_TIME
+echo "interface=$BM_NW_INTERFACE
+dhcp-range=$BM_NW_AP_IP_ROOT.$IP_START,$BM_NW_AP_IP_ROOT.$IP_END,255.255.255.0,$LEASE_TIME
 domain=wlan
-address=/$ALIAS/$AP_IP_ROOT.1
-" > $AP_DIR/etc/dnsmasq.conf
+address=/$ALIAS/$BM_NW_AP_IP_ROOT.1
+" > $BM_NW_AP_DIR/etc/dnsmasq.conf
 
 # dnsmasq is only used in access point mode, so this symlink can remain also in client mode
-sudo ln -sv {$AP_DIR,}/etc/dnsmasq.conf
+sudo ln -sv {$BM_NW_AP_DIR,}/etc/dnsmasq.conf
 
 # Make sure the wireless device is not blocked
 sudo rfkill unblock wlan
 
-mkdir $AP_DIR/etc/hostapd
+mkdir $BM_NW_AP_DIR/etc/hostapd
 
 # Configure hostapd
 set +x # Hide password
-echo "country_code=NO
-interface=$INTERFACE
-ssid=$SSID
+echo "country_code=$BM_NW_COUNTRY_CODE
+interface=$BM_NW_INTERFACE
+ssid=$BM_NW_SSID
 hw_mode=g
-channel=$CHANNEL
+channel=$BM_NW_CHANNEL
 macaddr_acl=0
 auth_algs=1
 ignore_broadcast_ssid=0
@@ -95,11 +106,11 @@ wpa_passphrase=$PASSWORD
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP
-" > $AP_DIR/etc/hostapd/hostapd.conf
+" > $BM_NW_AP_DIR/etc/hostapd/hostapd.conf
 set -x
 
 # hostapd is only used in access point mode, so this symlink can remain also in client mode
-sudo ln -sv {$AP_DIR,}/etc/hostapd/hostapd.conf
+sudo ln -sv {$BM_NW_AP_DIR,}/etc/hostapd/hostapd.conf
 
 # Disable IPv6 hostname resolution
 echo "
@@ -204,34 +215,11 @@ fi
 chmod +x $SERVER_CONTROL_DIR/ensure_connection.sh
 
 # Check connection every 10 minutes
-(crontab -l; echo "*/10 * * * * $SERVER_CONTROL_DIR/ensure_connection.sh") | crontab -
-
-echo "#!/bin/bash
-
-SERVER_CONTROL_DIR=$SERVER_CONTROL_DIR
-OUTPUT_FILE=\$SERVER_CONTROL_DIR/.wireless_scan_results.json
-
-rm -f \$OUTPUT_FILE
-sudo iwlist $INTERFACE scan | \$SERVER_CONTROL_DIR/parse_iwlist_scan.py \$OUTPUT_FILE
-chmod 750 \$OUTPUT_FILE
-" > $SERVER_CONTROL_DIR/scan_wireless_networks.sh
-chmod +x $SERVER_CONTROL_DIR/scan_wireless_networks.sh
-
-echo "#!/bin/bash
-SSID=\$1
-PASSWORD=\$2
-wpa_passphrase \$SSID \$PASSWORD | sed -n \"s/^\s*psk=\([a-z0-9]*\)$/\1/p\"
-" > $SERVER_CONTROL_DIR/get_network_psk.sh
-chmod +x $SERVER_CONTROL_DIR/get_network_psk.sh
-
-echo "#!/bin/bash
-iwgetid $INTERFACE --raw
-" > $SERVER_CONTROL_DIR/get_connected_network_ssid.sh
-chmod +x $SERVER_CONTROL_DIR/get_connected_network_ssid.sh
+(crontab -l; echo "*/10 * * * * $BM_SERVERCONTROL_DIR/ensure_connection.sh") | crontab -
 
 # Start in access point mode
 echo "Start access point mode by running the following command:
-nohup $SERVER_CONTROL_DIR/activate_ap_mode.sh &
+nohup $BM_SERVERCONTROL_DIR/activate_ap_mode.sh &
 
 Start client mode by running the following command:
-nohup $SERVER_CONTROL_DIR/activate_client_mode.sh &"
+nohup $BM_SERVERCONTROL_DIR/activate_client_mode.sh &"

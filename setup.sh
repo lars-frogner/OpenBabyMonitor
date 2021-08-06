@@ -29,16 +29,16 @@ set -e
 # for Raspbian Buster). The two modes of operation can be switched between using the
 # activate_ap_mode.sh and activate_client_mode.sh scripts.
 
-SERVER_USER=pi
+BM_SERVER_USER=pi
 WEB_USER=www-data
-WEB_GROUP=www-data
-READ_PERMISSIONS=750
-WRITE_PERMISSIONS=770
+BM_WEB_GROUP=www-data
+BM_READ_PERMISSIONS=750
+BM_WRITE_PERMISSIONS=770
 
 PHP_TIMEZONE=Europe/Oslo
 
 APACHE_LOG_DIR=/var/log/apache2
-APACHE_ERROR_LOG_PATH=$APACHE_LOG_DIR/error.log
+BM_ERROR_LOG_PATH=$APACHE_LOG_DIR/error.log
 
 BM_DIR=$(dirname $(readlink -f $0))
 BM_ENV_DIR=$BM_DIR/env
@@ -55,6 +55,7 @@ BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
 BM_SERVERCONTROL_DIR=$BM_DIR/site/servercontrol
 BM_SERVER_ACTION_DIR=$BM_SERVERCONTROL_DIR/.hook
 BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
+BM_SERVER_ACTION_RESULT_FILE=$BM_SERVER_ACTION_DIR/result
 BM_MODE_LOCK_DIR=$BM_DIR/control/.lock
 BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/free
 
@@ -136,15 +137,21 @@ if [[ "$SETUP_ENV" = true ]]; then
     mkdir -p $BM_ENV_DIR
 
     touch $BM_ENV_EXPORTS_PATH
+    echo "export BM_SERVER_USER=$BM_SERVER_USER" >> $BM_ENV_EXPORTS_PATH
+    echo "export WEB_USER=$WEB_USER" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_WEB_GROUP=$BM_WEB_GROUP" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_READ_PERMISSIONS=$BM_READ_PERMISSIONS" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_WRITE_PERMISSIONS=$BM_WRITE_PERMISSIONS" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_DIR=$BM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_ERROR_LOG_PATH=$BM_ERROR_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_LOG_PATH=$BM_PICAM_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVERCONTROL_DIR=$BM_SERVERCONTROL_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_DIR=$BM_SERVER_ACTION_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SERVER_ACTION_RESULT_FILE=$BM_SERVER_ACTION_RESULT_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MODE_LOCK_FILE=$BM_MODE_LOCK_FILE" >> $BM_ENV_EXPORTS_PATH
 
     # Copy environment variables (without 'export') into environment file for services and PHP
@@ -205,7 +212,7 @@ fi
 INSTALL_PICAM=true
 if [[ "$INSTALL_PICAM" = true ]]; then
     # Create directories and symbolic links
-    sudo install -d -o $SERVER_USER -g $WEB_GROUP -m $READ_PERMISSIONS $BM_PICAM_DIR{,/archive} $BM_SHAREDMEM_DIR/{rec,hooks,state}
+    sudo install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS $BM_PICAM_DIR{,/archive} $BM_SHAREDMEM_DIR/{rec,hooks,state}
 
     ln -sfn {$BM_PICAM_DIR,$BM_SHAREDMEM_DIR/rec}/archive
     ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/rec
@@ -214,13 +221,10 @@ if [[ "$INSTALL_PICAM" = true ]]; then
 
     sudo ln -s $BM_PICAM_STREAM_DIR $BM_PICAM_LINKED_STREAM_DIR
 
-    sudo touch $BM_PICAM_LOG_PATH
-    sudo chown $SERVER_USER:$WEB_GROUP $BM_PICAM_LOG_PATH
-
     echo "#!/bin/bash
-install -d -o $SERVER_USER -g $WEB_GROUP -m $READ_PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
+install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
 " > $BM_PICAM_DIR/create_sharedmem_dirs.sh
-    chmod $READ_PERMISSIONS $BM_PICAM_DIR/create_sharedmem_dirs.sh
+    chmod $BM_READ_PERMISSIONS $BM_PICAM_DIR/create_sharedmem_dirs.sh
 
     # Install picam binary
     PICAM_VERSION=1.4.9
@@ -256,7 +260,7 @@ Description=Babymonitor root startup script
 Type=forking
 EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/root_startup.sh
-StandardError=append:$APACHE_ERROR_LOG_PATH
+StandardError=append:$BM_ERROR_LOG_PATH
 
 [Install]
 WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$ROOT_STARTUP_SERVICE_FILENAME
@@ -272,11 +276,11 @@ After=mysqld.service
 
 [Service]
 Type=oneshot
-User=$SERVER_USER
-Group=$WEB_GROUP
+User=$BM_SERVER_USER
+Group=$BM_WEB_GROUP
 EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/startup.sh
-StandardError=append:$APACHE_ERROR_LOG_PATH
+StandardError=append:$BM_ERROR_LOG_PATH
 
 [Install]
 WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
@@ -297,11 +301,11 @@ Description=Babymonitor $SERVICE service
 
 [Service]
 Type=simple
-User=$SERVER_USER
-Group=$WEB_GROUP
+User=$BM_SERVER_USER
+Group=$BM_WEB_GROUP
 EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/$SERVICE.sh
-StandardError=append:$APACHE_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
+StandardError=append:$BM_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
 
         sudo ln -sfn {$LINKED_UNIT_DIR,$UNIT_DIR}/$SERVICE_FILENAME
 
@@ -309,7 +313,7 @@ StandardError=append:$APACHE_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAM
     done
 
     # Allow users in web group to manage the mode services without providing a password
-    echo -e "${CMD_ALIAS%,}\n%$WEB_GROUP ALL = NOPASSWD: BM_MODES" | sudo tee /etc/sudoers.d/$WEB_GROUP
+    echo -e "${CMD_ALIAS%,}\n%$BM_WEB_GROUP ALL = NOPASSWD: BM_MODES" | sudo tee /etc/sudoers.d/$BM_WEB_GROUP
 fi
 
 INSTALL_SERVER=true
@@ -329,21 +333,21 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     echo -e "\nDirectoryIndex index.php" | sudo tee -a $APACHE_CONF_PATH
 
     # Add main user to www-data group
-    sudo adduser $SERVER_USER $WEB_GROUP
+    sudo adduser $BM_SERVER_USER $BM_WEB_GROUP
 
     # Create folders where the group has write permissions
     mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR
 
     # Ensure permissions are correct in project folder
-    sudo chmod -R $READ_PERMISSIONS $BM_DIR
-    sudo chown -R $SERVER_USER:$WEB_GROUP $BM_DIR
+    sudo chmod -R $BM_READ_PERMISSIONS $BM_DIR
+    sudo chown -R $BM_SERVER_USER:$BM_WEB_GROUP $BM_DIR
 
     # Set write permissions
-    sudo chmod $WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
-    sudo chmod $WRITE_PERMISSIONS $BM_MODE_LOCK_DIR
+    sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
+    sudo chmod $BM_WRITE_PERMISSIONS $BM_MODE_LOCK_DIR
 
-    sudo chown $SERVER_USER:$WEB_GROUP $APACHE_ERROR_LOG_PATH
-    sudo chmod $WRITE_PERMISSIONS $APACHE_ERROR_LOG_PATH
+    sudo chown $BM_SERVER_USER:$BM_WEB_GROUP $BM_ERROR_LOG_PATH
+    sudo chmod $BM_WRITE_PERMISSIONS $BM_ERROR_LOG_PATH
 
     # Link site folder to default Apache site root
     sudo ln -s $BM_LINKED_SITE_DIR $BM_SITE_DIR
@@ -358,7 +362,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     SITE_NAME=$(basename $BM_SITE_DIR)
     echo "<VirtualHost *:80>
 	DocumentRoot $BM_SITE_DIR
-	ErrorLog $APACHE_ERROR_LOG_PATH
+	ErrorLog $BM_ERROR_LOG_PATH
 	CustomLog $APACHE_LOG_DIR/access.log combined
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME

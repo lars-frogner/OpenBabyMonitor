@@ -6,7 +6,7 @@ require_once(__DIR__ . '/config.php');
 
 $output = null;
 $result_code = null;
-exec(SERVER_CONTROL_DIR . '/get_wireless_operating_mode.sh', $output, $result_code);
+exec(SERVERCONTROL_DIR . '/get_wireless_operating_mode.sh', $output, $result_code);
 if ($result_code != 0) {
   bm_error("Check for wireless operating mode failed with error code $result_code:\n" . join("\n", $output));
 }
