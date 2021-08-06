@@ -13,9 +13,10 @@ if ($result_code != 0) {
 
 $_NETWORK_INFO = $_CONFIG['network'];
 
+define('NETWORK_QUERY_INTERVAL', intval($_NETWORK_INFO['network_query_interval'] * 1e6)); // In microseconds
+define('NETWORK_SWITCH_TIMEOUT', intval($_NETWORK_INFO['network_switch_timeout'] * 1e6));
+
 define('ACCESS_POINT_ACTIVE', $output[0] == $_NETWORK_INFO['wireless_modes']['access_point']);
 define('CONNECTED_TO_EXTERNAL_NETWORK', $output[0] == $_NETWORK_INFO['wireless_modes']['client']);
 
-define('WIRELESS_SCAN_RESULT_PATH', getenv('BM_SERVERCONTROL_DIR') . '/' . $_NETWORK_INFO['wireless_scan_results_filename']);
-define('GET_CONNECTED_NETWORK_SSID_SCRIPT', getenv('BM_SERVERCONTROL_DIR') . '/' . $_NETWORK_INFO['connected_network_script_filename']);
-define('GET_NETWORK_PSK_SCRIPT', getenv('BM_SERVERCONTROL_DIR') . '/' . $_NETWORK_INFO['psk_script_filename']);
+define('GET_CONNECTED_NETWORK_SSID_SCRIPT', getenv('BM_SERVERCONTROL_DIR') . '/' . $_NETWORK_INFO['connected_network_ssid_script_filename']);

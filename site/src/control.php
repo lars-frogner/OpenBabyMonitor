@@ -30,8 +30,8 @@ function releaseModeLock() {
 }
 
 function waitForModeLock() {
-  $result = waitForFileToExist(getenv('BM_MODE_LOCK_FILE'));
-  if ($result == MODE_ACTION_TIMED_OUT) {
+  $result = waitForFileToExist(getenv('BM_MODE_LOCK_FILE'), MODE_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
+  if ($result == ACTION_TIMED_OUT) {
     releaseModeLock();
   }
 }
@@ -92,17 +92,17 @@ function updateCurrentMode($database, $new_mode) {
   updateValuesInTable($database, 'modes', withPrimaryKey(array('current' => $new_mode)));
 }
 
-function waitForFileToExist($file_path) {
+function waitForFileToExist($file_path, $interval, $timeout) {
   $elapsed_time = 0;
   while (!file_exists($file_path)) {
-    usleep(MODE_QUERY_INTERVAL);
-    $elapsed_time += MODE_QUERY_INTERVAL;
-    if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
+    usleep($interval);
+    $elapsed_time += $interval;
+    if ($elapsed_time > $timeout) {
       bm_warning("Wait for creation of $file_path timed out");
-      return MODE_ACTION_TIMED_OUT;
+      return ACTION_TIMED_OUT;
     }
   }
-  return MODE_ACTION_OK;
+  return ACTION_OK;
 }
 
 function waitForFileUpdate($file_path) {
@@ -113,16 +113,16 @@ function waitForFileUpdate($file_path) {
     $elapsed_time += MODE_QUERY_INTERVAL;
     if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
       bm_warning("Wait for update of $file_path timed out");
-      return MODE_ACTION_TIMED_OUT;
+      return ACTION_TIMED_OUT;
     }
   }
-  return MODE_ACTION_OK;
+  return ACTION_OK;
 }
 
 function switchMode($database, $new_mode, $skip_if_same = true) {
   $current_mode = readCurrentMode($database);
   if ($current_mode == $new_mode && ($skip_if_same || $current_mode == MODE_VALUES['standby'])) {
-    return MODE_ACTION_OK;
+    return ACTION_OK;
   }
   acquireModeLock();
   stopMode($current_mode);
@@ -134,7 +134,7 @@ function switchMode($database, $new_mode, $skip_if_same = true) {
     waitForFileUpdate($wait_for_file_path);
   }
   releaseModeLock();
-  return MODE_ACTION_OK;
+  return ACTION_OK;
 }
 
 function restartCurrentMode($database) {

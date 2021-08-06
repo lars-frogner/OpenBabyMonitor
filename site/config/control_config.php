@@ -26,8 +26,8 @@ function getWaitForFilePath($mode_name) {
 define('MODE_VALUES', getModeAttributes('value'));
 define('MODE_NAMES', array_flip(MODE_VALUES));
 
-define('MODE_ACTION_OK', 0);
-define('MODE_ACTION_TIMED_OUT', 1);
+define('ACTION_OK', 0);
+define('ACTION_TIMED_OUT', 1);
 
 $_CONTROL_INFO = $_CONFIG['control'];
 define('MODE_QUERY_INTERVAL', intval($_CONTROL_INFO['mode_query_interval'] * 1e6)); // In microseconds
