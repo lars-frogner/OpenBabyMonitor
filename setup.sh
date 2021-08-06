@@ -111,6 +111,8 @@ if [[ "$SETUP_BASH_CONFIG" = true ]]; then
 
     echo -e "source $BM_ENV_PATH\n" >> ~/.bashrc
 
+    sudo sed -i 's/pi ALL=(ALL) NOPASSWD: ALL/pi ALL=(ALL) PASSWD: ALL/g' /etc/sudoers.d/010_pi-nopasswd
+
     source ~/.bashrc
 fi
 
