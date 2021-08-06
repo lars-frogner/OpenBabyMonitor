@@ -4,18 +4,13 @@ redirectIfLoggedOut('index.php');
 
 require_once(TEMPLATES_PATH . '/server_settings.php');
 
+$connection_failed = false;
 if (isset($_POST['connect'])) {
   $ssid = $_POST['available_networks'];
-  $known_networks = readKnownNetworks($_DATABASE);
-  if (array_key_exists($ssid, $known_networks)) {
-    $psk = $known_networks[$ssid];
-  } else {
-    $psk = isset($_POST['password']) ? obtainNetworkPSK($ssid, $_POST['password']) : null;
-  }
-  $success = connectToNetwork($ssid, $psk);
-  if ($success && isset($_POST['remember'])) {
-    rememberNetwork($_DATABASE, $ssid, $psk);
-  }
+  $password = isset($_POST['password']) ? $_POST['password'] : null;
+  $remember = isset($_POST['remember']);
+  $success = connectToNetwork($_DATABASE, $ssid, $password, $remember);
+  $connection_failed = !$success;
 } elseif (isset($_POST['forget'])) {
   $ssid = $_POST['known_networks'];
   removeKnownNetwork($_DATABASE, $ssid);
@@ -47,6 +42,7 @@ $connected_network = obtainConnectedNetworkSSID();
 
   <main>
     <div class="container">
+      <?php echo $connection_failed ? '<div class="alert alert-danger text-center">Tilkobling mislyktes, vennligst prøv igjen.</div>' : ''; ?>
       <h1 class="my-4">Enhetsinnstillinger</h1>
       <form id="server_settings_form" action="" method="post">
         <div class="row mb-3">

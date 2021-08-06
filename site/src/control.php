@@ -199,5 +199,23 @@ function obtainConnectedNetworkSSID() {
   return $ssid;
 }
 
-function connectToNetwork($ssid, $psk) {
+function executeConnectionToNetwork($ssid, $password, $remember) {
+  $arguments = array("'$ssid'", "'$password'");
+  if ($remember) {
+    array_push($arguments, '--save');
+  }
+  $result = executeServerControlActionWithResult('connect_to_network', $arguments, true);
+  $result_code = $result['result_code'];
+  if ($result_code != 0) {
+    if ($result_code == 1) {
+      return false;
+    } else {
+      bm_error("Connection to network with SSID $ssid failed with error code $result_code:\n" . join("\n", $result['output']));
+    }
+  }
+  return true;
+}
+
+function executeRemovalOfKnownNetwork($ssid) {
+  executeServerControlActionWithResult('remove_network', "'$ssid'");
 }
