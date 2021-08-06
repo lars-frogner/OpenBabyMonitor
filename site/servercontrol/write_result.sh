@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+
 ERROR_CODE="$1"
 OUTPUT="$2"
 
