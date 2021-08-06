@@ -25,7 +25,7 @@ if [[ "$SETUP_ENV" = true ]]; then
 fi
 
 stty -echo
-printf "New access point password (8-64 characters): "
+printf "New access point password (8-63 characters): "
 read PASSWORD
 stty echo
 printf '\n'
