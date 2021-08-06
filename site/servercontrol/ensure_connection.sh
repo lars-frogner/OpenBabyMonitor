@@ -1,4 +1,5 @@
 #!/bin/bash
+source /home/pi/babymonitor/env/envvar_exports
 
 ACCESS_POINT_ACTIVE=$($BM_SERVERCONTROL_DIR/access_point_active.sh)
 
