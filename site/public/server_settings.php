@@ -18,14 +18,12 @@ if (isset($_POST['connect'])) {
   }
 } elseif (isset($_POST['forget'])) {
   $ssid = $_POST['known_networks'];
-  deleteKnownNetwork($_DATABASE, $ssid);
+  removeKnownNetwork($_DATABASE, $ssid);
 }
 
 $mode = readCurrentMode($_DATABASE);
 $available_networks = obtainWirelessScanResults();
-if (!isset($known_networks)) {
-  $known_networks = readKnownNetworks($_DATABASE);
-}
+$known_networks = readKnownNetworks($_DATABASE);
 $connected_network = obtainConnectedNetworkSSID();
 ?>
 

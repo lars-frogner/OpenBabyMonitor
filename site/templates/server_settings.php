@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/config/path_config.php');
 require_once(SRC_PATH . '/database.php');
+require_once(SRC_PATH . '/control.php');
 
 define('KNOWN_NETWORKS_TABLE_NAME', 'known_networks');
 
@@ -13,24 +14,20 @@ function networkIsKnown($database, $ssid) {
 }
 
 function readKnownNetworks($database) {
-  $results = readValuesFromTable($database, KNOWN_NETWORKS_TABLE_NAME, '*', false, true);
-  $networks = array();
-  foreach ($results as $data) {
-    $networks[$data['ssid']] = $data['psk'];
+  $values = readValuesFromTable($database, KNOWN_NETWORKS_TABLE_NAME, '*', true, true);
+  return empty($values) ? $values : $values[0];
+}
+
+function connectToNetwork($database, $ssid, $password, $remember) {
+  $success = executeConnectionToNetwork($ssid, $password, $remember);
+  if ($success && $remember) {
+    insertValuesIntoTable($database, KNOWN_NETWORKS_TABLE_NAME, array('ssid' => $ssid));
   }
-  return $networks;
+  return $success;
 }
 
-function readKnownNetworkPSK($database, $ssid) {
-  return
-    readValuesFromTable($database, KNOWN_NETWORKS_TABLE_NAME, 'psk', false, "ssid = '$ssid'");
-}
-
-function rememberNetwork($database, $ssid, $psk) {
-  insertValuesIntoTable($database, KNOWN_NETWORKS_TABLE_NAME, array('ssid' => $ssid, 'psk' => $psk));
-}
-
-function deleteKnownNetwork($database, $ssid) {
+function removeKnownNetwork($database, $ssid) {
+  executeRemovalOfKnownNetwork($ssid);
   deleteTableRows($database, KNOWN_NETWORKS_TABLE_NAME, "ssid = '$ssid'");
 }
 
@@ -51,7 +48,7 @@ function generateAvailableNetworksSelect($available_networks, $known_networks, $
   line("<select name=\"$id\" class=\"form-select\" size=\"$size\" id=\"$id\">");
   foreach ($available_networks as $ssid => $data) {
     $requires_password = $data['authentication'] ? 'true' : 'false';
-    $is_known = array_key_exists($ssid, $known_networks) ? 'true' : 'false';
+    $is_known = in_array($ssid, $known_networks) ? 'true' : 'false';
     $is_connected = $ssid == $connected_network;
     $name = $ssid . ($is_connected ? ' (tilkoblet)' : '');
     $is_connected = $is_connected ? 'true' : 'false';
@@ -65,7 +62,7 @@ function generateAvailableNetworksSelect($available_networks, $known_networks, $
 function generateKnownNetworksSelect($known_networks, $id) {
   $size = max(2, count($known_networks));
   line("<select name=\"$id\" class=\"form-select\" size=\"$size\" id=\"$id\">");
-  foreach ($known_networks as $ssid => $psk) {
+  foreach ($known_networks as $ssid) {
     line("<option value=\"$ssid\">$ssid</option>");
   }
   line('</select>');

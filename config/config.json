@@ -84,9 +84,6 @@
     "known_networks": {
         "ssid": {
             "type": "VARCHAR(64) PRIMARY KEY"
-        },
-        "psk": {
-            "type": "CHAR(64)"
         }
     },
     "videostream_settings": {
