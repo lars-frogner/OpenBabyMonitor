@@ -31,8 +31,8 @@ def stream_video_with_settings(vertical_resolution=720,
                                volume=1.0,
                                show_time=True):
     mic_id = os.environ['BM_MIC_ID']
+    error_log_path = os.environ['BM_ERROR_LOG_PATH']
     picam_path = os.environ['BM_PICAM_DIR']
-    picam_log_path = os.environ['BM_PICAM_LOG_PATH']
     picam_output_path = os.environ['BM_PICAM_STREAM_DIR']
 
     assert vertical_resolution in HORIZONTAL_RESOLUTIONS, \
@@ -75,12 +75,12 @@ def stream_video_with_settings(vertical_resolution=720,
 
     output_args = ['--hlsdir', picam_output_path]
 
-    with open(picam_log_path, 'a') as log_file:
+    with open(error_log_path, 'a') as log_file:
         subprocess.check_call([os.path.join(picam_path, 'picam')] +
                               output_args + resolution_args + fps_args +
                               orientation_args + brightness_args + color_args +
                               audio_args + time_args,
-                              stdout=log_file,
+                              subprocess.DEVNULL,
                               stderr=log_file,
                               cwd=picam_path)
 
