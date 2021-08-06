@@ -6,9 +6,13 @@ function readJSON($filepath) {
   if (!$contents) {
     bm_error("Could not read $filepath");
   }
-  $json_data = json_decode($contents, true);
+  return parseJSON($contents);
+}
+
+function parseJSON($string) {
+  $json_data = json_decode($string, true);
   if (!isset($json_data)) {
-    bm_error("Could not decode $filepath as JSON");
+    bm_error("Could not decode JSON:\n$string");
   }
   return $json_data;
 }
