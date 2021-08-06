@@ -141,16 +141,43 @@ function restartCurrentMode($database) {
   switchMode($database, readCurrentMode($database), false);
 }
 
-function executeServerControlAction($action, $argument_env_name = null, $argument_value = null) {
+function executeServerControlAction($action, $arguments = null) {
+  if (is_null($arguments)) {
+    $arguments = '';
+  } elseif (!is_array($arguments)) {
+    $arguments = " $arguments";
+  } else {
+    $arguments = ' ' . join(' ', $arguments);
+  }
   if (!key_exists($action, SERVER_ACTION_COMMANDS)) {
     bm_error("Invalid server action $action");
   }
   $output = null;
   $result_code = null;
-  exec(ENVVAR_ASSIGNMENT . ((is_null($argument_env_name) || is_null($argument_value)) ? '' : "$argument_env_name=$argument_value; ") . SERVER_ACTION_COMMANDS[$action], $output, $result_code);
+  exec('rm -f ' . SERVER_ACTION_RESULT_FILE, $output, $result_code);
   if ($result_code != 0) {
+    bm_error("Deletion of action result file failed with error code $result_code:\n" . join("\n", $output));
+  }
+  $output = null;
+  $result_code = null;
+  exec(ENVVAR_ASSIGNMENT . SERVER_ACTION_COMMANDS[$action] . $arguments, $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Initiation of server action command $action failed with error code $result_code:\n" . join("\n", $output));
+  }
+}
+
+function executeServerControlActionWithResult($action, $arguments = null, $return_result_code = false) {
+  executeServerControlAction($action, $arguments);
+  waitForFileToExist(SERVER_ACTION_RESULT_FILE, NETWORK_QUERY_INTERVAL, NETWORK_SWITCH_TIMEOUT);
+  $result = readLines(SERVER_ACTION_RESULT_FILE);
+  $result_code = $result[0];
+  $output = (count($result) > 1) ? array_slice($result, 1) : array();
+  if ($return_result_code) {
+    return array('result_code' => $result_code, 'output' => $output);
+  } elseif ($result_code != 0) {
     bm_error("Server action command $action failed with error code $result_code:\n" . join("\n", $output));
   }
+  return $output;
 }
 
 function obtainWirelessScanResults() {

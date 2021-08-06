@@ -6,5 +6,5 @@ redirectIfLoggedOut('index.php');
 
 if (isset($_POST['current_timestamp'])) {
   $timestamp = $_POST['current_timestamp'];
-  executeServerControlAction('set_timestamp', 'TIMESTAMP', $timestamp);
+  executeServerControlAction('set_timestamp', $timestamp);
 }
