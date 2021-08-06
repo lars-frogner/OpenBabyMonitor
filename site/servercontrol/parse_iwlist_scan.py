@@ -24,13 +24,5 @@ def parse(iwlist_output):
 if __name__ == '__main__':
     import sys
 
-    assert len(
-        sys.argv
-    ) > 1, 'Usage: sudo iwlist <interface> scan | {} <Output path>'.format(
-        sys.argv[0])
-    output_path = sys.argv[1]
-
     parsed = parse(sys.stdin.read())
-
-    with open(output_path, 'w') as f:
-        json.dump(parsed, f)
+    json.dump(parsed, sys.stdout)

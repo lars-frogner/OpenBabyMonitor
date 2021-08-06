@@ -33,6 +33,7 @@ $_CONTROL_INFO = $_CONFIG['control'];
 define('MODE_QUERY_INTERVAL', intval($_CONTROL_INFO['mode_query_interval'] * 1e6)); // In microseconds
 define('MODE_SWITCH_TIMEOUT', intval($_CONTROL_INFO['mode_switch_timeout'] * 1e6));
 
+define('SERVER_ACTION_RESULT_FILE', getenv('BM_SERVER_ACTION_RESULT_FILE'));
 define('SERVER_ACTION_COMMANDS', $_CONTROL_INFO['server_actions']['commands']);
 
 define('SERVER_LOCK_COMMANDS', $_CONTROL_INFO['lock_commands']);
