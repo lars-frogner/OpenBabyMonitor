@@ -69,6 +69,13 @@ function selectKnownNetwork() {
     enableButton($('#' + FORGET_BUTTON_ID));
 }
 
+function performPrePostActions() {
+    setDisabledForNavbar(true);
+    $('#' + SETTINGS_FORM_CONTAINER_ID).find('*').hide();
+    $('#' + SWITCHING_INFO_ID).show();
+    $('#' + MODAL_ID).modal('hide');
+}
+
 $('#' + AVAILABLE_NETWORKS_SELECT_ID).change(function () {
     $('#' + KNOWN_NETWORKS_SELECT_ID).prop('value', '');
     const network_meta = $('#' + this.value).data('network_meta');
@@ -93,7 +100,7 @@ $('#' + PASSWORD_INPUT_ID).on('input', function () {
 });
 
 $(function () {
-    connectLinkToModal(CONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble til nettverket?', confirm: 'Koble til', dismiss: 'Avbryt', confirm_onclick: () => { $('#' + CONNECT_SUBMIT_BUTTON_ID).click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til det nye nettverket.', showText: () => { return true; } });
+    connectLinkToModal(CONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble til nettverket?', confirm: 'Koble til', dismiss: 'Avbryt', confirm_onclick: () => { performPrePostActions(); $('#' + CONNECT_SUBMIT_BUTTON_ID).click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til det nye nettverket.', showText: () => { return true; } });
     connectLinkToModal(DISCONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble fra nettverket?', confirm: 'Koble fra', dismiss: 'Avbryt', confirm_class: 'btn btn-warning', confirm_onclick: () => { $('#' + DISCONNECT_SUBMIT_BUTTON_ID)[0].click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til enhetens tilgangspunkt.', showText: () => { return true; } });
-    connectLinkToModal(FORGET_BUTTON_ID, { header: 'Er du sikker på at du vil glemme nettverket?', confirm: 'Glem', dismiss: 'Avbryt', confirm_class: 'btn btn-danger', confirm_onclick: () => { $('#' + FORGET_SUBMIT_BUTTON_ID).click(); } }, null);
+    connectLinkToModal(FORGET_BUTTON_ID, { header: 'Er du sikker på at du vil glemme nettverket?', confirm: 'Glem', dismiss: 'Avbryt', confirm_class: 'btn btn-danger', confirm_onclick: () => { performPrePostActions(); $('#' + FORGET_SUBMIT_BUTTON_ID).click(); } }, null);
 });

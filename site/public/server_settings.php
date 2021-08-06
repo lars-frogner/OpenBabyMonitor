@@ -4,13 +4,12 @@ redirectIfLoggedOut('index.php');
 
 require_once(TEMPLATES_PATH . '/server_settings.php');
 
-$connection_failed = false;
+$connection_succeeded = null;
 if (isset($_POST['connect'])) {
   $ssid = $_POST['available_networks'];
   $password = isset($_POST['password']) ? $_POST['password'] : null;
   $remember = isset($_POST['remember']);
-  $success = connectToNetwork($_DATABASE, $ssid, $password, $remember);
-  $connection_failed = !$success;
+  $connection_succeeded = connectToNetwork($_DATABASE, $ssid, $password, $remember);
 } elseif (isset($_POST['forget'])) {
   $ssid = $_POST['known_networks'];
   removeKnownNetwork($_DATABASE, $ssid);
@@ -41,8 +40,29 @@ $connected_network = obtainConnectedNetworkSSID();
   </header>
 
   <main>
-    <div class="container">
-      <?php echo $connection_failed ? '<div class="alert alert-danger text-center">Tilkobling mislyktes, vennligst prøv igjen.</div>' : ''; ?>
+    <div <?php echo ($connection_succeeded === true) ? '' : 'style="display: none;"'; ?>>
+      <div class="d-flex flex-row justify-content-center">
+        <div class="d-flex flex-column">
+          <span class="alert alert-success text-center">Gratulerer, tilkoblingen var vellykket!</span>
+        </div>
+      </div>
+    </div>
+    <div <?php echo ($connection_succeeded === false) ? '' : 'style="display: none;"'; ?>>
+      <div class="d-flex flex-row justify-content-center">
+        <div class="d-flex flex-column">
+          <span class="alert alert-danger text-center">Tilkobling mislyktes, vennligst prøv igjen.</span>
+        </div>
+      </div>
+    </div>
+    <div style="display: none;" id="switching_network_info">
+      <div class="d-flex flex-row justify-content-center">
+        <div class="d-flex flex-column text-center">
+          <span class="alert alert-warning">Bytter nettverk, tilkoblingen vil bli brutt.</span>
+          <a class="btn btn-secondary" href="server_settings.php">Forny siden</a>
+        </div>
+      </div>
+    </div>
+    <div class="container" id="server_settings_form_container">
       <h1 class="my-4">Enhetsinnstillinger</h1>
       <form id="server_settings_form" action="" method="post">
         <div class="row mb-3">
@@ -79,6 +99,7 @@ $connected_network = obtainConnectedNetworkSSID();
           </div>
         </div>
       </form>
+    </div>
   </main>
 </body>
 
@@ -88,6 +109,8 @@ require_once(TEMPLATES_PATH . '/bootstrap_js.php');
 
 <script>
   const SETTINGS_FORM_ID = 'server_settings_form';
+  const SETTINGS_FORM_CONTAINER_ID = 'server_settings_form_container';
+  const SWITCHING_INFO_ID = 'switching_network_info';
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
   const AVAILABLE_NETWORKS_SELECT_ID = 'available_networks';
