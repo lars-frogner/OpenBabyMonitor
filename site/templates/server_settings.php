@@ -14,8 +14,7 @@ function networkIsKnown($database, $ssid) {
 }
 
 function readKnownNetworks($database) {
-  $values = readValuesFromTable($database, KNOWN_NETWORKS_TABLE_NAME, '*', true, true);
-  return empty($values) ? $values : $values[0];
+  return readValuesFromTable($database, KNOWN_NETWORKS_TABLE_NAME, 'ssid', true, true);
 }
 
 function connectToNetwork($database, $ssid, $password, $remember) {

@@ -144,7 +144,6 @@ function deleteTableRows($database, $table_name, $condition) {
 
 function readValuesFromTable($database, $table_name, $columns, $return_with_numeric_keys = false, $condition = 'id = 0') {
   $column_string = is_array($columns) ? join(', ', $columns) : $columns;
-  $multiple_columns = is_array($columns) || $columns === '*';
 
   $command = "SELECT $column_string FROM `$table_name`" . (($condition === true) ? ';' : " WHERE $condition;");
   $result = $database->query($command);
@@ -156,8 +155,10 @@ function readValuesFromTable($database, $table_name, $columns, $return_with_nume
     bm_warning("Column(s) $column_string not present in table $table_name");
     return $result;
   }
-  if ($multiple_columns) {
-    $columns = array_keys($result[0]);
+  $columns = array_keys($result[0]);
+  $multiple_columns = count($columns) > 1;
+  if (!$multiple_columns) {
+    $columns = $columns[0];
   }
   if ($return_with_numeric_keys) {
     if ($multiple_columns) {
