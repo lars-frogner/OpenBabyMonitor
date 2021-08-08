@@ -38,7 +38,9 @@ BM_WRITE_PERMISSIONS=770
 PHP_TIMEZONE=Europe/Oslo
 
 APACHE_LOG_DIR=/var/log/apache2
-BM_ERROR_LOG_PATH=$APACHE_LOG_DIR/error.log
+BM_APACHE_LOG_PATH=$APACHE_LOG_DIR/error.log
+SERVER_LOG_DIR=/var/log/babymonitor
+BM_SERVER_LOG_PATH=$SERVER_LOG_DIR/error.log
 
 BM_DIR=$(dirname $(readlink -f $0))
 BM_ENV_DIR=$BM_DIR/env
@@ -145,8 +147,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_READ_PERMISSIONS=$BM_READ_PERMISSIONS" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_WRITE_PERMISSIONS=$BM_WRITE_PERMISSIONS" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_DIR=$BM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_ERROR_LOG_PATH=$BM_ERROR_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SERVER_LOG_PATH=$BM_SERVER_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
@@ -262,7 +263,7 @@ Description=Babymonitor root startup script
 Type=forking
 EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/root_startup.sh
-StandardError=append:$BM_ERROR_LOG_PATH
+StandardError=append:$BM_SERVER_LOG_PATH
 
 [Install]
 WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$ROOT_STARTUP_SERVICE_FILENAME
@@ -282,7 +283,7 @@ User=$BM_SERVER_USER
 Group=$BM_WEB_GROUP
 EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/startup.sh
-StandardError=append:$BM_ERROR_LOG_PATH
+StandardError=append:$BM_SERVER_LOG_PATH
 
 [Install]
 WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
@@ -307,7 +308,7 @@ User=$BM_SERVER_USER
 Group=$BM_WEB_GROUP
 EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/$SERVICE.sh
-StandardError=append:$BM_ERROR_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
+StandardError=append:$BM_SERVER_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
 
         sudo ln -sfn {$LINKED_UNIT_DIR,$UNIT_DIR}/$SERVICE_FILENAME
 
@@ -348,8 +349,10 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
     sudo chmod $BM_WRITE_PERMISSIONS $BM_MODE_LOCK_DIR
 
-    sudo chown $BM_SERVER_USER:$BM_WEB_GROUP $BM_ERROR_LOG_PATH
-    sudo chmod $BM_WRITE_PERMISSIONS $BM_ERROR_LOG_PATH
+    sudo mkdir -p $SERVER_LOG_DIR
+    sudo touch $BM_SERVER_LOG_PATH
+    sudo chown $BM_SERVER_USER:$BM_WEB_GROUP
+    sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_LOG_PATH
 
     # Link site folder to default Apache site root
     sudo ln -s $BM_LINKED_SITE_DIR $BM_SITE_DIR
@@ -364,7 +367,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     SITE_NAME=$(basename $BM_SITE_DIR)
     echo "<VirtualHost *:80>
 	DocumentRoot $BM_SITE_DIR
-	ErrorLog $BM_ERROR_LOG_PATH
+	ErrorLog $BM_APACHE_LOG_PATH
 	CustomLog $APACHE_LOG_DIR/access.log combined
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME

@@ -31,9 +31,9 @@ def stream_video_with_settings(vertical_resolution=720,
                                volume=1.0,
                                show_time=True):
     mic_id = os.environ['BM_MIC_ID']
-    error_log_path = os.environ['BM_ERROR_LOG_PATH']
-    picam_path = os.environ['BM_PICAM_DIR']
-    picam_output_path = os.environ['BM_PICAM_STREAM_DIR']
+    log_path = os.environ['BM_SERVER_LOG_PATH']
+    picam_dir = os.environ['BM_PICAM_DIR']
+    picam_output_dir = os.environ['BM_PICAM_STREAM_DIR']
 
     assert vertical_resolution in HORIZONTAL_RESOLUTIONS, \
         'Vertical resolution ({}) is not one of {}'.format(
@@ -73,16 +73,16 @@ def stream_video_with_settings(vertical_resolution=720,
     time_args = ['--time', '--timeformat', r'%a %d.%m.%Y %T'
                  ] if show_time else []
 
-    output_args = ['--hlsdir', picam_output_path]
+    output_args = ['--hlsdir', picam_output_dir]
 
-    with open(error_log_path, 'a') as log_file:
-        subprocess.check_call([os.path.join(picam_path, 'picam')] +
+    with open(log_path, 'a') as log_file:
+        subprocess.check_call([os.path.join(picam_dir, 'picam')] +
                               output_args + resolution_args + fps_args +
                               orientation_args + brightness_args + color_args +
                               audio_args + time_args,
                               subprocess.DEVNULL,
                               stderr=log_file,
-                              cwd=picam_path)
+                              cwd=picam_output_dir)
 
 
 if __name__ == '__main__':
