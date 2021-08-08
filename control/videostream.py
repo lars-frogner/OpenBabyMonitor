@@ -80,7 +80,7 @@ def stream_video_with_settings(vertical_resolution=720,
                               output_args + resolution_args + fps_args +
                               orientation_args + brightness_args + color_args +
                               audio_args + time_args,
-                              subprocess.DEVNULL,
+                              stdout=subprocess.DEVNULL,
                               stderr=log_file,
                               cwd=picam_output_dir)
 
