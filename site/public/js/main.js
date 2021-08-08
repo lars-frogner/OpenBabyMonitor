@@ -1,3 +1,7 @@
+const MODE_CONTENT_AUDIO_ID = 'mode_content_audio';
+const AUDIO_STREAM_PARENT_ID = MODE_CONTENT_AUDIO_ID + '_box';
+const AUDIO_ID = 'audiostream_audio';
+
 const MODE_CONTENT_VIDEO_ID = 'mode_content_video';
 const VIDEO_STREAM_PARENT_ID = MODE_CONTENT_VIDEO_ID + '_box';
 const VIDEO_STREAM_DIV_ID = 'video_stream';
@@ -6,7 +10,7 @@ const VIDEO_STREAM_SRC = 'hls/index.m3u8';
 const VIDEO_STREAM_TYPE = 'application/x-mpegURL';
 
 const MODE_RADIO_IDS = ['mode_radio_standby', 'mode_radio_listen', 'mode_radio_audio', 'mode_radio_video'];
-const MODE_CONTENT_IDS = ['mode_content_standby', 'mode_content_listen', 'mode_content_audio', MODE_CONTENT_VIDEO_ID];
+const MODE_CONTENT_IDS = ['mode_content_standby', 'mode_content_listen', MODE_CONTENT_AUDIO_ID, MODE_CONTENT_VIDEO_ID];
 
 const WAITING_CONTENT_ID = 'mode_content_waiting';
 
@@ -17,8 +21,11 @@ var _CURRENT_MODE = INITIAL_MODE;
 
 $(function () {
     registerModeChangeHandler();
+    if (INITIAL_MODE == AUDIOSTREAM_MODE) {
+        enable_audio_stream_player();
+    }
     if (INITIAL_MODE == VIDEOSTREAM_MODE) {
-        create_video_element();
+        enable_video_stream_player();
     }
     setDisabledForRelevantElements(false);
 });
@@ -103,10 +110,15 @@ function setVisibleContent(visible_content_id) {
     } else {
         waiting_content.hide();
     }
-    if (visible_content_id == MODE_CONTENT_VIDEO_ID) {
-        show_video_stream_player();
+    if (visible_content_id == MODE_CONTENT_AUDIO_ID) {
+        enable_audio_stream_player();
     } else {
-        hide_video_stream_player();
+        disable_audio_stream_player();
+    }
+    if (visible_content_id == MODE_CONTENT_VIDEO_ID) {
+        enable_video_stream_player();
+    } else {
+        disable_video_stream_player();
     }
     MODE_CONTENT_IDS.forEach(content_id => {
         var content = $('#' + content_id);
@@ -141,13 +153,32 @@ function create_video_element() {
     });
 }
 
-function show_video_stream_player() {
+function enable_video_stream_player() {
     create_video_element();
 }
 
-function hide_video_stream_player() {
+function disable_video_stream_player() {
     var player = videojs.getPlayer(VIDEO_STREAM_ID);
     if (player && !player.isDisposed()) {
         player.dispose();
+    }
+}
+
+function enable_audio_stream_player() {
+    create_audio_element();
+}
+
+function create_audio_element() {
+    var audio_element = $('<audio></audio>')
+        .prop({ id: AUDIO_ID, controls: true, autoplay: true, preload: 'none' })
+        .append($('<source></source>').prop({ src: AUDIO_SRC, type: 'audio/mpeg' }))
+        .append('Denne funksjonaliteten er ikke tilgjengelig i din nettleser.');
+    $('#' + AUDIO_STREAM_PARENT_ID).append(audio_element);
+}
+
+function disable_audio_stream_player() {
+    var player = document.getElementById(AUDIO_ID);
+    if (player) {
+        player.remove();
     }
 }

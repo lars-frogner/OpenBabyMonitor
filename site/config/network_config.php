@@ -20,3 +20,5 @@ define('ACCESS_POINT_ACTIVE', $output[0] == $_NETWORK_INFO['wireless_modes']['ac
 define('CONNECTED_TO_EXTERNAL_NETWORK', $output[0] == $_NETWORK_INFO['wireless_modes']['client']);
 
 define('GET_CONNECTED_NETWORK_SSID_SCRIPT', getenv('BM_SERVERCONTROL_DIR') . '/' . $_NETWORK_INFO['connected_network_ssid_script_filename']);
+
+define('SERVER_IP', trim(`hostname -I`));

@@ -48,9 +48,11 @@ BM_ENV_EXPORTS_PATH=$BM_ENV_DIR/envvar_exports
 BM_ENV_PATH=$BM_ENV_DIR/envvars
 BM_SITE_DIR=/var/www/babymonitor
 BM_LINKED_SITE_DIR=$BM_DIR/site/public
-BM_PICAM_DIR=$BM_DIR/picam
-BM_PICAM_LOG_PATH=/var/log/picam.log
 BM_SHAREDMEM_DIR=/run/shm
+BM_MICSTREAM_DIR=/usr/local/bin
+BM_MICSTREAM_ENDPOINT=/audiostream/stream.mp3
+BM_MICSTREAM_PORT=8080
+BM_PICAM_DIR=$BM_DIR/picam
 BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/hls
 BM_PICAM_LINKED_STREAM_DIR=$BM_LINKED_SITE_DIR/hls
 BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
@@ -129,11 +131,31 @@ dtoverlay=disable-bt" | sudo tee -a /boot/config.txt
     sudo systemctl disable bluetooth
 fi
 
-SETUP_MIC=true
-if [[ "$SETUP_MIC" = true ]]; then
-    sudo adduser $SERVER_USER audio
+SETUP_AUDIO=true
+if [[ "$SETUP_AUDIO" = true ]]; then
+    WD="$(pwd)"
+    cd /tmp
+    git clone https://github.com/BlackLight/micstream.git
+    cd micstream
+    sudo python3 setup.py install # Installs /usr/local/bin/micstream
+    cd -
+    sudo rm -rf micstream
+    cd "$WD"
+
+    sudo adduser $BM_SERVER_USER audio
+
     BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
-    echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_PATH
+    echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_EXPORTS_PATH
+
+    # Create folder for stream endpoint
+    MICSTREAM_ENDPOINT_DIR="$BM_LINKED_SITE_DIR/$(dirname BM_MICSTREAM_ENDPOINT)"
+    mkdir -p $MICSTREAM_ENDPOINT_DIR
+
+    # Add header entry to prevent browsers from caching the streamed file
+    echo "<ifModule mod_headers.c>
+    Header set Cache-Control no-cache
+</ifModule>
+    " > $MICSTREAM_ENDPOINT_DIR/.htaccess
 fi
 
 SETUP_ENV=true
@@ -149,6 +171,10 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_DIR=$BM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_LOG_PATH=$BM_SERVER_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_MICSTREAM_DIR=$BM_MICSTREAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_MICSTREAM_ENDPOINT=$BM_MICSTREAM_ENDPOINT" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_MICSTREAM_PORT=$BM_MICSTREAM_PORT" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVERCONTROL_DIR=$BM_SERVERCONTROL_DIR" >> $BM_ENV_EXPORTS_PATH
@@ -215,7 +241,7 @@ fi
 INSTALL_PICAM=true
 if [[ "$INSTALL_PICAM" = true ]]; then
     # Create directories and symbolic links
-    sudo install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS $BM_PICAM_DIR{,/archive} $BM_SHAREDMEM_DIR/{rec,hooks,state}
+    sudo install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS $BM_PICAM_DIR{,/archive}
 
     ln -sfn {$BM_PICAM_DIR,$BM_SHAREDMEM_DIR/rec}/archive
     ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/rec

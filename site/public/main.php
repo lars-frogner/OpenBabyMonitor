@@ -42,7 +42,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
       <div id="mode_content_audio" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
         <div class="d-flex flex-row justify-content-center">
-          <p>Audio</p>
+          <div id="mode_content_audio_box"></div>
         </div>
       </div>
 
@@ -100,8 +100,11 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
   <script>
     const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
+    const AUDIOSTREAM_MODE = <?php echo MODE_VALUES['audiostream']; ?>;
     const VIDEOSTREAM_MODE = <?php echo MODE_VALUES['videostream']; ?>;
     const INITIAL_MODE = <?php echo $mode; ?>;
+
+    const AUDIO_SRC = <?php echo '\'http://' . SERVER_IP . ':' . getenv('BM_MICSTREAM_PORT') . getenv('BM_MICSTREAM_ENDPOINT') . '\''; ?>;
   </script>
   <script src="js/confirmation_modal.js"></script>
   <script src="js/navbar.js"></script>
