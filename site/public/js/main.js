@@ -1,13 +1,5 @@
-const MODE_CONTENT_AUDIO_ID = 'mode_content_audio';
-const AUDIO_STREAM_PARENT_ID = MODE_CONTENT_AUDIO_ID + '_box';
-const AUDIO_ID = 'audiostream_audio';
 
-const MODE_CONTENT_VIDEO_ID = 'mode_content_video';
-const VIDEO_STREAM_PARENT_ID = MODE_CONTENT_VIDEO_ID + '_box';
-const VIDEO_STREAM_DIV_ID = 'video_stream';
-const VIDEO_STREAM_ID = VIDEO_STREAM_DIV_ID + '_html5_api';
-const VIDEO_STREAM_SRC = 'hls/index.m3u8';
-const VIDEO_STREAM_TYPE = 'application/x-mpegURL';
+
 
 const MODE_RADIO_IDS = ['mode_radio_standby', 'mode_radio_listen', 'mode_radio_audio', 'mode_radio_video'];
 const MODE_CONTENT_IDS = ['mode_content_standby', 'mode_content_listen', MODE_CONTENT_AUDIO_ID, MODE_CONTENT_VIDEO_ID];
@@ -21,12 +13,6 @@ var _CURRENT_MODE = INITIAL_MODE;
 
 $(function () {
     registerModeChangeHandler();
-    if (INITIAL_MODE == AUDIOSTREAM_MODE) {
-        enable_audio_stream_player();
-    }
-    if (INITIAL_MODE == VIDEOSTREAM_MODE) {
-        enable_video_stream_player();
-    }
     setDisabledForRelevantElements(false);
 });
 
@@ -137,48 +123,5 @@ function getContentIdByRadioId(radio_id) {
     } else {
         alert('Invalid radio ID' + radio_id);
         return null;
-    }
-}
-
-function create_video_element() {
-    var video_element = $('<video></video>')
-        .addClass('video-js vjs-default-skin vjs-big-play-centered vjs-fill')
-        .prop({ id: VIDEO_STREAM_DIV_ID, controls: true })
-        .hide();
-    $('#' + VIDEO_STREAM_PARENT_ID).append(video_element);
-    videojs(video_element.get(0), { autoplay: 'now', preload: 'metadata', responsive: true }, function () {
-        this.src({ src: VIDEO_STREAM_SRC, type: VIDEO_STREAM_TYPE });
-        $('#' + VIDEO_STREAM_DIV_ID).show(); // New parent element of the video element created by video-js
-        $('#' + VIDEO_STREAM_ID).show(); // The actual video element
-    });
-}
-
-function enable_video_stream_player() {
-    create_video_element();
-}
-
-function disable_video_stream_player() {
-    var player = videojs.getPlayer(VIDEO_STREAM_ID);
-    if (player && !player.isDisposed()) {
-        player.dispose();
-    }
-}
-
-function enable_audio_stream_player() {
-    create_audio_element();
-}
-
-function create_audio_element() {
-    var audio_element = $('<audio></audio>')
-        .prop({ id: AUDIO_ID, controls: true, autoplay: true, preload: 'none' })
-        .append($('<source></source>').prop({ src: AUDIO_SRC, type: 'audio/mpeg' }))
-        .append('Denne funksjonaliteten er ikke tilgjengelig i din nettleser.');
-    $('#' + AUDIO_STREAM_PARENT_ID).append(audio_element);
-}
-
-function disable_audio_stream_player() {
-    var player = document.getElementById(AUDIO_ID);
-    if (player) {
-        player.remove();
     }
 }

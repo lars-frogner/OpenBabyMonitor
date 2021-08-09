@@ -109,6 +109,8 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   <script src="js/confirmation_modal.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/navbar_main.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/video.js"></script>
   <script src="js/main.js"></script>
 
 </body>
