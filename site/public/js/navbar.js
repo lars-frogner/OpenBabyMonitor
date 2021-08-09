@@ -23,6 +23,13 @@ const CLIENT_MODAL_BASE_PROPERTIES = { href: 'activate_client_mode.php', header:
 const AP_MODAL_BASE_BODY_SETTER = { text: 'Du er nå koblet til via et eksternt trådløst nettverk. Enheten vil koble seg av nettverket og opprette sitt eget tilgangspunkt. Du vil logges ut og midlertidig miste forbindelsen med enheten. Enheten vil ikke lenger ha tilgang til internett.', showText: () => { return true; } };
 const CLIENT_MODAL_BASE_BODY_SETTER = { text: 'Du er nå koblet til via enhetens tilgangspunkt, som vil deaktiveres. Du vil logges ut og midlertidig miste forbindelsen med enheten.', showText: () => { return true; } };
 
+$(function () {
+    $('.nav-link').on('click', '.disabled', function (event) {
+        event.preventDefault();
+        return false;
+    })
+});
+
 function setDisabledForNavbar(is_disabled) {
     if (is_disabled) {
         $('.nav-link').addClass('disabled');
@@ -30,10 +37,3 @@ function setDisabledForNavbar(is_disabled) {
         $('.nav-link').removeClass('disabled');
     }
 }
-
-$(function () {
-    $('.nav-link').on('click', '.disabled', function (event) {
-        event.preventDefault();
-        return false;
-    })
-});
