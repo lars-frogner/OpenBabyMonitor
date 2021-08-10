@@ -395,6 +395,10 @@ if [[ "$INSTALL_SERVER" = true ]]; then
 	DocumentRoot $BM_SITE_DIR
 	ErrorLog $BM_APACHE_LOG_PATH
 	CustomLog $APACHE_LOG_DIR/access.log combined
+
+    <Directory "$BM_SITE_DIR">
+        AllowOverride All
+    </Directory>
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME
 fi
