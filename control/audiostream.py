@@ -18,9 +18,13 @@ def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128000):
     micstream_dir = os.environ['BM_MICSTREAM_DIR']
     micstream_endpoint = os.environ['BM_MICSTREAM_ENDPOINT']
     micstream_port = os.environ['BM_MICSTREAM_PORT']
+    micstream_header_filepath = os.environ['BM_MICSTREAM_HEADERS_PATH']
 
-    input_args = ['-v', '--device', 'plug{}'.format(mic_id)]
-    output_args = ['--endpoint', micstream_endpoint, '--port', micstream_port]
+    input_args = ['--device', 'plug{}'.format(mic_id)]
+    output_args = [
+        '--endpoint', micstream_endpoint, '--headers',
+        micstream_header_filepath, '--port', micstream_port
+    ]
     quality_args = [
         '--sample-rate', '{}'.format(sample_rate), '--bitrate',
         '{}'.format(int(round(mp3_bitrate * 1e-3)))
