@@ -3,6 +3,7 @@
 import os
 import subprocess
 import control
+import json
 
 MODE = 'audiostream'
 
@@ -18,7 +19,9 @@ def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128000):
     micstream_dir = os.environ['BM_MICSTREAM_DIR']
     micstream_endpoint = os.environ['BM_MICSTREAM_ENDPOINT']
     micstream_port = os.environ['BM_MICSTREAM_PORT']
-    micstream_header_filepath = os.environ['BM_MICSTREAM_HEADERS_PATH']
+    micstream_header_filepath = os.environ['BM_MICSTREAM_HEADERS_FILE']
+
+    update_headers(micstream_header_filepath)
 
     input_args = ['--device', 'plug{}'.format(mic_id)]
     output_args = [
@@ -35,6 +38,19 @@ def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128000):
                               input_args + output_args + quality_args,
                               stdout=subprocess.DEVNULL,
                               stderr=log_file)
+
+
+def update_headers(header_filepath):
+    ip = subprocess.check_output(['hostname', '-I']).decode().strip()
+    origins = [ip, 'babymonitor.local', 'babymonitor.home']
+    headers = {
+        'Cache-Control':
+        'no-cache',
+        'Access-Control-Allow-Origin':
+        ' '.join(['http://{}'.format(origin) for origin in origins])
+    }
+    with open(header_filepath, 'w') as f:
+        json.dump(headers, f)
 
 
 if __name__ == '__main__':

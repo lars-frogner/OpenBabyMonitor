@@ -51,7 +51,7 @@ BM_LINKED_SITE_DIR=$BM_DIR/site/public
 BM_SHAREDMEM_DIR=/run/shm
 BM_MICSTREAM_DIR=/usr/local/bin
 BM_MICSTREAM_ENDPOINT=/audiostream.mp3
-BM_MICSTREAM_HEADERS_PATH=$BM_LINKED_SITE_DIR/headers.json
+BM_MICSTREAM_HEADERS_FILE=$BM_LINKED_SITE_DIR/audiostream_headers.json
 BM_MICSTREAM_PORT=8080
 BM_PICAM_DIR=$BM_DIR/picam
 BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/hls
@@ -151,10 +151,8 @@ if [[ "$SETUP_AUDIO" = true ]]; then
     # Add headers:
     # 'Cache-Control no-cache' prevents browsers from caching the streamed file
     # 'Access-Control-Allow-Origin *' allows the Apache server to request the stream endpoint
-    echo '{
-    "Cache-Control": "no-cache",
-    "Access-Control-Allow-Origin": "*"
-}' > $BM_MICSTREAM_HEADERS_PATH
+    echo '{}' > $BM_MICSTREAM_HEADERS_FILE
+    chmod $BM_WRITE_PERMISSIONS $BM_MICSTREAM_HEADERS_FILE
 fi
 
 SETUP_ENV=true
@@ -173,7 +171,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_MICSTREAM_DIR=$BM_MICSTREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MICSTREAM_ENDPOINT=$BM_MICSTREAM_ENDPOINT" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MICSTREAM_PORT=$BM_MICSTREAM_PORT" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_MICSTREAM_HEADERS_PATH=$BM_MICSTREAM_HEADERS_PATH" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_MICSTREAM_HEADERS_FILE=$BM_MICSTREAM_HEADERS_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
