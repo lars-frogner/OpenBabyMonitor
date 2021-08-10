@@ -1,6 +1,8 @@
 <?php
+require_once(__DIR__ . '/error_config.php');
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/env_config.php');
+require_once(__DIR__ . '/network_config.php');
 
 function getModeAttributes($attribute_name, $mode_name = null, $converter = null) {
   global $_CONFIG;
