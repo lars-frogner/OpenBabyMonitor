@@ -30,7 +30,7 @@ function releaseModeLock() {
 }
 
 function waitForModeLock() {
-  $result = waitForFileToExist(getenv('BM_MODE_LOCK_FILE'), MODE_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
+  $result = waitForFileToExist(getenv('BM_MODE_LOCK_FILE'), FILE_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
   if ($result == ACTION_TIMED_OUT) {
     releaseModeLock();
   }
@@ -78,8 +78,8 @@ function restartMode($mode) {
 function waitForModeSwitch($database, $new_mode) {
   $elapsed_time = 0;
   while (readCurrentMode($database) != $new_mode) {
-    usleep(MODE_QUERY_INTERVAL);
-    $elapsed_time += MODE_QUERY_INTERVAL;
+    usleep(FILE_QUERY_INTERVAL);
+    $elapsed_time += FILE_QUERY_INTERVAL;
     if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
       updateCurrentMode($database, MODE_VALUES['standby']);
       releaseModeLock();
@@ -105,17 +105,40 @@ function waitForFileToExist($file_path, $interval, $timeout) {
   return ACTION_OK;
 }
 
-function waitForFileUpdate($file_path) {
+function waitForFileUpdate($file_path, $interval, $timeout) {
   $initial_timestamp = time();
   $elapsed_time = 0;
   while (!file_exists($file_path) || filemtime($file_path) <= $initial_timestamp) {
-    usleep(MODE_QUERY_INTERVAL);
-    $elapsed_time += MODE_QUERY_INTERVAL;
-    if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
+    usleep($interval);
+    $elapsed_time += $interval;
+    if ($elapsed_time > $timeout) {
       bm_warning("Wait for update of $file_path timed out");
       return ACTION_TIMED_OUT;
     }
   }
+  return ACTION_OK;
+}
+
+function waitForSocketToOpen($hostname, $port, $interval, $timeout) {
+  $error_code = null;
+  $error_message = null;
+  $elapsed_time = 0;
+  $previous_timestamp = microtime(true) * 1e6;
+  while (!($f = @fsockopen($hostname, $port, $error_code, $error_message, $timeout))) {
+    $timestamp = microtime(true) * 1e6;
+    $call_duration = $timestamp - $previous_timestamp;
+    $previous_timestamp = $timestamp;
+    $remaining_wait_time = $interval - $call_duration;
+    if ($remaining_wait_time > 0) {
+      usleep($remaining_wait_time);
+    }
+    $elapsed_time += max($call_duration, $interval);
+    if ($elapsed_time > $timeout) {
+      bm_warning("Wait for socket $hostname:$port timed out");
+      return ACTION_TIMED_OUT;
+    }
+  }
+  fclose($f);
   return ACTION_OK;
 }
 
@@ -129,9 +152,20 @@ function switchMode($database, $new_mode, $skip_if_same = true) {
   waitForModeSwitch($database, MODE_VALUES['standby']);
   startMode($new_mode);
   waitForModeSwitch($database, $new_mode);
-  $wait_for_file_path = getWaitForFilePath(MODE_NAMES[$new_mode]);
-  if (!is_null($wait_for_file_path)) {
-    waitForFileUpdate($wait_for_file_path);
+  $requirement = getWaitForRequirement(MODE_NAMES[$new_mode]);
+  if (!is_null($requirement)) {
+    $type = $requirement['type'];
+    switch ($type) {
+      case 'file':
+        waitForFileUpdate($requirement['file_path'], FILE_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
+        break;
+      case 'socket':
+        waitForSocketToOpen($requirement['hostname'], $requirement['port'], SOCKET_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
+        break;
+      default:
+        bm_warning("Unknown wait_for requirement type $type");
+        break;
+    }
   }
   releaseModeLock();
   return ACTION_OK;
