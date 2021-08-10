@@ -5,9 +5,9 @@ BUTTON_CLASSES[DISCONNECT_BUTTON_ID] = 'btn btn-warning';
 BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-danger';
 
 $(function () {
-    connectLinkToModal(CONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble til nettverket?', confirm: 'Koble til', dismiss: 'Avbryt', confirm_onclick: () => { performPrePostActions(); $('#' + CONNECT_SUBMIT_BUTTON_ID).click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til det nye nettverket.', showText: () => { return true; } });
-    connectLinkToModal(DISCONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble fra nettverket?', confirm: 'Koble fra', dismiss: 'Avbryt', confirm_class: 'btn btn-warning', confirm_onclick: () => { $('#' + DISCONNECT_SUBMIT_BUTTON_ID)[0].click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til enhetens tilgangspunkt.', showText: () => { return true; } });
-    connectLinkToModal(FORGET_BUTTON_ID, { header: 'Er du sikker på at du vil glemme nettverket?', confirm: 'Glem', dismiss: 'Avbryt', confirm_class: 'btn btn-danger', confirm_onclick: () => { performPrePostActions(); $('#' + FORGET_SUBMIT_BUTTON_ID).click(); } }, null);
+    connectLinkToModal(CONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble til nettverket?', confirm: 'Koble til', dismiss: 'Avbryt', confirmOnclick: () => { performPrePostActions(); $('#' + CONNECT_SUBMIT_BUTTON_ID).click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til det nye nettverket.', showText: () => { return true; } });
+    connectLinkToModal(DISCONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble fra nettverket?', confirm: 'Koble fra', dismiss: 'Avbryt', confirmClass: 'btn btn-warning', confirmOnclick: () => { $('#' + DISCONNECT_SUBMIT_BUTTON_ID)[0].click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til enhetens tilgangspunkt.', showText: () => { return true; } });
+    connectLinkToModal(FORGET_BUTTON_ID, { header: 'Er du sikker på at du vil glemme nettverket?', confirm: 'Glem', dismiss: 'Avbryt', confirmClass: 'btn btn-danger', confirmOnclick: () => { performPrePostActions(); $('#' + FORGET_SUBMIT_BUTTON_ID).click(); } }, null);
 });
 
 function disableButton(button) {
@@ -41,18 +41,18 @@ function selectNoNetwork() {
     disableButton($('#' + FORGET_BUTTON_ID));
 }
 
-function selectAvailableNetwork(network_meta) {
+function selectAvailableNetwork(networkMeta) {
     enablePasswordInput();
     disableButton($('#' + DISCONNECT_BUTTON_ID));
     disableButton($('#' + FORGET_BUTTON_ID));
-    if (network_meta.requires_password && !network_meta.is_known) {
+    if (networkMeta.requiresPassword && !networkMeta.isKnown) {
         enablePasswordInput();
         disableButton($('#' + CONNECT_BUTTON_ID));
     } else {
         disablePasswordInput();
         enableButton($('#' + CONNECT_BUTTON_ID));
     }
-    if (network_meta.is_known) {
+    if (networkMeta.isKnown) {
         $('#' + REMEMBER_CHECK_ID).prop('disabled', true);
     } else {
         $('#' + REMEMBER_CHECK_ID).prop('disabled', false);
@@ -84,11 +84,11 @@ function performPrePostActions() {
 
 $('#' + AVAILABLE_NETWORKS_SELECT_ID).change(function () {
     $('#' + KNOWN_NETWORKS_SELECT_ID).prop('value', '');
-    const network_meta = $('#' + this.value).data('network_meta');
-    if (network_meta.is_connected) {
+    const networkMeta = $('#' + this.value).data('networkMeta');
+    if (networkMeta.isConnected) {
         selectConnectedNetwork();
     } else {
-        selectAvailableNetwork(network_meta);
+        selectAvailableNetwork(networkMeta);
     }
 });
 

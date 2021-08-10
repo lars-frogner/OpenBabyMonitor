@@ -7,28 +7,28 @@ const VIDEO_STREAM_TYPE = 'application/x-mpegURL';
 
 $(function () {
     if (INITIAL_MODE == VIDEOSTREAM_MODE) {
-        enable_video_stream_player();
+        enableVideoStreamPlayer();
     }
 });
 
-function create_video_element() {
-    var video_element = $('<video></video>')
+function createVideoElement() {
+    var videoElement = $('<video></video>')
         .addClass('video-js vjs-default-skin vjs-big-play-centered vjs-fill')
         .prop({ id: VIDEO_STREAM_DIV_ID, controls: true })
         .hide();
-    $('#' + VIDEO_STREAM_PARENT_ID).append(video_element);
-    videojs(video_element.get(0), { autoplay: 'now', preload: 'metadata', responsive: true }, function () {
+    $('#' + VIDEO_STREAM_PARENT_ID).append(videoElement);
+    videojs(videoElement.get(0), { autoplay: 'now', preload: 'metadata', responsive: true }, function () {
         this.src({ src: VIDEO_STREAM_SRC, type: VIDEO_STREAM_TYPE });
         $('#' + VIDEO_STREAM_DIV_ID).show(); // New parent element of the video element created by video-js
         $('#' + VIDEO_STREAM_ID).show(); // The actual video element
     });
 }
 
-function enable_video_stream_player() {
-    create_video_element();
+function enableVideoStreamPlayer() {
+    createVideoElement();
 }
 
-function disable_video_stream_player() {
+function disableVideoStreamPlayer() {
     var player = videojs.getPlayer(VIDEO_STREAM_ID);
     if (player && !player.isDisposed()) {
         player.dispose();

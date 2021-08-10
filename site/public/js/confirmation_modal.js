@@ -22,78 +22,78 @@ function setConfirmationModalProperties(properties) {
     } else {
         body.hide();
     }
-    if (properties.hasOwnProperty('confirm_element') && properties['confirm_element'] == 'button') {
-        confirm_id = MODAL_CONFIRM_BUTTON_ID;
+    if (properties.hasOwnProperty('confirmElement') && properties['confirmElement'] == 'button') {
+        confirmId = MODAL_CONFIRM_BUTTON_ID;
         $('#' + MODAL_CONFIRM_LINK_ID).hide();
     } else {
-        confirm_id = MODAL_CONFIRM_LINK_ID;
+        confirmId = MODAL_CONFIRM_LINK_ID;
         $('#' + MODAL_CONFIRM_BUTTON_ID).hide();
     }
-    $('#' + confirm_id).show();
+    $('#' + confirmId).show();
     if (properties.hasOwnProperty('confirm')) {
-        $('#' + confirm_id).html(properties['confirm']);
+        $('#' + confirmId).html(properties['confirm']);
     }
     if (properties.hasOwnProperty('href')) {
-        $('#' + confirm_id).prop('href', properties['href']);
+        $('#' + confirmId).prop('href', properties['href']);
     }
-    if (properties.hasOwnProperty('confirm_name')) {
-        $('#' + confirm_id).prop('name', properties['confirm_name']);
+    if (properties.hasOwnProperty('confirmName')) {
+        $('#' + confirmId).prop('name', properties['confirmName']);
     }
-    if (properties.hasOwnProperty('confirm_type')) {
-        $('#' + confirm_id).prop('type', properties['confirm_type']);
+    if (properties.hasOwnProperty('confirmType')) {
+        $('#' + confirmId).prop('type', properties['confirmType']);
     }
-    if (properties.hasOwnProperty('confirm_form')) {
-        $('#' + confirm_id).get()[0].form = properties['confirm_form'];
+    if (properties.hasOwnProperty('confirmForm')) {
+        $('#' + confirmId).get()[0].form = properties['confirmForm'];
     }
-    $('#' + confirm_id).removeClass();
-    if (properties.hasOwnProperty('confirm_class')) {
-        $('#' + confirm_id).addClass(properties['confirm_class']);
+    $('#' + confirmId).removeClass();
+    if (properties.hasOwnProperty('confirmClass')) {
+        $('#' + confirmId).addClass(properties['confirmClass']);
     } else {
-        $('#' + confirm_id).addClass('btn btn-primary');
+        $('#' + confirmId).addClass('btn btn-primary');
     }
-    if (properties.hasOwnProperty('confirm_onclick')) {
-        $('#' + confirm_id).click(properties['confirm_onclick']);
+    if (properties.hasOwnProperty('confirmOnclick')) {
+        $('#' + confirmId).click(properties['confirmOnclick']);
     }
     if (properties.hasOwnProperty('dismiss')) {
         $('#' + MODAL_DISMISS_ID).html(properties['dismiss']);
     }
-    if (properties.hasOwnProperty('dismiss_class')) {
-        $('#' + MODAL_DISMISS_ID).addClass(properties['dismiss_class']);
+    if (properties.hasOwnProperty('dismissClass')) {
+        $('#' + MODAL_DISMISS_ID).addClass(properties['dismissClass']);
     }
 }
 
-function connectLinkToModal(link_id, modal_properties, body_setters) {
+function connectLinkToModal(link_id, modalProperties, bodySetters) {
     var link = $('#' + link_id);
     if (!link.length) {
         return;
     }
-    if (!body_setters || (Array.isArray(body_setters) && body_setters.length == 0)) {
-        body_setters = [];
+    if (!bodySetters || (Array.isArray(bodySetters) && bodySetters.length == 0)) {
+        bodySetters = [];
     }
-    if (!Array.isArray(body_setters)) {
-        body_setters = [body_setters];
+    if (!Array.isArray(bodySetters)) {
+        bodySetters = [bodySetters];
     }
-    if (modal_properties.hasOwnProperty('showModal')) {
-        var showModal = modal_properties.showModal;
+    if (modalProperties.hasOwnProperty('showModal')) {
+        var showModal = modalProperties.showModal;
     } else {
         var showModal = () => { return true; };
     }
-    link.data('modal_properties', modal_properties);
-    link.data('body_setters', body_setters);
+    link.data('modalProperties', modalProperties);
+    link.data('bodySetters', bodySetters);
     link.data('showModal', showModal);
 
     link.click(function (event) {
-        var modal_properties = link.data('modal_properties');
-        var body_setters = link.data('body_setters');
+        var modalProperties = link.data('modalProperties');
+        var bodySetters = link.data('bodySetters');
         var showModal = link.data('showModal');
         if (showModal()) {
-            modal_properties['body'] = [];
-            body_setters.forEach(setter => {
+            modalProperties['body'] = [];
+            bodySetters.forEach(setter => {
                 if (setter.showText()) {
-                    modal_properties['body'].push($('<p></p>').text(setter.text));
+                    modalProperties['body'].push($('<p></p>').text(setter.text));
                 }
             });
-            setConfirmationModalProperties(modal_properties);
+            setConfirmationModalProperties(modalProperties);
             event.preventDefault();
             $('#' + MODAL_ID).modal('show');
         }

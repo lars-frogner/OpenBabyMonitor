@@ -53,7 +53,7 @@ function generateAvailableNetworksSelect($available_networks, $known_networks, $
     $is_connected = $is_connected ? 'true' : 'false';
     $color_class = getColorClass($data['quality']);
     line("<option class=\"$color_class\" value=\"$ssid\" id=\"$ssid\">$name</option>");
-    line("<script>$('#' + '$ssid').data('network_meta', {requires_password: $requires_password, is_known: $is_known, is_connected: $is_connected});</script>");
+    line("<script>$('#' + '$ssid').data('networkMeta', {requiresPassword: $requires_password, isKnown: $is_known, isConnected: $is_connected});</script>");
   }
   line('</select>');
 }

@@ -1,6 +1,3 @@
-
-
-
 const MODE_RADIO_IDS = ['mode_radio_standby', 'mode_radio_listen', 'mode_radio_audio', 'mode_radio_video'];
 const MODE_CONTENT_IDS = ['mode_content_standby', 'mode_content_listen', MODE_CONTENT_AUDIO_ID, MODE_CONTENT_VIDEO_ID];
 
@@ -42,9 +39,9 @@ function requestModeChange(radio) {
         body: data
     })
         .then(response => response.text())
-        .then(response_text => handleModeChangeResponse(radio.prop('id'), radio.prop('value'), response_text))
+        .then(responseText => handleModeChangeResponse(radio.prop('id'), radio.prop('value'), responseText))
         .catch(error => {
-            console.log(error)
+            alert(error)
         });
 
     indicateWaiting();
@@ -55,60 +52,60 @@ function indicateWaiting() {
     setVisibleContent(WAITING_CONTENT_ID);
 }
 
-function handleModeChangeResponse(checked_radio_id, checked_radio_value, response_text) {
-    switch (response_text) {
+function handleModeChangeResponse(checkedRadioId, checkedRadioValue, responseText) {
+    switch (responseText) {
         case '0':
-            setCurrentMode(checked_radio_value);
-            setVisibleContent(getContentIdByRadioId(checked_radio_id));
+            setCurrentMode(checkedRadioValue);
+            setVisibleContent(getContentIdByRadioId(checkedRadioId));
             setDisabledForRelevantElements(false);
             break;
         default:
-            if (!response_text) {
-                response_text = 'An error occured on the server.'
+            if (!responseText) {
+                responseText = 'An error occured on the server.'
             }
-            $('#' + ERROR_CONTENT_MESSAGE_ID).html(response_text);
+            $('#' + ERROR_CONTENT_MESSAGE_ID).html(responseText);
             setVisibleContent(ERROR_CONTENT_ID);
             break;
     }
 }
 
-function setDisabledForModeRadios(is_disabled) {
-    MODE_RADIO_IDS.forEach(radio_id => {
-        $('#' + radio_id).prop('disabled', is_disabled);
+function setDisabledForModeRadios(isDisabled) {
+    MODE_RADIO_IDS.forEach(radioId => {
+        $('#' + radioId).prop('disabled', isDisabled);
     });
 }
 
-function setDisabledForRelevantElements(is_disabled) {
-    setDisabledForModeRadios(is_disabled);
-    setDisabledForNavbar(is_disabled);
+function setDisabledForRelevantElements(isDisabled) {
+    setDisabledForModeRadios(isDisabled);
+    setDisabledForNavbar(isDisabled);
 }
 
-function setVisibleContent(visible_content_id) {
-    var error_content = $('#' + ERROR_CONTENT_ID);
-    if (visible_content_id == ERROR_CONTENT_ID) {
-        error_content.show();
+function setVisibleContent(visibleContentId) {
+    var errorContent = $('#' + ERROR_CONTENT_ID);
+    if (visibleContentId == ERROR_CONTENT_ID) {
+        errorContent.show();
     } else {
-        error_content.hide();
+        errorContent.hide();
     }
-    var waiting_content = $('#' + WAITING_CONTENT_ID);
-    if (visible_content_id == WAITING_CONTENT_ID) {
-        waiting_content.show();
+    var waitingContent = $('#' + WAITING_CONTENT_ID);
+    if (visibleContentId == WAITING_CONTENT_ID) {
+        waitingContent.show();
     } else {
-        waiting_content.hide();
+        waitingContent.hide();
     }
-    if (visible_content_id == MODE_CONTENT_AUDIO_ID) {
-        enable_audio_stream_player();
+    if (visibleContentId == MODE_CONTENT_AUDIO_ID) {
+        enableAudioStreamPlayer();
     } else {
-        disable_audio_stream_player();
+        disableAudioStreamPlayer();
     }
-    if (visible_content_id == MODE_CONTENT_VIDEO_ID) {
-        enable_video_stream_player();
+    if (visibleContentId == MODE_CONTENT_VIDEO_ID) {
+        enableVideoStreamPlayer();
     } else {
-        disable_video_stream_player();
+        disableVideoStreamPlayer();
     }
-    MODE_CONTENT_IDS.forEach(content_id => {
-        var content = $('#' + content_id);
-        if (content_id == visible_content_id) {
+    MODE_CONTENT_IDS.forEach(contentId => {
+        var content = $('#' + contentId);
+        if (contentId == visibleContentId) {
             content.show();
         } else {
             content.hide();
@@ -116,12 +113,12 @@ function setVisibleContent(visible_content_id) {
     });
 }
 
-function getContentIdByRadioId(radio_id) {
-    const idx = MODE_RADIO_IDS.indexOf(radio_id);
+function getContentIdByRadioId(radioId) {
+    const idx = MODE_RADIO_IDS.indexOf(radioId);
     if (idx >= 0) {
         return MODE_CONTENT_IDS[idx];
     } else {
-        alert('Invalid radio ID' + radio_id);
+        alert('Invalid radio ID' + radioId);
         return null;
     }
 }

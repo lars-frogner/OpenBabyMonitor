@@ -30,8 +30,8 @@ $(function () {
     })
 });
 
-function setDisabledForNavbar(is_disabled) {
-    if (is_disabled) {
+function setDisabledForNavbar(isDisabled) {
+    if (isDisabled) {
         $('.nav-link').addClass('disabled');
     } else {
         $('.nav-link').removeClass('disabled');
