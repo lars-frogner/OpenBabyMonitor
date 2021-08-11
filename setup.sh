@@ -148,9 +148,6 @@ if [[ "$SETUP_AUDIO" = true ]]; then
     BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
     echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_EXPORTS_PATH
 
-    # Add headers:
-    # 'Cache-Control no-cache' prevents browsers from caching the streamed file
-    # 'Access-Control-Allow-Origin *' allows the Apache server to request the stream endpoint
     echo '{}' > $BM_MICSTREAM_HEADERS_FILE
     chmod $BM_WRITE_PERMISSIONS $BM_MICSTREAM_HEADERS_FILE
 fi

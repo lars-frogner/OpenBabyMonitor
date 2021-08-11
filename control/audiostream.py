@@ -41,6 +41,8 @@ def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128000):
 
 
 def update_headers(header_filepath):
+    # 'Cache-Control: no-cache' prevents browsers from caching the streamed file
+    # 'Access-Control-Allow-Origin: <origin>' allows the Apache server to request the stream endpoint
     ip = subprocess.check_output(['hostname', '-I']).decode().strip()
     origins = [ip, 'babymonitor.local', 'babymonitor.home']
     headers = {
