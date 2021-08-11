@@ -42,7 +42,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
       <div id="mode_content_audio" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
         <div class="d-flex flex-row justify-content-center">
-          <div id="mode_content_audio_box"></div>
+          <div id="mode_content_audio_box" class="row"></div>
         </div>
       </div>
 
