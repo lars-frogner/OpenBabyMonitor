@@ -3,6 +3,8 @@ const AUDIO_STREAM_PARENT_ID = MODE_CONTENT_AUDIO_ID + '_box';
 const AUDIO_ID = 'audiostream_audio';
 const AUDIO_CANVAS_ID = 'audiostream_canvas';
 
+const CANVAS_ASPECT_RATIO = 1.0;
+const CANVAS_MAX_WIDTH = 600;
 const CANVAS_TIME_BACKGROUND = 'rgb(255, 255, 255)';
 const CANVAS_TIME_FOREGROUND = 'rgb(0, 0, 0)';
 const CANVAS_TIME_LINEWIDTH = 2;
@@ -36,8 +38,8 @@ function getAudioCanvas() {
 }
 
 function enableAudioStreamPlayer() {
-    var canvas = createAudioCanvasElement();
     var player = createAudioElement();
+    var canvas = createAudioCanvasElement();
     var analyser = createAudioStreamAnalyser(_AUDIO_CONTEXT, player);
     enableAudioAnimation(player, analyser, canvas, ANIMATION_MODES.FREQUENCY, 2 ** 13);
 }
@@ -50,7 +52,7 @@ function disableAudioStreamPlayer() {
 function createAudioElement() {
     var src = AUDIO_SRC + '?salt=' + new Date().getTime();
     var audio = $('<audio></audio>')
-        .prop({ id: AUDIO_ID, controls: true, autoplay: true, crossOrigin: 'anonymous' })
+        .prop({ id: AUDIO_ID, controls: true, autoplay: true, crossOrigin: 'anonymous' }).css('max-width', CANVAS_MAX_WIDTH + 'px')
         .append($('<source></source>').prop({ src: src, type: 'audio/mpeg' }))
         .append('Denne funksjonaliteten er ikke tilgjengelig i din nettleser.');
     $('#' + AUDIO_STREAM_PARENT_ID).append(audio);
@@ -58,12 +60,26 @@ function createAudioElement() {
 }
 
 function createAudioCanvasElement() {
-    var canvas = $('<canvas></canvas>').prop({ if: AUDIO_CANVAS_ID, width: 250, height: 250 });
-    $('#' + AUDIO_STREAM_PARENT_ID).append(canvas);
+    var canvas = $('<canvas></canvas>').prop('id', AUDIO_CANVAS_ID).addClass('px-0');
+    $('#' + AUDIO_STREAM_PARENT_ID).prepend(canvas);
+    window.addEventListener('resize', resizeAudioCanvas, false);
+    resizeAudioCanvas();
     return canvas.get()[0];
 }
 
+function resizeAudioCanvas() {
+    var canvas = $('#' + AUDIO_CANVAS_ID);
+    var parent = $('#main');
+    var player = $('#' + AUDIO_ID);
+    var width = player.width();
+    var max_height = parent.height() - player.height();
+    var target_height = width / CANVAS_ASPECT_RATIO;
+    var height = Math.min(max_height, target_height);
+    canvas.prop({ width: width, height: height }).css({ width: width + 'px', height: height + 'px' });
+}
+
 function removeAudioElements() {
+    window.removeEventListener('resize', resizeAudioCanvas, false);
     $('#' + AUDIO_STREAM_PARENT_ID).empty();
 }
 
@@ -155,10 +171,8 @@ function animateAudio(analyser, canvas, animationMode, fftSize) {
     });
 
     var canvasContext = canvas.getContext('2d');
-    const width = canvas.width;
-    const height = canvas.height;
 
-    canvasContext.clearRect(0, 0, width, height);
+    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
 
     var previousTimestamp = null;
     var frameCounter = 0;
@@ -180,7 +194,7 @@ function animateAudio(analyser, canvas, animationMode, fftSize) {
             frameCounter++;
 
             fetchData(dataArray);
-            drawFrame(canvasContext, width, height, dataArray);
+            drawFrame(canvasContext, canvas.width, canvas.height, dataArray);
 
             previousTimestamp = timestamp;
         }

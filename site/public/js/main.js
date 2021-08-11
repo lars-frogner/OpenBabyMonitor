@@ -93,11 +93,6 @@ function setVisibleContent(visibleContentId) {
     } else {
         waitingContent.hide();
     }
-    if (visibleContentId == MODE_CONTENT_AUDIO_ID) {
-        enableAudioStreamPlayer();
-    } else {
-        disableAudioStreamPlayer();
-    }
     if (visibleContentId == MODE_CONTENT_VIDEO_ID) {
         enableVideoStreamPlayer();
     } else {
@@ -111,6 +106,11 @@ function setVisibleContent(visibleContentId) {
             content.hide();
         }
     });
+    if (visibleContentId == MODE_CONTENT_AUDIO_ID) {
+        enableAudioStreamPlayer();
+    } else {
+        disableAudioStreamPlayer();
+    }
 }
 
 function getContentIdByRadioId(radioId) {
