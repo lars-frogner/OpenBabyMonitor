@@ -23,8 +23,8 @@ define('HIDDEN_STYLE', 'style="display: none;"');
   ?>
 </head>
 
-<body class="mb-0">
-  <div class="d-flex flex-column overflow-hidden min-vh-100 vh-100">
+<body>
+  <div class="d-flex flex-column min-vh-100 vh-100">
     <header>
       <?php
       require_once(TEMPLATES_PATH . '/navbar.php');
@@ -32,44 +32,43 @@ define('HIDDEN_STYLE', 'style="display: none;"');
       ?>
     </header>
 
-    <main id="main" class="d-flex flex-column flex-grow-1 overflow-auto justify-content-center">
+    <main id="main" class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
 
-      <div id="mode_content_listen" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : '' ?>>
-        <div class="d-flex flex-row justify-content-center">
-          <p>Listen</p>
-        </div>
-      </div>
+      <div class="container-fluid h-100">
+        <div class="row h-100 align-items-center justify-content-center px-0">
 
-      <div id="mode_content_audio" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
-        <div class="d-flex flex-row justify-content-center">
-          <div id="mode_content_audio_box" class="row"></div>
-        </div>
-      </div>
-
-      <div id="mode_content_video" class="h-100" <?php echo ($mode != MODE_VALUES['videostream']) ? HIDDEN_STYLE : '' ?>>
-        <div id="mode_content_video_box" class="d-flex flex-row justify-content-center h-100">
-        </div>
-      </div>
-
-      <div id="mode_content_standby" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
-        <div class="d-flex flex-row justify-content-center">
-          <p>Standby</p>
-        </div>
-      </div>
-
-      <div id="mode_content_waiting" <?php echo HIDDEN_STYLE; ?>>
-        <div class="d-flex flex-row justify-content-center">
-          <span class="spinner-grow text-dark"></span>
-        </div>
-      </div>
-
-      <div id="mode_content_error" <?php echo HIDDEN_STYLE; ?>>
-        <div class="d-flex flex-row justify-content-center text-center">
-          <div class="row">
-            <span id="mode_content_error_message" class="alert alert-danger">Error
-            </span>
-            <a class=" btn btn-secondary" href="main.php">Refresh</a>
+          <div id="mode_content_listen" class="col-auto" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : '' ?>>
+            Listen
           </div>
+
+          <div id="mode_content_audio" class="col-auto" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
+            <div id="mode_content_audio_box" class="row justify-content-center">
+            </div>
+          </div>
+
+          <div id="mode_content_video" class="h-100 px-0" <?php echo ($mode != MODE_VALUES['videostream']) ? HIDDEN_STYLE : '' ?>>
+            <div id="mode_content_video_box" class="h-100">
+            </div>
+          </div>
+
+          <div id="mode_content_standby" class="col-auto" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
+            Standby
+          </div>
+
+          <div id="mode_content_waiting" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
+            <span class="spinner-grow text-dark"></span>
+          </div>
+
+          <div id="mode_content_error" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
+            <div class="container">
+              <div class="row">
+                <span id="mode_content_error_message" class="alert alert-danger text-center">Error
+                </span>
+                <a class=" btn btn-secondary" href="main.php">Refresh</a>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
 
