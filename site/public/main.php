@@ -41,8 +41,46 @@ define('HIDDEN_STYLE', 'style="display: none;"');
             Listen
           </div>
 
-          <div id="mode_content_audio" class="col-auto" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
-            <div id="mode_content_audio_box" class="row justify-content-center">
+          <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
+            <div class="row align-items-center justify-content-center" id="audiostream_visualization_mode_box" <?php echo HIDDEN_STYLE; ?>>
+              <div class="col-auto fw-bold">
+                Visualisering
+              </div>
+              <div class="col-auto">
+                <form>
+                  <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_none_radio" onclick="switchAudioVisualizationModeTo(null);" checked>
+                    <label class="form-check-label" for="none_radio">Ingen</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_time_radio" onclick="switchAudioVisualizationModeTo('time');">
+                    <label class="form-check-label" for="time_radio">Bølge</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_frequency_radio" onclick="switchAudioVisualizationModeTo('frequency');">
+                    <label class="form-check-label" for="frequency_radio">Frekvenser</label>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="row align-items-center justify-content-center" id="audiostream_fftsize_range_box" <?php echo HIDDEN_STYLE; ?>>
+              <div class="col-auto">
+                <label class="form-label" for="audiostream_fftsize_range">Målinger per bilde</label>
+              </div>
+              <div class="col-auto">
+                <div class="row flex-nowrap">
+                  <div class="col-10">
+                    <input type="range" class="form-range" value="11" min="5" max="15" step="1" id="audiostream_fftsize_range" oninput="$('#audiostream_fftsize_range_value').html('2<sup>' + this.value + '</sup>'); switchFFTSizePowerTo(this.value);">
+                  </div>
+                  <div class="col-1">
+                    <output id="audiostream_fftsize_range_value">2<sup>11</sup></output>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row justify-content-center" id="audiostream_canvas_box">
+            </div>
+            <div class="row justify-content-center" id="audiostream_player_box">
             </div>
           </div>
 

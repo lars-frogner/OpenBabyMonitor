@@ -1,6 +1,9 @@
 const MODE_CONTENT_AUDIO_ID = 'mode_content_audio';
-const AUDIO_STREAM_PARENT_ID = MODE_CONTENT_AUDIO_ID + '_box';
-const AUDIO_ID = 'audiostream_audio';
+const AUDIO_PLAYER_PARENT_ID = 'audiostream_player_box';
+const AUDIO_CANVAS_PARENT_ID = 'audiostream_canvas_box';
+const AUDIO_VISUALIZATION_MODE_PARENT_ID = 'audiostream_visualization_mode_box';
+const AUDIO_FFTSIZE_PARENT_ID = 'audiostream_fftsize_range_box';
+const AUDIO_PLAYER_ID = 'audiostream_audio';
 const AUDIO_CANVAS_ID = 'audiostream_canvas';
 
 const CANVAS_ASPECT_RATIO = 1.0;
@@ -14,14 +17,19 @@ const CANVAS_FREQUENCY_FOREGROUND = 'rgb(0, 0, 0)';
 const CANVAS_FREQUENCY_SAMPLE_OFFSET = 140;
 const CANVAS_FREQUENCY_SAMPLE_SCALE = 0.005;
 
-const ANIMATION_MODES = { TIME: 'time', FREQUENCY: 'frequency' };
+const VISUALIZATION_MODES = { TIME: 'time', FREQUENCY: 'frequency' };
 
 const SAMPLING_RATE = 44100; // [Hz]
 const CHANNELS = 1;
 
-var _AUDIO_CONTEXT = createAudioContext();
+var _VISUALIZATION_MODE = null;
+var _FFTSIZE_POWER = 11;
+
+var _ANALYSER = null;
+var _AUDIO_CONTEXT = null;
+
 var _ANIMATION_IS_RUNNING = false;
-var _STOP_ANIMATION = false;
+var _ANIMATION_REQUEST_ID = null;
 
 $(function () {
     if (INITIAL_MODE == AUDIOSTREAM_MODE) {
@@ -29,73 +37,157 @@ $(function () {
     }
 });
 
-function getAudioPlayer() {
-    return document.getElementById(AUDIO_ID);
+function getAudioVisualizationMode() {
+    return _VISUALIZATION_MODE;
 }
 
-function getAudioCanvas() {
+function getAudioPlayerElement() {
+    return document.getElementById(AUDIO_PLAYER_ID);
+}
+
+function getAudioCanvasElement() {
     return document.getElementById(AUDIO_CANVAS_ID);
 }
 
+function getAudioContext() {
+    return _AUDIO_CONTEXT;
+}
+
+function getAudioAnalyser() {
+    return _ANALYSER;
+}
+
+function getFFTSizePower() {
+    return _FFTSIZE_POWER;
+}
+
+function getFFTSize() {
+    return 2 ** _FFTSIZE_POWER;
+}
+
+function setFFTSizePower(fftSize_power) {
+    _FFTSIZE_POWER = fftSize_power;
+}
+
 function enableAudioStreamPlayer() {
-    var player = createAudioElement();
-    var canvas = createAudioCanvasElement();
-    var analyser = createAudioStreamAnalyser(_AUDIO_CONTEXT, player);
-    enableAudioAnimation(player, analyser, canvas, ANIMATION_MODES.FREQUENCY, 2 ** 13);
+    createAudioPlayerElement();
+    if (getAudioVisualizationMode() !== null) {
+        $('#' + AUDIO_FFTSIZE_PARENT_ID).show();
+        setupAudioVisualization();
+    }
+    $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).show();
 }
 
 function disableAudioStreamPlayer() {
-    stopAudioAnimation();
-    removeAudioElements();
+    $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).hide();
+    if (getAudioVisualizationMode() !== null) {
+        $('#' + AUDIO_FFTSIZE_PARENT_ID).hide();
+        teardownAudioVisualization();
+    }
+    removeAudioPlayerElement();
 }
 
-function createAudioElement() {
+function switchAudioVisualizationModeTo(newVisualizationMode) {
+    var oldVisualizationMode = getAudioVisualizationMode();
+
+    if (newVisualizationMode == oldVisualizationMode) {
+        return;
+    }
+
+    var animationWasDisabled = oldVisualizationMode === null;
+    var player = getAudioPlayerElement();
+
+    _VISUALIZATION_MODE = newVisualizationMode;
+
+    if (newVisualizationMode === null) {
+        $('#' + AUDIO_FFTSIZE_PARENT_ID).hide();
+        teardownAudioVisualization();
+    } else {
+        if (animationWasDisabled) {
+            $('#' + AUDIO_FFTSIZE_PARENT_ID).show();
+            setupAudioVisualization();
+            if (!player.paused) {
+                startAudioAnimation();
+            }
+        } else if (!player.paused) {
+            restartAudioAnimation();
+        }
+        if (player.paused) {
+            clearCanvas(newVisualizationMode);
+        }
+    }
+}
+
+function switchFFTSizePowerTo(fftSizePower) {
+    if (fftSizePower == getFFTSizePower()) {
+        return;
+    }
+    setFFTSizePower(fftSizePower);
+    var visualizationMode = getAudioVisualizationMode();
+    if (visualizationMode !== null) {
+        if (getAudioPlayerElement().paused) {
+            clearCanvas(visualizationMode);
+        } else {
+            restartAudioAnimation();
+        }
+    }
+}
+
+function setupAudioVisualization() {
+    createAudioCanvasElement();
+    _AUDIO_CONTEXT = createAudioContext();
+    _ANALYSER = createAudioStreamAnalyser(_AUDIO_CONTEXT, getAudioPlayerElement());
+    enableAudioAnimation();
+}
+
+function teardownAudioVisualization() {
+    disableAudioAnimation();
+    _AUDIO_CONTEXT.close();
+    _AUDIO_CONTEXT = null;
+    _ANALYSER = null;
+    removeAudioCanvasElement();
+}
+
+function createAudioPlayerElement() {
     var src = AUDIO_SRC + '?salt=' + new Date().getTime();
     var audio = $('<audio></audio>')
-        .prop({ id: AUDIO_ID, controls: true, autoplay: true, crossOrigin: 'anonymous' }).css('max-width', CANVAS_MAX_WIDTH + 'px')
+        .prop({ id: AUDIO_PLAYER_ID, controls: true, autoplay: true, crossOrigin: 'anonymous' }).css('max-width', CANVAS_MAX_WIDTH + 'px')
         .append($('<source></source>').prop({ src: src, type: 'audio/mpeg' }))
         .append('Denne funksjonaliteten er ikke tilgjengelig i din nettleser.');
-    $('#' + AUDIO_STREAM_PARENT_ID).append(audio);
-    return audio.get()[0];
+    $('#' + AUDIO_PLAYER_PARENT_ID).append(audio);
+}
+
+function removeAudioPlayerElement() {
+    var player = getAudioPlayerElement();
+    if (player) {
+        player.remove();
+    }
 }
 
 function createAudioCanvasElement() {
     var canvas = $('<canvas></canvas>').prop('id', AUDIO_CANVAS_ID).addClass('px-0');
-    $('#' + AUDIO_STREAM_PARENT_ID).prepend(canvas);
-    window.addEventListener('resize', resizeAudioCanvas, false);
+    $('#' + AUDIO_CANVAS_PARENT_ID).append(canvas);
+    window.addEventListener('resize', resizeAudioCanvas);
     resizeAudioCanvas();
-    return canvas.get()[0];
+}
+
+function removeAudioCanvasElement() {
+    var canvas = getAudioCanvasElement();
+    if (canvas) {
+        window.removeEventListener('resize', resizeAudioCanvas);
+        canvas.remove();
+    }
 }
 
 function resizeAudioCanvas() {
     var canvas = $('#' + AUDIO_CANVAS_ID);
     var parent = $('#main');
-    var player = $('#' + AUDIO_ID);
+    var player = $('#' + AUDIO_PLAYER_ID);
     var width = player.width();
-    var max_height = parent.height() - player.height();
+    var max_height = parent.height() - player.height() - $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).height() - $('#' + AUDIO_FFTSIZE_PARENT_ID).height();
     var target_height = width / CANVAS_ASPECT_RATIO;
     var height = Math.min(max_height, target_height);
     canvas.prop({ width: width, height: height }).css({ width: width + 'px', height: height + 'px' });
-}
-
-function removeAudioElements() {
-    window.removeEventListener('resize', resizeAudioCanvas, false);
-    $('#' + AUDIO_STREAM_PARENT_ID).empty();
-}
-
-function removeAudioElement() {
-    removeElement(AUDIO_ID);
-}
-
-function removeAudioCanvasElement() {
-    removeElement(AUDIO_CANVAS_ID);
-}
-
-function removeElement(elementId) {
-    var element = document.getElementById(elementId)
-    if (element) {
-        element.remove();
-    }
 }
 
 function createAudioContext() {
@@ -109,33 +201,19 @@ function createAudioStreamAnalyser(audioContext, player) {
     return analyser;
 }
 
-function enableAudioAnimation(player, analyser, canvas, animationMode, fftSize) {
-    player.onplay = function () {
-        animateAudio(analyser, canvas, animationMode, fftSize);
-    }
-    player.onpause = function () {
-        stopAudioAnimation();
-    }
+function enableAudioAnimation() {
+    var player = getAudioPlayerElement();
+    player.addEventListener('play', startAudioAnimation);
+    player.addEventListener('pause', stopAudioAnimation);
 }
 
-function reEnableAnimation(player, analyser, canvas, animationMode, fftSize) {
-    stopAudioAnimation();
-    enableAudioAnimation(player, analyser, canvas, animationMode, fftSize)
+function disableAudioAnimation() {
+    var player = getAudioPlayerElement();
+    player.removeEventListener('play', startAudioAnimation);
+    player.removeEventListener('pause', stopAudioAnimation);
 }
 
-function getFrequencyRange() {
-    return (0, SAMPLING_RATE / 2);
-}
-
-function getTimeRange(offset, fftSize) {
-    return (offset, offset + getSampleSetDuration(fftSize));
-}
-
-function getSampleSetDuration(fftSize) {
-    return fftSize / SAMPLING_RATE;
-}
-
-function animateAudio(analyser, canvas, animationMode, fftSize) {
+function startAudioAnimation() {
     /*
     Sample rate: 44100 Hz
     Channel: 1
@@ -155,64 +233,71 @@ function animateAudio(analyser, canvas, animationMode, fftSize) {
 
     So higher fftSize gives higher frequency resolution and is taken over a larger duration.
     */
-    var dataArray = selectForAnimationMode(animationMode, {
-        TIME: createDataArrayForTimeDomain,
-        FREQUENCY: createDataArrayForFrequencyDomain
-    })(analyser, fftSize);
+    [dataArray, fetchData, drawFrame] = selectDrawingObjects();
 
-    var fetchData = selectForAnimationMode(animationMode, {
-        TIME: (dataArray) => analyser.getFloatTimeDomainData(dataArray),
-        FREQUENCY: (dataArray) => analyser.getFloatFrequencyData(dataArray)
-    });
-
-    var drawFrame = selectForAnimationMode(animationMode, {
-        TIME: drawAnimationFrameForTimeDomain,
-        FREQUENCY: drawAnimationFrameForFrequencyDomain
-    });
-
+    var canvas = getAudioCanvasElement();
     var canvasContext = canvas.getContext('2d');
 
-    canvasContext.clearRect(0, 0, canvas.width, canvas.height);
-
     var previousTimestamp = null;
-    var frameCounter = 0;
-    var requestId;
 
     function draw(timestamp) {
-        if (_STOP_ANIMATION) {
-            cancelAnimationFrame(requestId);
-            _ANIMATION_IS_RUNNING = false;
-            _STOP_ANIMATION = false;
-
-            var endTime = performance.now();
-            console.log('Average frame duration: ' + (endTime - startTime) / frameCounter + ' ms');
-            console.log('Sound duration analysed per frame: ' + getSampleSetDuration(fftSize) * 1e3 + ' ms');
-            return;
-        }
         if (timestamp !== previousTimestamp) {
             _ANIMATION_IS_RUNNING = true;
-            frameCounter++;
 
             fetchData(dataArray);
             drawFrame(canvasContext, canvas.width, canvas.height, dataArray);
 
             previousTimestamp = timestamp;
         }
-        requestId = requestAnimationFrame(draw);
+        _ANIMATION_REQUEST_ID = requestAnimationFrame(draw);
     }
 
-    var startTime = performance.now();
-    requestId = requestAnimationFrame(draw);
+    _ANIMATION_REQUEST_ID = requestAnimationFrame(draw);
 }
 
-function selectForAnimationMode(animationMode, actions) {
-    switch (animationMode) {
-        case ANIMATION_MODES.TIME:
+function selectDrawingObjects() {
+    var analyser = getAudioAnalyser();
+    var visualizationMode = getAudioVisualizationMode();
+    var fftSize = getFFTSize();
+
+    var dataArray = selectForVisualizationMode(visualizationMode, {
+        TIME: createDataArrayForTimeDomain,
+        FREQUENCY: createDataArrayForFrequencyDomain
+    })(analyser, fftSize);
+
+    var fetchData = selectForVisualizationMode(visualizationMode, {
+        TIME: (dataArray) => analyser.getFloatTimeDomainData(dataArray),
+        FREQUENCY: (dataArray) => analyser.getFloatFrequencyData(dataArray)
+    });
+
+    var drawFrame = selectForVisualizationMode(visualizationMode, {
+        TIME: drawAnimationFrameForTimeDomain,
+        FREQUENCY: drawAnimationFrameForFrequencyDomain
+    });
+
+    return [dataArray, fetchData, drawFrame];
+}
+
+function stopAudioAnimation() {
+    if (_ANIMATION_IS_RUNNING) {
+        cancelAnimationFrame(_ANIMATION_REQUEST_ID);
+        _ANIMATION_IS_RUNNING = false;
+    }
+}
+
+function restartAudioAnimation() {
+    stopAudioAnimation();
+    startAudioAnimation();
+}
+
+function selectForVisualizationMode(visualizationMode, actions) {
+    switch (visualizationMode) {
+        case VISUALIZATION_MODES.TIME:
             return actions.TIME;
-        case ANIMATION_MODES.FREQUENCY:
+        case VISUALIZATION_MODES.FREQUENCY:
             return actions.FREQUENCY;
         default:
-            alert('Invalid animation mode: ' + animationMode);
+            alert('Invalid animation mode: ' + visualizationMode);
             break;
     }
 }
@@ -268,6 +353,18 @@ function drawAnimationFrameForFrequencyDomain(canvasContext, width, height, data
     }
 }
 
+function getFrequencyRange() {
+    return (0, SAMPLING_RATE / 2);
+}
+
+function getTimeRange(offset, fftSize) {
+    return (offset, offset + getSampleSetDuration(fftSize));
+}
+
+function getSampleSetDuration(fftSize) {
+    return fftSize / SAMPLING_RATE;
+}
+
 function clearCanvasTimeDomain(canvasContext, width, height) {
     canvasContext.fillStyle = CANVAS_TIME_BACKGROUND;
     canvasContext.fillRect(0, 0, width, height);
@@ -278,8 +375,11 @@ function clearCanvasFrequencyDomain(canvasContext, width, height) {
     canvasContext.fillRect(0, 0, width, height);
 }
 
-function stopAudioAnimation() {
-    if (_ANIMATION_IS_RUNNING) {
-        _STOP_ANIMATION = true;
-    }
+function clearCanvas(visualizationMode) {
+    var canvas = getAudioCanvasElement();
+    var canvasContext = canvas.getContext('2d');
+    selectForVisualizationMode(visualizationMode, {
+        TIME: () => clearCanvasTimeDomain(canvasContext, canvas.width, canvas.height),
+        FREQUENCY: () => clearCanvasTimeDomain(canvasContext, canvas.width, canvas.height)
+    })();
 }
