@@ -12,9 +12,15 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle disabled" href="#" data-bs-toggle="dropdown">Innstillinger</a>
           <ul class="dropdown-menu">
+<<<<<<< HEAD
             <li><a id="listen_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'listen_settings' ? ' active' : '' ?>" href="listen_settings.php">Varsel</a></li>
             <li><a id="audiostream_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'audiostream_settings' ? ' active' : '' ?>" href="audiostream_settings.php">Lyd</a></li>
             <li><a id="videostream_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'videostream_settings' ? ' active' : '' ?>" href="videostream_settings.php">Video</a></li>
+=======
+            <li><a id="listen_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'listen_settings' ? ' active' : '' ?>" href="listen_settings.php">Varsle</a></li>
+            <li><a id="audiostream_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'audiostream_settings' ? ' active' : '' ?>" href="audiostream_settings.php">Høre</a></li>
+            <li><a id="videostream_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'videostream_settings' ? ' active' : '' ?>" href="videostream_settings.php">Se</a></li>
+>>>>>>> 9da7629260246529d27284bcbbbb3f9bf85fcec7
             <li><a id="server_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'server_settings' ? ' active' : '' ?>" href="server_settings.php">Nettverk</a></li>
           </ul>
         </li>
