@@ -13,7 +13,7 @@ def stream_audio():
     control.enter_mode(MODE, stream_audio_with_settings)
 
 
-def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128000):
+def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128, volume=1.0):
     mic_id = os.environ['BM_MIC_ID']
     log_path = os.environ['BM_SERVER_LOG_PATH']
     micstream_dir = os.environ['BM_MICSTREAM_DIR']
@@ -30,7 +30,7 @@ def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128000):
     ]
     quality_args = [
         '--sample-rate', '{}'.format(sample_rate), '--bitrate',
-        '{}'.format(int(round(mp3_bitrate * 1e-3)))
+        '{}'.format(int(round(mp3_bitrate)))
     ]
 
     with open(log_path, 'a') as log_file:

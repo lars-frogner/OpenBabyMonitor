@@ -44,7 +44,7 @@ echo "Storing password hash in database $db_name\n";
 createPasswordTableIfMissing($database, strlen($hashed_password));
 storeHashedPassword($database, $hashed_password);
 
-foreach (array('modes', 'videostream_settings') as $table_name) {
+foreach (array('modes', 'audiostream_settings', 'videostream_settings') as $table_name) {
   echo "Creating table $table_name in database $db_name\n";
   createTableIfMissing($database, $table_name, readTableColumnsFromConfig($table_name));
   echo "Writing initial values to table $table_name in database $db_name\n";

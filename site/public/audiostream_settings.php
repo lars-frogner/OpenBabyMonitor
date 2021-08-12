@@ -1,8 +1,28 @@
 <?php
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
+require_once(SRC_PATH . '/settings.php');
+require_once(SRC_PATH . '/control.php');
 
 $mode = readCurrentMode($_DATABASE);
+
+$setting_type = 'audiostream';
+$table_name = $setting_type . '_settings';
+if (isset($_POST['submit'])) {
+  $settings_edited = true;
+  unset($_POST['submit']);
+  updateValuesInTable($_DATABASE, $table_name, withPrimaryKey(convertSettingValues($setting_type, $_POST)));
+  $values = readValuesFromTable($_DATABASE, $table_name, readTableColumnNamesFromConfig($table_name));
+} elseif (isset($_POST['reset'])) {
+  $settings_edited = true;
+  $values = readTableInitialValuesFromConfig($table_name);
+  updateValuesInTable($_DATABASE, $table_name, $values);
+} else {
+  $settings_edited = false;
+  $values = readValuesFromTable($_DATABASE, $table_name, readTableColumnNamesFromConfig($table_name));
+}
+$grouped_values = groupSettingValues($setting_type, $values);
+require_once(TEMPLATES_PATH . '/settings.php');
 ?>
 
 <!DOCTYPE html>
@@ -24,10 +44,18 @@ $mode = readCurrentMode($_DATABASE);
 
   <main>
     <div class="container">
-      <h1>Audio settings</h1>
+      <h1 class="my-4">Lydinnstillinger</h1>
       <form id="audiostream_settings_form" action="" method="post">
-        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+        <div class="row">
+          <?php generateInputs($setting_type, $grouped_values); ?>
+        </div>
+        <div class="my-4">
+          <button type="submit" name="submit" class="btn btn-primary">Bekreft</button>
+          <button name="undo" class="btn btn-secondary" onclick="$('#audiostream_settings_form').trigger('reset');">Angre</button>
+          <button type="submit" name="reset" class="btn btn-secondary">Tilbakestill</button>
+        </div>
       </form>
+    </div>
   </main>
 </body>
 
@@ -38,7 +66,9 @@ require_once(TEMPLATES_PATH . '/jquery_js.php');
 
 <script>
   const SETTINGS_FORM_ID = 'audiostream_settings_form';
+  const SETTINGS_EDITED = <?php echo $settings_edited ? 'true' : 'false'; ?>;
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
+  const SITE_MODE = <?php echo MODE_VALUES[$setting_type]; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
   const DETECT_FORM_CHANGES = true;
 </script>
@@ -47,6 +77,9 @@ require_once(TEMPLATES_PATH . '/jquery_js.php');
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
+<script>
+  <?php generateBehavior($setting_type); ?>
+</script>
 <script>
   $(function() {
     captureElementState(SETTINGS_FORM_ID);
