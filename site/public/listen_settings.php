@@ -24,9 +24,9 @@ $mode = readCurrentMode($_DATABASE);
 
   <main>
     <div class="container">
-      <h1>Listen settings</h1>
+      <h1>Varselinnstillinger</h1>
       <form id="listen_settings_form" action="" method="post">
-        <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" name="submit" class="btn btn-primary">Bekreft</button>
       </form>
   </main>
 </body>

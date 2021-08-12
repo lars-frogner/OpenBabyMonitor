@@ -63,7 +63,7 @@ $connected_network = obtainConnectedNetworkSSID();
       </div>
     </div>
     <div class="container" id="server_settings_form_container">
-      <h1 class="my-4">Enhetsinnstillinger</h1>
+      <h1 class="my-4">Nettverksinnstillinger</h1>
       <form id="server_settings_form" action="" method="post">
         <div class="row mb-3">
           <div class="col">

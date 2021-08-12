@@ -38,7 +38,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
         <div class="row h-100 align-items-center justify-content-center px-0">
 
           <div id="mode_content_listen" class="col-auto" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : '' ?>>
-            Listen
+            Varsle
           </div>
 
           <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
@@ -90,7 +90,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
           </div>
 
           <div id="mode_content_standby" class="col-auto" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
-            Standby
+            Hvilemodus
           </div>
 
           <div id="mode_content_waiting" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
@@ -102,7 +102,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
               <div class="row">
                 <span id="mode_content_error_message" class="alert alert-danger text-center">Error
                 </span>
-                <a class=" btn btn-secondary" href="main.php">Refresh</a>
+                <a class=" btn btn-secondary" href="main.php">Forny siden</a>
               </div>
             </div>
           </div>
@@ -115,16 +115,16 @@ define('HIDDEN_STYLE', 'style="display: none;"');
     <footer class="d-flex flex-grow-0 flex-shrink-1 justify-content-center">
       <div class="btn-group">
         <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_listen" autocomplete="off" disabled <?php echo ($mode == MODE_VALUES['listen']) ? 'checked' : '' ?> value="<?php echo MODE_VALUES['listen'] ?>">
-        <label class="btn btn-outline-primary" for="mode_radio_listen">Listen</label>
+        <label class="btn btn-outline-primary" for="mode_radio_listen">Varsle</label>
 
         <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_audio" autocomplete="off" disabled <?php echo ($mode == MODE_VALUES['audiostream']) ? 'checked' : '' ?> value="<?php echo MODE_VALUES['audiostream'] ?>">
-        <label class="btn btn-outline-primary" for="mode_radio_audio">Audio</label>
+        <label class="btn btn-outline-primary" for="mode_radio_audio">Høre</label>
 
         <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_video" autocomplete="off" disabled <?php echo ($mode == MODE_VALUES['videostream']) ? 'checked' : '' ?> value="<?php echo MODE_VALUES['videostream'] ?>">
-        <label class="btn btn-outline-primary" for="mode_radio_video">Video</label>
+        <label class="btn btn-outline-primary" for="mode_radio_video">Se</label>
 
         <input type="radio" class="btn-check" name="mode_radio" id="mode_radio_standby" autocomplete="off" disabled <?php echo ($mode == MODE_VALUES['standby']) ? 'checked' : '' ?> value="<?php echo MODE_VALUES['standby'] ?>">
-        <label class="btn btn-outline-primary" for="mode_radio_standby">Standby</label>
+        <label class="btn btn-outline-primary" for="mode_radio_standby">Hvile</label>
       </div>
     </footer>
   </div>
