@@ -142,6 +142,9 @@ define('HIDDEN_STYLE', 'style="display: none;"');
     const INITIAL_MODE = <?php echo $mode; ?>;
 
     const AUDIO_SRC = <?php echo '\'http://' . SERVER_IP . ':' . getenv('BM_MICSTREAM_PORT') . getenv('BM_MICSTREAM_ENDPOINT') . '\''; ?>;
+
+    const SETTING_VOLUME = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'volume', true); ?>;
+    const SETTING_MAX_FREQUENCY = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'max_frequency', true); ?>;
   </script>
   <script src="js/confirmation_modal.js"></script>
   <script src="js/navbar.js"></script>

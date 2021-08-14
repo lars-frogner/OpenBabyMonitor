@@ -8,14 +8,21 @@ const AUDIO_CANVAS_ID = 'audiostream_canvas';
 
 const CANVAS_ASPECT_RATIO = 1.0;
 const CANVAS_MAX_WIDTH = 600;
+
 const CANVAS_TIME_BACKGROUND = 'rgb(255, 255, 255)';
 const CANVAS_TIME_FOREGROUND = 'rgb(0, 0, 0)';
 const CANVAS_TIME_LINEWIDTH = 2;
-const CANVAS_TIME_SAMPLE_SCALE = 100;
+const CANVAS_TIME_SAMPLE_OFFSET = -127.5;
+const CANVAS_TIME_SAMPLE_SCALE = 1 / 256;
+
 const CANVAS_FREQUENCY_BACKGROUND = 'rgb(255, 255, 255)';
 const CANVAS_FREQUENCY_FOREGROUND = 'rgb(0, 0, 0)';
-const CANVAS_FREQUENCY_SAMPLE_OFFSET = 140;
-const CANVAS_FREQUENCY_SAMPLE_SCALE = 0.005;
+const CANVAS_FREQUENCY_FONT = 'Helvetica';
+const CANVAS_FREQUENCY_FONT_SIZE = 14;
+const CANVAS_FREQUENCY_FONT_OFFSET_X = 4;
+const CANVAS_FREQUENCY_FONT_OFFSET_Y = 25;
+const CANVAS_FREQUENCY_SAMPLE_OFFSET = 0;
+const CANVAS_FREQUENCY_SAMPLE_SCALE = 2 / 256;
 
 const VISUALIZATION_MODES = { TIME: 'time', FREQUENCY: 'frequency' };
 
@@ -66,8 +73,11 @@ class AudiostreamContext {
         this.#source = this.#context.createMediaElementSource(this.player);
         this.#analyser = this.#context.createAnalyser();
         this.#gain = this.#context.createGain();
-        this.#source.connect(this.#analyser);
+        this.#source.connect(this.#gain);
+        this.#gain.connect(this.#analyser);
         this.#analyser.connect(this.#context.destination);
+
+        this.#gain.gain.value = SETTING_VOLUME;
 
         $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).show();
     }
@@ -154,12 +164,12 @@ class AudiostreamContext {
         switch (this.#visualizer.mode) {
             case VISUALIZATION_MODES.TIME:
                 return function () {
-                    this.#analyser.getFloatTimeDomainData(this.#analyserSamples);
+                    this.#analyser.getByteTimeDomainData(this.#analyserSamples);
                     return this.#analyserSamples;
                 }.bind(this);
             case VISUALIZATION_MODES.FREQUENCY:
                 return function () {
-                    this.#analyser.getFloatFrequencyData(this.#analyserSamples);
+                    this.#analyser.getByteFrequencyData(this.#analyserSamples);
                     return this.#analyserSamples;
                 }.bind(this);
             default:
@@ -184,16 +194,21 @@ class AudiostreamContext {
         }
         switch (this.#visualizer.mode) {
             case VISUALIZATION_MODES.TIME:
-                this.#analyserSamples = new Float32Array(this.#analyser.fftSize);
+                this.#analyserSamples = new Uint8Array(this.#analyser.fftSize);
                 this.#rebuildAnalyserSamplesArray = false;
                 break;
             case VISUALIZATION_MODES.FREQUENCY:
-                this.#analyserSamples = new Float32Array(this.#analyser.frequencyBinCount);
+                const length = AudiostreamContext.#computeBufferLengthForMaxFrequency(SETTING_MAX_FREQUENCY, this.#analyser.fftSize);
+                this.#analyserSamples = new Uint8Array(length);
                 this.#rebuildAnalyserSamplesArray = false;
                 break;
             default:
                 break;
         }
+    }
+
+    static #computeBufferLengthForMaxFrequency(maxFrequency, fftSize) {
+        return Math.round(fftSize * maxFrequency / SAMPLING_RATE);
     }
 
     static #createPlayer() {
@@ -377,7 +392,7 @@ class AudioVisualizer {
         var x = 0;
         var y;
         for (var i = 0; i < samples.length; i++) {
-            y = height / 2 + samples[i] * height * CANVAS_TIME_SAMPLE_SCALE;
+            y = height / 2 + (samples[i] + CANVAS_TIME_SAMPLE_OFFSET) * height * CANVAS_TIME_SAMPLE_SCALE;
 
             if (i === 0) {
                 canvasContext.moveTo(x, y);
@@ -392,8 +407,6 @@ class AudioVisualizer {
 
     static #drawFrameFrequencyDomain(canvasContext, width, height, samples) {
         AudioVisualizer.#clearCanvasFrequencyDomain(canvasContext, width, height);
-
-        canvasContext.fillStyle = CANVAS_FREQUENCY_FOREGROUND;
 
         var barWidth = width / samples.length;
         var barHeight;
@@ -413,5 +426,12 @@ class AudioVisualizer {
     static #clearCanvasFrequencyDomain(canvasContext, width, height) {
         canvasContext.fillStyle = CANVAS_FREQUENCY_BACKGROUND;
         canvasContext.fillRect(0, 0, width, height);
+
+        canvasContext.fillStyle = CANVAS_FREQUENCY_FOREGROUND;
+        canvasContext.font = CANVAS_FREQUENCY_FONT_SIZE + 'px ' + CANVAS_FREQUENCY_FONT;
+
+        var max_label = SETTING_MAX_FREQUENCY + ' Hz';
+        canvasContext.fillText('0 Hz', CANVAS_FREQUENCY_FONT_OFFSET_X, CANVAS_FREQUENCY_FONT_OFFSET_Y);
+        canvasContext.fillText(max_label, width - Math.round(0.75 * CANVAS_FREQUENCY_FONT_SIZE * max_label.length) - CANVAS_FREQUENCY_FONT_OFFSET_X, CANVAS_FREQUENCY_FONT_OFFSET_Y);
     }
 }

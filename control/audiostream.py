@@ -13,7 +13,7 @@ def stream_audio():
     control.enter_mode(MODE, stream_audio_with_settings)
 
 
-def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128, volume=1.0):
+def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128, **kwargs):
     mic_id = os.environ['BM_MIC_ID']
     log_path = os.environ['BM_SERVER_LOG_PATH']
     micstream_dir = os.environ['BM_MICSTREAM_DIR']

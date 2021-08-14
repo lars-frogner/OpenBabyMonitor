@@ -108,18 +108,24 @@
                 "min": 16,
                 "max": 320,
                 "step": 16
-            },
-            "disabled_when": {
-                "white_balance_mode": {
-                    "operator": "!=",
-                    "value": "off"
-                }
+            }
+        },
+        "max_frequency": {
+            "group": "visualization",
+            "name": "Høyeste frekvens",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 12000,
+            "range": {
+                "min": 1000,
+                "max": 22000,
+                "step": 1000
             }
         }
     },
     "audiostream_groups": {
         "volume": "Volum",
-        "quality": "Kvalitet"
+        "quality": "Kvalitet",
+        "visualization": "Visualisering"
     },
     "videostream_settings": {
         "vertical_resolution": {
