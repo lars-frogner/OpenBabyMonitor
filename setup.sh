@@ -372,7 +372,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
 
     sudo mkdir -p $SERVER_LOG_DIR
     sudo touch $BM_SERVER_LOG_PATH
-    sudo chown $BM_SERVER_USER:$BM_WEB_GROUP
+    sudo chown $BM_SERVER_USER:$BM_WEB_GROUP $BM_SERVER_LOG_PATH
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_LOG_PATH
 
     # Link site folder to default Apache site root
