@@ -337,7 +337,7 @@ StandardError=append:$BM_SERVER_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
     done
 
     # Allow users in web group to manage the mode services without providing a password
-    echo -e "${CMD_ALIAS%,}\n%$BM_WEB_GROUP ALL = NOPASSWD: BM_MODES" | sudo tee /etc/sudoers.d/$BM_WEB_GROUP
+    echo -e "${CMD_ALIAS%,}\n%$BM_WEB_GROUP ALL = NOPASSWD: BM_MODES" | (sudo su -c "EDITOR=\"tee\" visudo -f /etc/sudoers.d/$BM_WEB_GROUP")
 fi
 
 INSTALL_SERVER=true
