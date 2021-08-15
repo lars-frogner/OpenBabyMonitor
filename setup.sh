@@ -387,9 +387,9 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Setup new site
     SITE_NAME=$(basename $BM_SITE_DIR)
     echo "<VirtualHost *:80>
-	DocumentRoot $BM_SITE_DIR
-	ErrorLog $BM_APACHE_LOG_PATH
-	CustomLog $APACHE_LOG_DIR/access.log combined
+    DocumentRoot $BM_SITE_DIR
+    ErrorLog $BM_APACHE_LOG_PATH
+    CustomLog $APACHE_LOG_DIR/access.log combined
 
     <Directory "$BM_SITE_DIR">
         AllowOverride All
