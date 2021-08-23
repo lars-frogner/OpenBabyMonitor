@@ -10,16 +10,22 @@ class Database:
                         account_info['password'], db_info['name'])
 
     def __init__(self, host, user, password, name, **extra_config):
-        self.connection = mysql.connector.connect(host=host,
-                                                  user=user,
-                                                  password=password,
-                                                  database=name,
-                                                  **extra_config)
+        self.host = host
+        self.user = user
+        self.password = password
+        self.name = name
+        self.extra_config = extra_config
+
+    def __enter__(self):
+        self.connection = mysql.connector.connect(host=self.host,
+                                                  user=self.user,
+                                                  password=self.password,
+                                                  database=self.name,
+                                                  **self.extra_config)
         self.connection.autocommit = True
 
         self.cursor = self.connection.cursor(dictionary=True)
 
-    def __enter__(self):
         return self
 
     def update_values_in_table(self,
@@ -45,14 +51,15 @@ class Database:
         if len(column_values) > 1:
             updates = updates[:-2]
 
-        self.cursor.execute('UPDATE `{}` SET {} WHERE {}'.format(
+        self.cursor.execute('UPDATE `{}` SET {} WHERE {};'.format(
             table_name, updates, condition))
 
     def read_values_from_table(self, table_name, columns, condition='id = 0'):
-        multiple_columns = hasattr(columns, '__iter__')
+        multiple_columns = hasattr(
+            columns, '__iter__') and not isinstance(columns, str)
         column_string = ', '.join(columns) if multiple_columns else columns
 
-        self.cursor.execute('SELECT {} FROM `{}` WHERE {}'.format(
+        self.cursor.execute('SELECT {} FROM `{}` WHERE {};'.format(
             column_string, table_name, condition))
         result = self.cursor.fetchall()
 

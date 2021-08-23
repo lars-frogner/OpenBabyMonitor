@@ -10,7 +10,9 @@ MODE = 'audiostream'
 
 def stream_audio():
     control.register_shutdown_handler()
-    control.enter_mode(MODE, stream_audio_with_settings)
+    control.enter_mode(
+        MODE, lambda mode, config, database: stream_audio_with_settings(
+            **control.read_settings(mode, config, database)))
 
 
 def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128, **kwargs):

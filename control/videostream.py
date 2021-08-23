@@ -10,7 +10,9 @@ HORIZONTAL_RESOLUTIONS = {480: 640, 720: 1280, 1080: 1920}
 
 def stream_video():
     control.register_shutdown_handler()
-    control.enter_mode(MODE, stream_video_with_settings)
+    control.enter_mode(
+        MODE, lambda mode, config, database: stream_video_with_settings(
+            **control.read_settings(mode, config, database)))
 
 
 def stream_video_with_settings(vertical_resolution=720,
@@ -29,7 +31,8 @@ def stream_video_with_settings(vertical_resolution=720,
                                blue_gain=0.0,
                                capture_audio=True,
                                volume=1.0,
-                               show_time=True):
+                               show_time=True,
+                               **kwargs):
     mic_id = os.environ['BM_MIC_ID']
     log_path = os.environ['BM_SERVER_LOG_PATH']
     picam_dir = os.environ['BM_PICAM_DIR']
