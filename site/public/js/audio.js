@@ -13,16 +13,20 @@ const CANVAS_TIME_BACKGROUND = 'rgb(255, 255, 255)';
 const CANVAS_TIME_FOREGROUND = 'rgb(0, 0, 0)';
 const CANVAS_TIME_LINEWIDTH = 2;
 const CANVAS_TIME_SAMPLE_OFFSET = -127.5;
-const CANVAS_TIME_SAMPLE_SCALE = 1 / 256;
+const CANVAS_TIME_SAMPLE_SCALE = 1 / 64;
 
 const CANVAS_FREQUENCY_BACKGROUND = 'rgb(255, 255, 255)';
 const CANVAS_FREQUENCY_FOREGROUND = 'rgb(0, 0, 0)';
+const CANVAS_FREQUENCY_GRID_COLOR = 'rgb(100, 100, 100)';
+const CANVAS_FREQUENCY_GRID_DASH = [10, 10];
+const CANVAS_FREQUENCY_GRID_LINE_WIDTH = 1;
+const CANVAS_FREQUENCY_N_GRID_LINES = 10;
 const CANVAS_FREQUENCY_FONT = 'Helvetica';
 const CANVAS_FREQUENCY_FONT_SIZE = 14;
 const CANVAS_FREQUENCY_FONT_OFFSET_X = 4;
 const CANVAS_FREQUENCY_FONT_OFFSET_Y = 25;
 const CANVAS_FREQUENCY_SAMPLE_OFFSET = 0;
-const CANVAS_FREQUENCY_SAMPLE_SCALE = 2 / 256;
+const CANVAS_FREQUENCY_SAMPLE_SCALE = (1 / 512);
 
 const VISUALIZATION_MODES = { TIME: 'time', FREQUENCY: 'frequency' };
 
@@ -59,11 +63,14 @@ function switchFFTSizePowerTo(fftSizePower) {
 class AudiostreamContext {
     #context;
     #source;
-    #analyser;
+    #highpassFilter;
+    #lowpassFilter;
     #gain;
+    #analyser;
     #fftSizePower = 11;
     #visualizer;
     #analyserSamples;
+    #analyserSamplesOffset;
     #rebuildAnalyserSamplesArray = true;
 
     constructor() {
@@ -71,13 +78,18 @@ class AudiostreamContext {
 
         this.#context = new (window.AudioContext || window.webkitAudioContext)();
         this.#source = this.#context.createMediaElementSource(this.player);
-        this.#analyser = this.#context.createAnalyser();
+        this.#highpassFilter = this.#context.createBiquadFilter();
+        this.#lowpassFilter = this.#context.createBiquadFilter();
         this.#gain = this.#context.createGain();
-        this.#source.connect(this.#gain);
+        this.#analyser = this.#context.createAnalyser();
+        this.#source.connect(this.#highpassFilter);
+        this.#highpassFilter.connect(this.#lowpassFilter);
+        this.#lowpassFilter.connect(this.#gain);
         this.#gain.connect(this.#analyser);
         this.#analyser.connect(this.#context.destination);
 
-        this.#gain.gain.value = SETTING_VOLUME;
+        setupBandpassFilters(this.#highpassFilter, this.#lowpassFilter);
+        setupGain(this.#gain);
 
         $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).show();
     }
@@ -94,6 +106,10 @@ class AudiostreamContext {
         return 2 ** this.fftSizePower;
     }
 
+    get nFrequencies() {
+        return this.fftSize / 2;
+    }
+
     get visualizer() {
         if (this.#visualizer == null) {
             return null;
@@ -102,16 +118,20 @@ class AudiostreamContext {
         }
     }
 
-    static get frequencyRange() {
-        return (0, SAMPLING_RATE / 2);
+    get analyserSamplesOffset() {
+        return this.#analyserSamplesOffset;
+    }
+
+    static get maxFrequency() {
+        return SAMPLING_RATE / 2;
     }
 
     get sampleSetDuration() {
         return this.fftSize / SAMPLING_RATE;
     }
 
-    timeRange(offset) {
-        return (offset, offset + this.sampleSetDuration);
+    get maxToMinFrequencyRatio() {
+        return (AudiostreamContext.#computeBufferLength(this.nFrequencies) - 1) / AudiostreamContext.#computeBufferOffset(this.nFrequencies);
     }
 
     set visualizer(newVisualizationMode) {
@@ -195,11 +215,13 @@ class AudiostreamContext {
         switch (this.#visualizer.mode) {
             case VISUALIZATION_MODES.TIME:
                 this.#analyserSamples = new Uint8Array(this.#analyser.fftSize);
+                this.#analyserSamplesOffset = 0;
                 this.#rebuildAnalyserSamplesArray = false;
                 break;
             case VISUALIZATION_MODES.FREQUENCY:
-                const length = AudiostreamContext.#computeBufferLengthForMaxFrequency(SETTING_MAX_FREQUENCY, this.#analyser.fftSize);
+                const length = AudiostreamContext.#computeBufferLength(this.nFrequencies);
                 this.#analyserSamples = new Uint8Array(length);
+                this.#analyserSamplesOffset = AudiostreamContext.#computeBufferOffset(this.nFrequencies);
                 this.#rebuildAnalyserSamplesArray = false;
                 break;
             default:
@@ -207,8 +229,12 @@ class AudiostreamContext {
         }
     }
 
-    static #computeBufferLengthForMaxFrequency(maxFrequency, fftSize) {
-        return Math.round(fftSize * maxFrequency / SAMPLING_RATE);
+    static #computeBufferOffset(nFrequencies) {
+        return Math.max(1, Math.floor(nFrequencies * SETTING_MIN_FREQUENCY / AudiostreamContext.maxFrequency));
+    }
+
+    static #computeBufferLength(nFrequencies) {
+        return Math.min(nFrequencies, Math.ceil(nFrequencies * SETTING_MAX_FREQUENCY / AudiostreamContext.maxFrequency));
     }
 
     static #createPlayer() {
@@ -305,7 +331,8 @@ class AudioVisualizer {
         function draw(timestamp) {
             if (timestamp !== previousTimestamp) {
                 this.#animationIsRunning = true;
-                this.#drawFrame(canvasContext, canvas.width, canvas.height, sampler());
+                var samples = sampler();
+                this.#drawFrame(canvasContext, canvas.width, canvas.height, samples, this.#audioContext.analyserSamplesOffset);
                 previousTimestamp = timestamp;
             }
             this.#animationRequestId = requestAnimationFrame(this.#drawBound);
@@ -330,7 +357,7 @@ class AudioVisualizer {
     clearCanvas() {
         var canvas = this.#canvas;
         var canvasContext = canvas.getContext('2d');
-        this.#clearCanvas(canvasContext, canvas.width, canvas.height);
+        this.#clearCanvas(canvasContext, canvas.width, canvas.height, this.#audioContext.maxToMinFrequencyRatio);
     }
 
     destroy() {
@@ -386,6 +413,7 @@ class AudioVisualizer {
 
         canvasContext.lineWidth = CANVAS_TIME_LINEWIDTH;
         canvasContext.strokeStyle = CANVAS_TIME_FOREGROUND;
+        canvasContext.setLineDash([]);
         canvasContext.beginPath();
 
         var sliceWidth = width / samples.length;
@@ -405,16 +433,31 @@ class AudioVisualizer {
         canvasContext.stroke();
     }
 
-    static #drawFrameFrequencyDomain(canvasContext, width, height, samples) {
-        AudioVisualizer.#clearCanvasFrequencyDomain(canvasContext, width, height);
+    static #drawFrameFrequencyDomain(canvasContext, width, height, samples, start_idx) {
+        AudioVisualizer.#clearCanvasFrequencyDomain(canvasContext, width, height, this.#audioContext.maxToMinFrequencyRatio);
 
-        var barWidth = width / samples.length;
-        var barHeight;
+        const barWidth = width / samples.length;
         var x = 0;
-        for (var i = 0; i < samples.length; i++) {
-            barHeight = (samples[i] + CANVAS_FREQUENCY_SAMPLE_OFFSET) * height * CANVAS_FREQUENCY_SAMPLE_SCALE;
+        var barHeight;
+
+        const end_idx = samples.length - 1;
+        const idx_factor = (end_idx / start_idx) ** (1.0 / (end_idx - start_idx));
+        var idx = start_idx;
+        var idx_lower, idx_upper, fraction, sample_value;
+
+        for (var i = start_idx; i < samples.length; i++) {
+            idx_lower = Math.floor(idx);
+            idx_upper = Math.ceil(idx);
+            if (idx_lower == idx_upper || idx_upper > end_idx) {
+                sample_value = samples[idx_lower];
+            } else {
+                fraction = idx - idx_lower;
+                sample_value = (1 - fraction) * samples[idx_lower] + fraction * samples[idx_upper];
+            }
+            barHeight = (sample_value + CANVAS_FREQUENCY_SAMPLE_OFFSET) * height * CANVAS_FREQUENCY_SAMPLE_SCALE;
             canvasContext.fillRect(x, height - barHeight, barWidth, barHeight);
             x += barWidth;
+            idx *= idx_factor;
         }
     }
 
@@ -423,15 +466,30 @@ class AudioVisualizer {
         canvasContext.fillRect(0, 0, width, height);
     }
 
-    static #clearCanvasFrequencyDomain(canvasContext, width, height) {
+    static #clearCanvasFrequencyDomain(canvasContext, width, height, maxToMinFrequencyRatio) {
         canvasContext.fillStyle = CANVAS_FREQUENCY_BACKGROUND;
         canvasContext.fillRect(0, 0, width, height);
+
+        const factor1 = (maxToMinFrequencyRatio - 1) / (CANVAS_FREQUENCY_N_GRID_LINES + 1);
+        const factor2 = width / Math.log10(maxToMinFrequencyRatio);
+        var x;
+        canvasContext.lineWidth = CANVAS_FREQUENCY_GRID_LINE_WIDTH;
+        canvasContext.strokeStyle = CANVAS_FREQUENCY_GRID_COLOR;
+        canvasContext.setLineDash(CANVAS_FREQUENCY_GRID_DASH);
+        canvasContext.beginPath();
+        for (var i = 1; i < CANVAS_FREQUENCY_N_GRID_LINES + 1; i++) {
+            x = Math.log10(1 + i * factor1) * factor2;
+            canvasContext.moveTo(x, 0);
+            canvasContext.lineTo(x, height);
+        }
+        canvasContext.stroke();
 
         canvasContext.fillStyle = CANVAS_FREQUENCY_FOREGROUND;
         canvasContext.font = CANVAS_FREQUENCY_FONT_SIZE + 'px ' + CANVAS_FREQUENCY_FONT;
 
+        var min_label = SETTING_MIN_FREQUENCY + ' Hz';
         var max_label = SETTING_MAX_FREQUENCY + ' Hz';
-        canvasContext.fillText('0 Hz', CANVAS_FREQUENCY_FONT_OFFSET_X, CANVAS_FREQUENCY_FONT_OFFSET_Y);
+        canvasContext.fillText(min_label, CANVAS_FREQUENCY_FONT_OFFSET_X, CANVAS_FREQUENCY_FONT_OFFSET_Y);
         canvasContext.fillText(max_label, width - Math.round(0.75 * CANVAS_FREQUENCY_FONT_SIZE * max_label.length) - CANVAS_FREQUENCY_FONT_OFFSET_X, CANVAS_FREQUENCY_FONT_OFFSET_Y);
     }
 }

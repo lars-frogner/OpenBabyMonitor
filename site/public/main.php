@@ -11,16 +11,16 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 <html>
 
 <head>
+  <?php
+  require_once(TEMPLATES_PATH . '/head_common.php');
+  require_once(TEMPLATES_PATH . '/video-js_css.php');
+  ?>
+
   <script>
     const SERVER_TIMESTAMP = <?php echo microtime(true); ?> * 1e3; // Milliseconds
     const CLIENT_TIMESTAMP = Date.now(); // Milliseconds
   </script>
   <script src="js/sync_time.js"></script>
-
-  <?php
-  require_once(TEMPLATES_PATH . '/head_common.php');
-  require_once(TEMPLATES_PATH . '/video-js_css.php');
-  ?>
 </head>
 
 <body>
@@ -144,11 +144,15 @@ define('HIDDEN_STYLE', 'style="display: none;"');
     const AUDIO_SRC = <?php echo '\'http://' . SERVER_IP . ':' . getenv('BM_MICSTREAM_PORT') . getenv('BM_MICSTREAM_ENDPOINT') . '\''; ?>;
 
     const SETTING_VOLUME = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'volume', true); ?>;
-    const SETTING_MAX_FREQUENCY = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'max_frequency', true); ?>;
+    const min_frequency = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'min_frequency', true); ?>;
+    const max_frequency = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'max_frequency', true); ?>;
+    const SETTING_MIN_FREQUENCY = Math.min(min_frequency, max_frequency);
+    const SETTING_MAX_FREQUENCY = Math.max(min_frequency, max_frequency);
   </script>
   <script src="js/confirmation_modal.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/navbar_main.js"></script>
+  <script src="js/audio_video.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/video.js"></script>
   <script src="js/main.js"></script>

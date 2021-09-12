@@ -5,6 +5,8 @@ const VIDEO_STREAM_ID = VIDEO_STREAM_DIV_ID + '_html5_api';
 const VIDEO_STREAM_SRC = 'hls/index.m3u8';
 const VIDEO_STREAM_TYPE = 'application/x-mpegURL';
 
+var _AUDIO_CONTEXT;
+
 $(function () {
     if (INITIAL_MODE == VIDEOSTREAM_MODE) {
         enableVideoStreamPlayer();
@@ -26,11 +28,28 @@ function createVideoElement() {
 
 function enableVideoStreamPlayer() {
     createVideoElement();
+    setupAudioFiltering();
+}
+
+function setupAudioFiltering() {
+    _AUDIO_CONTEXT = new (window.AudioContext || window.webkitAudioContext)();
+    var source = _AUDIO_CONTEXT.createMediaElementSource($('#' + VIDEO_STREAM_ID).get()[0]);
+    var highpassFilter = _AUDIO_CONTEXT.createBiquadFilter();
+    var lowpassFilter = _AUDIO_CONTEXT.createBiquadFilter();
+    var gain = _AUDIO_CONTEXT.createGain();
+    source.connect(highpassFilter);
+    highpassFilter.connect(lowpassFilter);
+    lowpassFilter.connect(gain);
+    gain.connect(_AUDIO_CONTEXT.destination);
+
+    setupBandpassFilters(highpassFilter, lowpassFilter);
+    setupGain(gain);
 }
 
 function disableVideoStreamPlayer() {
     var player = videojs.getPlayer(VIDEO_STREAM_ID);
     if (player && !player.isDisposed()) {
+        _AUDIO_CONTEXT.close();
         player.dispose();
     }
 }
