@@ -6,3 +6,5 @@
 <title>Babymonitor</title>
 
 <?php require_once(TEMPLATES_PATH . '/bootstrap_css.php'); ?>
+
+<script src="js/session.js"></script>
