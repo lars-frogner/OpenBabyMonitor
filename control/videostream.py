@@ -30,7 +30,6 @@ def stream_video_with_settings(vertical_resolution=720,
                                red_gain=0.0,
                                blue_gain=0.0,
                                capture_audio=True,
-                               volume=1.0,
                                show_time=True,
                                **kwargs):
     mic_id = os.environ['BM_MIC_ID']
@@ -70,8 +69,7 @@ def stream_video_with_settings(vertical_resolution=720,
     if white_balance_mode == 'off':
         color_args += ['--wbred', str(red_gain), '--wbblue', str(blue_gain)]
 
-    audio_args = ['--alsadev', mic_id, '--volume',
-                  str(volume)] if capture_audio else ['--noaudio']
+    audio_args = ['--alsadev', mic_id] if capture_audio else ['--noaudio']
 
     time_args = ['--time', '--timeformat', r'%a %d.%m.%Y %T'
                  ] if show_time else []
