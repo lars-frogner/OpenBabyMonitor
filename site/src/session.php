@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(__DIR__ . '/security.php');
 
 function tryLogin($database, $password, $destination, $otherwise) {
@@ -11,16 +12,19 @@ function tryLogin($database, $password, $destination, $otherwise) {
   }
 }
 
-function redirectIfLoggedIn($destination) {
+function isLoggedIn() {
   session_start();
-  if (isset($_SESSION['login'])) {
+  return isset($_SESSION['login']);
+}
+
+function redirectIfLoggedIn($destination) {
+  if (isLoggedIn()) {
     redirectTo($destination);
   }
 }
 
 function redirectIfLoggedOut($destination) {
-  session_start();
-  if (!isset($_SESSION['login'])) {
+  if (!isLoggedIn()) {
     redirectTo($destination);
   }
 }
@@ -37,4 +41,11 @@ function redirectTo($destination, $exit_command = null) {
     $exit_command();
   }
   exit();
+}
+
+function abortIfSessionExpired() {
+  if (!isLoggedIn()) {
+    echo SESSION_EXPIRED;
+    exit();
+  }
 }

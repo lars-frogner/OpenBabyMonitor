@@ -11,9 +11,12 @@ function sendClientTimestampToServer() {
     fetch('sync_time.php', {
         method: 'post',
         body: data
-    }).catch(error => {
-        console.log(error)
-    });
+    })
+        .then(response => response.text())
+        .then(logoutIfSessionExpired)
+        .catch(error => {
+            console.log(error)
+        });
 
 }
 

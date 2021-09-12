@@ -39,7 +39,7 @@ function requestModeChange(radio) {
         body: data
     })
         .then(response => response.text())
-        .then(responseText => handleModeChangeResponse(radio.prop('id'), radio.prop('value'), responseText))
+        .then(responseText => { logoutIfSessionExpired(responseText); handleModeChangeResponse(radio.prop('id'), radio.prop('value'), responseText); })
         .catch(error => {
             alert(error)
         });

@@ -1,6 +1,6 @@
 <?php
 require_once(dirname(__DIR__) . '/config/site_config.php');
-redirectIfLoggedOut('index.php');
+abortIfSessionExpired();
 
 if (isset($_POST['requested_mode'])) {
   $new_mode = intval($_POST['requested_mode']);

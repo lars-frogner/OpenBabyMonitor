@@ -12,3 +12,5 @@ function bm_error($message) {
 function bm_warning($message) {
   error_log('Warning: ' . $message);
 }
+
+define('SESSION_EXPIRED', -1);
