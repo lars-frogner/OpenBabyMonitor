@@ -90,8 +90,8 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     # Install dependencies for picam
     sudo apt -y install libharfbuzz0b libfontconfig1
 
-    # Install ffmpeg for audio streaming
-    sudo apt -y install ffmpeg
+    # Install packages for audio recording and streaming
+    sudo apt -y install alsa-utils ffmpeg lame
 
     # Install required Python packages
     pip3 install -r requirements.txt
@@ -146,7 +146,9 @@ if [[ "$SETUP_AUDIO" = true ]]; then
     sudo adduser $BM_SERVER_USER audio
 
     BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
+    BM_SOUND_CARD_NUMBER=$(echo $BM_MIC_ID | sed -n 's/^hw:\([0-9]*\),[0.9]*$/\1/p')
     echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_SOUND_CARD_NUMBER='$BM_SOUND_CARD_NUMBER'" >> $BM_ENV_EXPORTS_PATH
 
     echo '{}' > $BM_MICSTREAM_HEADERS_FILE
     chmod $BM_WRITE_PERMISSIONS $BM_MICSTREAM_HEADERS_FILE
