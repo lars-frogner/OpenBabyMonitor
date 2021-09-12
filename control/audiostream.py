@@ -15,13 +15,19 @@ def stream_audio():
             **control.read_settings(mode, config, database)))
 
 
-def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128, **kwargs):
+def stream_audio_with_settings(gain=100,
+                               sample_rate=44100,
+                               mp3_bitrate=128,
+                               **kwargs):
     mic_id = os.environ['BM_MIC_ID']
+    sound_card_number = os.environ['BM_SOUND_CARD_NUMBER']
     log_path = os.environ['BM_SERVER_LOG_PATH']
     micstream_dir = os.environ['BM_MICSTREAM_DIR']
     micstream_endpoint = os.environ['BM_MICSTREAM_ENDPOINT']
     micstream_port = os.environ['BM_MICSTREAM_PORT']
     micstream_header_filepath = os.environ['BM_MICSTREAM_HEADERS_FILE']
+
+    update_gain(sound_card_number, gain, log_path)
 
     update_headers(micstream_header_filepath)
 
@@ -38,6 +44,16 @@ def stream_audio_with_settings(sample_rate=44100, mp3_bitrate=128, **kwargs):
     with open(log_path, 'a') as log_file:
         subprocess.check_call([os.path.join(micstream_dir, 'micstream')] +
                               input_args + output_args + quality_args,
+                              stdout=subprocess.DEVNULL,
+                              stderr=log_file)
+
+
+def update_gain(sound_card_number, gain, log_path):
+    with open(log_path, 'a') as log_file:
+        subprocess.check_call([
+            'amixer', '-c', '{}'.format(sound_card_number), 'sset', 'Mic',
+            '{}%'.format(gain)
+        ],
                               stdout=subprocess.DEVNULL,
                               stderr=log_file)
 
