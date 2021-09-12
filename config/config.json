@@ -55,7 +55,7 @@
     "control": {
         "file_query_interval": 1e-2,
         "socket_query_interval": 0.2,
-        "mode_switch_timeout": 15.0,
+        "mode_switch_timeout": 30.0,
         "server_actions": {
             "commands": {
                 "activate_ap_mode": "$BM_SERVERCONTROL_DIR/perform_action.sh activate_ap_mode",
@@ -88,6 +88,17 @@
         }
     },
     "audiostream_settings": {
+        "gain": {
+            "group": "volume",
+            "name": "Mikrofonforsterkning (%)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 100,
+            "range": {
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
         "volume": {
             "group": "volume",
             "name": "Volumjustering",
@@ -101,7 +112,7 @@
         },
         "mp3_bitrate": {
             "group": "quality",
-            "name": "MP3 bitrate",
+            "name": "MP3 bitrate (kbit/s)",
             "type": "INT UNSIGNED NOT NULL",
             "initial_value": 128,
             "range": {
@@ -110,22 +121,33 @@
                 "step": 16
             }
         },
-        "max_frequency": {
-            "group": "visualization",
-            "name": "Høyeste frekvens",
+        "min_frequency": {
+            "group": "filtration",
+            "name": "Laveste frekvens (Hz)",
             "type": "INT UNSIGNED NOT NULL",
-            "initial_value": 12000,
+            "initial_value": 160,
             "range": {
-                "min": 1000,
+                "min": 0,
+                "max": 2000,
+                "step": 20
+            }
+        },
+        "max_frequency": {
+            "group": "filtration",
+            "name": "Høyeste frekvens (Hz)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 3600,
+            "range": {
+                "min": 2000,
                 "max": 22000,
-                "step": 1000
+                "step": 200
             }
         }
     },
     "audiostream_groups": {
         "volume": "Volum",
         "quality": "Kvalitet",
-        "visualization": "Visualisering"
+        "filtration": "Filtrering"
     },
     "videostream_settings": {
         "vertical_resolution": {
@@ -344,21 +366,10 @@
             }
         },
         "capture_audio": {
-            "group": "Inkluder lyd",
-            "name": "capture_audio",
+            "group": "audio",
+            "name": "Inkluder lyd",
             "type": "BOOLEAN NOT NULL",
             "initial_value": true
-        },
-        "volume": {
-            "group": "audio",
-            "name": "Volum",
-            "type": "FLOAT NOT NULL",
-            "initial_value": 2.0,
-            "range": {
-                "min": 0.1,
-                "max": 10.0,
-                "step": 0.1
-            }
         },
         "show_time": {
             "group": "info",
