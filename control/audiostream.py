@@ -16,7 +16,7 @@ def stream_audio():
 
 
 def stream_audio_with_settings(gain=100,
-                               sample_rate=44100,
+                               sampling_rate=8000,
                                mp3_bitrate=128,
                                **kwargs):
     mic_id = os.environ['BM_MIC_ID']
@@ -37,7 +37,7 @@ def stream_audio_with_settings(gain=100,
         micstream_header_filepath, '--port', micstream_port
     ]
     quality_args = [
-        '--sample-rate', '{}'.format(sample_rate), '--bitrate',
+        '--sample-rate', '{}'.format(sampling_rate), '--bitrate',
         '{}'.format(int(round(mp3_bitrate)))
     ]
 

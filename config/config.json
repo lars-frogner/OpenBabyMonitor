@@ -110,6 +110,17 @@
                 "step": 0.1
             }
         },
+        "sampling_rate": {
+            "group": "quality",
+            "name": "Samplingsrate (Hz)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 8000,
+            "range": {
+                "min": 8000,
+                "max": 48000,
+                "step": 100
+            }
+        },
         "mp3_bitrate": {
             "group": "quality",
             "name": "MP3 bitrate (kbit/s)",
