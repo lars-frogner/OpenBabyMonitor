@@ -70,10 +70,10 @@ define('HIDDEN_STYLE', 'style="display: none;"');
               <div class="col-auto">
                 <div class="row flex-nowrap">
                   <div class="col-10">
-                    <input type="range" class="form-range" value="11" min="5" max="15" step="1" id="audiostream_fftsize_range" oninput="$('#audiostream_fftsize_range_value').html('2<sup>' + this.value + '</sup>'); switchFFTSizePowerTo(this.value);">
+                    <input type="range" class="form-range" value="8" min="5" max="15" step="1" id="audiostream_fftsize_range" oninput="$('#audiostream_fftsize_range_value').html(2**this.value); switchFFTSizePowerTo(this.value);">
                   </div>
                   <div class="col-1">
-                    <output id="audiostream_fftsize_range_value">2<sup>11</sup></output>
+                    <output id="audiostream_fftsize_range_value">256</output>
                   </div>
                 </div>
               </div>
@@ -143,6 +143,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 
     const AUDIO_SRC = <?php echo '\'http://' . SERVER_IP . ':' . getenv('BM_MICSTREAM_PORT') . getenv('BM_MICSTREAM_ENDPOINT') . '\''; ?>;
 
+    const SETTING_SAMPLING_RATE = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'sampling_rate', true); ?>;
     const SETTING_VOLUME = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'volume', true); ?>;
     const min_frequency = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'min_frequency', true); ?>;
     const max_frequency = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'max_frequency', true); ?>;
