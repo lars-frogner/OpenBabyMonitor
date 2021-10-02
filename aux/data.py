@@ -5,9 +5,12 @@ import subprocess
 import datetime
 import random
 import requests
-import torchaudio
 import numpy as np
-import matplotlib.pyplot as plt
+import torch
+import torch.utils.data as torch_data
+from torch.utils.data import dataset
+from torchvision.transforms import ToTensor
+from sklearn.model_selection import KFold
 
 SRC_DIR = pathlib.Path(os.path.realpath(os.path.dirname(__file__)))
 
@@ -219,6 +222,38 @@ class VideoSegmentList:
                     self.segment_info_list.pop(most_common_idx)
 
 
+class LabelFile:
+    def __init__(self, file_path):
+        self.file_path = file_path
+        self.data = None
+
+    def get_data(self, force_read=False):
+        if not force_read and self.data is not None:
+            label_data = self.data
+        elif self.file_path.exists():
+            with open(self.file_path, 'r') as f:
+                label_data = json.load(f)
+        else:
+            label_data = {}
+        return label_data
+
+    def write(self, label_data=None):
+        if label_data is None:
+            assert self.data is not None
+            label_data = self.data
+        with open(self.file_path, 'w') as f:
+            json.dump(label_data, f)
+
+    def update(self, label, ids, append=True):
+        label_data = self.get_data()
+        if append and label in label_data:
+            label_data[label] = sorted(
+                list(set(label_data[label]).union(set(ids))))
+        else:
+            label_data[label] = sorted(ids)
+        self.write(label_data)
+
+
 class AudioSetDataManager:
     def __init__(self):
         self.download_script = SRC_DIR / 'fetch_youtube_audio.sh'
@@ -226,12 +261,22 @@ class AudioSetDataManager:
         self.data_dir = SRC_DIR / 'data'
         self.data_dir.mkdir(exist_ok=True)
 
+        self.raw_label_file = LabelFile(self.data_dir / 'raw_labels.json')
+        self.feature_label_file = LabelFile(self.data_dir /
+                                            'feature_labels.json')
+
+        self.raw_data_dir = self.data_dir / 'raw'
+        self.raw_data_dir.mkdir(exist_ok=True)
+
+        self.feature_data_dir = self.data_dir / 'features'
+        self.feature_data_dir.mkdir(exist_ok=True)
+
         self.error_log_file = SRC_DIR / 'error.log'
 
-        self.ontology_file = self.data_dir / 'ontology.json'
-        self.balanced_train_segments_file = self.data_dir / 'balanced_train_segments.csv'
-        self.unbalanced_train_segments_file = self.data_dir / 'unbalanced_train_segments.csv'
-        self.eval_segments_file = self.data_dir / 'eval_segments.csv'
+        self.ontology_file = self.raw_data_dir / 'ontology.json'
+        self.balanced_train_segments_file = self.raw_data_dir / 'balanced_train_segments.csv'
+        self.unbalanced_train_segments_file = self.raw_data_dir / 'unbalanced_train_segments.csv'
+        self.eval_segments_file = self.raw_data_dir / 'eval_segments.csv'
 
         if not self.ontology_file.exists():
             open(self.ontology_file, 'wb').write(
@@ -250,18 +295,10 @@ class AudioSetDataManager:
                         f'http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/{segments_file.name}',
                         allow_redirects=True).content)
 
-        self.segment_files = dict(train=dict(
-            balanced=(self.balanced_train_segments_file, ),
-            unbalanced=(self.unbalanced_train_segments_file, ),
-            all=(self.balanced_train_segments_file,
-                 self.unbalanced_train_segments_file)),
-                                  eval=(self.eval_segments_file, ))
-
-        self.audio_clip_dirs = {}
-        for directory_name in ['train', 'eval']:
-            dir_path = self.data_dir / directory_name
-            dir_path.mkdir(exist_ok=True)
-            self.audio_clip_dirs[directory_name] = dir_path
+        self.segment_files = dict(
+            train_balanced=self.balanced_train_segments_file,
+            train_unbalanced=self.unbalanced_train_segments_file,
+            eval=self.eval_segments_file)
 
     def read_sound_category_tags(self):
         with open(self.ontology_file, 'r') as f:
@@ -328,18 +365,15 @@ class AudioSetDataManager:
                     ], [])
         return list(set(tags))
 
-    def get_label_file(self, label, purpose='train'):
-        return self.audio_clip_dirs[purpose] / f'{label}.dat'
-
-    def create_data_set_for_label(self,
-                                  label,
-                                  at_least_one_category_from=None,
-                                  only_categories_from=None,
-                                  no_categories_from=None,
-                                  max_video_count=None,
-                                  purpose='train',
-                                  training_set='all',
-                                  overwrite=False):
+    def create_raw_data_set_for_label(self,
+                                      label,
+                                      at_least_one_category_from=None,
+                                      only_categories_from=None,
+                                      no_categories_from=None,
+                                      max_video_count=None,
+                                      data_groups='all',
+                                      overwrite=False,
+                                      append=True):
         video_ids = []
         with open(self.error_log_file, 'a') as error_log:
             for segment in self.find_videos_by_categories(
@@ -347,27 +381,24 @@ class AudioSetDataManager:
                     only_categories_from=only_categories_from,
                     no_categories_from=no_categories_from,
                     max_video_count=max_video_count,
-                    purpose=purpose,
-                    training_set=training_set).segment_info_list:
-                self.download_audio(label,
-                                    segment.video_id,
-                                    segment.start_time_s,
-                                    segment.end_time_s,
-                                    purpose=purpose,
-                                    error_log=error_log,
-                                    overwrite=overwrite)
-                video_ids.append(segment.video_id)
+                    data_groups=data_groups).segment_info_list:
+                success = self.download_audio(label,
+                                              segment.video_id,
+                                              segment.start_time_s,
+                                              segment.end_time_s,
+                                              error_log=error_log,
+                                              overwrite=overwrite)
+                if success:
+                    video_ids.append(segment.video_id)
 
-        with open(self.get_label_file(label, purpose=purpose), 'w') as f:
-            f.writelines(video_ids)
+        self.raw_label_file.update(label, video_ids, append=append)
 
     def find_videos_by_categories(self,
                                   at_least_one_category_from=None,
                                   only_categories_from=None,
                                   no_categories_from=None,
                                   max_video_count=None,
-                                  purpose='train',
-                                  training_set='all'):
+                                  data_groups='all'):
         def ensure_list(obj):
             if not isinstance(obj, (list, tuple)):
                 obj = [] if obj is None else [obj]
@@ -383,9 +414,9 @@ class AudioSetDataManager:
                                                 include_children=True)
         no_tags_from = self.get_category_tags(no_categories_from)
 
-        input_files = self.segment_files[purpose]
-        if isinstance(input_files, dict):
-            input_files = input_files[training_set]
+        data_groups = self.segment_files.keys(
+        ) if data_groups == 'all' else data_groups
+        input_files = [self.segment_files[group] for group in data_groups]
 
         segments = VideoSegmentList(None)
         for input_file in input_files:
@@ -405,43 +436,207 @@ class AudioSetDataManager:
                        video_id,
                        start_time_s,
                        end_time_s,
-                       purpose='train',
                        error_log=None,
                        overwrite=False):
-        audio_clip_dir = self.audio_clip_dirs[purpose] / label
+        audio_clip_dir = self.raw_data_dir / label
         audio_clip_dir.mkdir(exist_ok=True)
         if not overwrite:
             audio_file = audio_clip_dir / f'{video_id}.wav'
             if audio_file.exists():
-                return
+                return True
 
         start_time = str(datetime.timedelta(seconds=start_time_s))
         end_time = str(datetime.timedelta(seconds=end_time_s))
 
-        subprocess.run([
+        completed_process = subprocess.run([
             self.download_script, video_id, start_time, end_time,
             audio_clip_dir
         ],
-                       stderr=error_log)
+                                           stderr=error_log)
+        return completed_process.returncode == 0
+
+    def extract_features(self,
+                         feature_extractor,
+                         labels='all',
+                         use_test_dir=False,
+                         **kwargs):
+        raw_label_data = self.raw_label_file.get_data()
+        labels = raw_label_data.keys() if labels == 'all' else labels
+        for label in labels:
+            audio_dir = self.raw_data_dir / label
+            feature_dir = self.feature_data_dir / label
+            if use_test_dir:
+                audio_dir = audio_dir / 'test'
+                feature_dir = feature_dir / 'test'
+            feature_dir.mkdir(parents=True, exist_ok=True)
+
+            feature_ids = []
+            for video_id in raw_label_data[label]:
+                audio_file_path = audio_dir / f'{video_id}.wav'
+                waveform = feature_extractor.read_wav(audio_file_path)
+                if waveform.size == 0:
+                    continue
+                for idx, feature in enumerate(
+                        feature_extractor(waveform, **kwargs)):
+                    feature_id = f'{video_id}_{idx}'
+                    np.save(feature_dir / f'{feature_id}.npy',
+                            feature,
+                            allow_pickle=False,
+                            fix_imports=False)
+                    feature_ids.append(feature_id)
+
+            self.feature_label_file.update(label, feature_ids)
+
+
+class AudioDataset(torch_data.Dataset):
+    def __init__(self,
+                 data_dir,
+                 label_file_path,
+                 transform=None,
+                 target_transform=None):
+        self.data_dir = data_dir
+        label_data = (label_file_path if isinstance(label_file_path, LabelFile)
+                      else LabelFile(label_file_path)).get_data()
+
+        self.transform = transform
+        self.target_transform = target_transform
+
+        self.label_names, self.id_lists = zip(*sorted(label_data.items()))
+        self.id_list_lengths = list(map(len, self.id_lists))
+        self.length = sum(self.id_list_lengths)
+
+        self.cumul_id_list_lengths = np.cumsum(
+            np.array(self.id_list_lengths, dtype=int))
+
+    def __len__(self):
+        return self.length
+
+    def __idx_to_feature_id_and_label(self, idx):
+        label_idx = np.searchsorted(self.cumul_id_list_lengths,
+                                    idx,
+                                    side='right')
+        feature_id = self.id_lists[label_idx][idx - (
+            0 if label_idx == 0 else self.cumul_id_list_lengths[label_idx -
+                                                                1])]
+        return feature_id, label_idx
+
+    def get_n_labels(self):
+        return len(self.label_names)
+
+    def get_label_name(self, label):
+        return self.label_names[label]
+
+    def get_feature_shape(self):
+        return self.__read_feature(
+            *self.__idx_to_feature_id_and_label(0)).shape
+
+    def get_n_features_for_label(self, label):
+        return self.id_list_lengths[
+            self.label_names.index(label) if isinstance(label, str) else label]
+
+    def __read_feature(self, feature_id, label):
+        return np.load(self.data_dir / self.get_label_name(label) /
+                       f'{feature_id}.npy')
+
+    def __getitem__(self, idx):
+        feature_id, label = self.__idx_to_feature_id_and_label(idx)
+        feature = self.__read_feature(feature_id, label)
+
+        if self.transform:
+            feature = self.transform(feature)
+        if self.target_transform:
+            label = self.target_transform(label)
+
+        return feature, label
+
+
+def fetch_raw_data(max_video_count_per_label=2000, labels='all', **kwargs):
+    manager = AudioSetDataManager(**kwargs)
+
+    labels = ['bad', 'good', 'ambient'] if labels == 'all' else labels
+    if 'bad' in labels:
+        manager.create_raw_data_set_for_label(
+            'bad',
+            at_least_one_category_from=CATEGORIES['bad'],
+            only_categories_from=(CATEGORIES['bad'] + CATEGORIES['ambient']),
+            max_video_count=max_video_count_per_label,
+            data_groups='all')
+    if 'good' in labels:
+        manager.create_raw_data_set_for_label(
+            'good',
+            at_least_one_category_from=CATEGORIES['good'],
+            only_categories_from=(CATEGORIES['good'] + CATEGORIES['ambient']),
+            no_categories_from=manager.get_child_categories('Music'),
+            max_video_count=max_video_count_per_label,
+            data_groups='all')
+    if 'ambient' in labels:
+        manager.create_raw_data_set_for_label(
+            'ambient',
+            only_categories_from=CATEGORIES['ambient'],
+            no_categories_from=manager.get_child_categories('Music'),
+            max_video_count=max_video_count_per_label,
+            data_groups='all')
+
+
+def compute_features(**kwargs):
+    from features import AudioFeatureExtractor
+    manager = AudioSetDataManager()
+    extractor = AudioFeatureExtractor(**kwargs)
+    manager.extract_features(extractor)
+
+
+def create_dataset():
+    manager = AudioSetDataManager()
+    dataset = AudioDataset(manager.feature_data_dir,
+                           manager.feature_label_file,
+                           transform=ToTensor())
+    return dataset
+
+
+def create_dataloaders(test_proportion=0.2,
+                       batch_size=32,
+                       num_workers=6,
+                       seed=42):
+    dataset = create_dataset()
+    dataset_size = len(dataset)
+    test_size = int(test_proportion * dataset_size)
+    train_size = dataset_size - test_size
+    train_dataset, test_dataset = torch_data.random_split(
+        dataset, (train_size, test_size),
+        generator=torch.Generator().manual_seed(seed))
+
+    train_dataloader = torch_data.DataLoader(train_dataset,
+                                             batch_size=batch_size,
+                                             num_workers=num_workers,
+                                             shuffle=True)
+    test_dataloader = torch_data.DataLoader(test_dataset,
+                                            batch_size=batch_size,
+                                            num_workers=num_workers,
+                                            shuffle=True)
+
+    return dataset, train_dataloader, test_dataloader
+
+
+def create_kfold_dataloaders(n_splits=5,
+                             batch_size=32,
+                             num_workers=6,
+                             seed=42):
+    dataset = create_dataset()
+    return dataset, [
+        tuple(
+            map(
+                lambda indices: torch_data.DataLoader(
+                    dataset,
+                    batch_size=batch_size,
+                    num_workers=num_workers,
+                    sampler=torch_data.SubsetRandomSampler(
+                        indices, generator=torch.Generator().manual_seed(
+                            seed))), train_or_test_indices))
+        for train_or_test_indices in KFold(
+            n_splits=n_splits, shuffle=True, random_state=seed).split(dataset)
+    ]
 
 
 if __name__ == '__main__':
-    manager = AudioSetDataManager()
-    max_video_count = 2000
-
-    manager.create_data_set_for_label(
-        'bad',
-        at_least_one_category_from=CATEGORIES['bad'],
-        only_categories_from=(CATEGORIES['bad'] + CATEGORIES['ambient']),
-        max_video_count=max_video_count)
-    manager.create_data_set_for_label(
-        'good',
-        at_least_one_category_from=CATEGORIES['good'],
-        only_categories_from=(CATEGORIES['good'] + CATEGORIES['ambient']),
-        no_categories_from=manager.get_child_categories('Music'),
-        max_video_count=max_video_count)
-    manager.create_data_set_for_label(
-        'ambient',
-        only_categories_from=CATEGORIES['ambient'],
-        no_categories_from=manager.get_child_categories('Music'),
-        max_video_count=max_video_count)
+    # fetch_raw_data()
+    compute_features()
