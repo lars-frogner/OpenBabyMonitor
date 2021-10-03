@@ -1,7 +1,9 @@
 import time
+from librosa import feature
 import numpy as np
 import matplotlib.pyplot as plt
-import librosa.feature
+import librosa
+import soundfile
 
 
 def next_power_of_2(x):
@@ -26,9 +28,10 @@ class AudioFeatureExtractor:
                  max_frequency=3600,
                  lifter=22,
                  normalize_coefs=True,
-                 feature_duration=1.0,
+                 feature_window_count=64,
                  feature_overlap_fraction=0.5,
-                 min_feature_energy=-950.0):
+                 low_energy_threshold=-400.0,
+                 max_low_energy_feature_proportion=0.7):
         self.dtype = np.dtype(dtype)
         assert self.dtype.kind == 'f'
         self.sampling_rate = sampling_rate
@@ -42,8 +45,8 @@ class AudioFeatureExtractor:
         self.normalize_coefs = normalize_coefs
         self.fft_length = next_power_of_2(self.window_length)
 
-        self.feature_length = self.adjust_waveform_length_to_fit_windows(
-            self.time_to_sample_num(feature_duration))
+        self.feature_window_count = feature_window_count
+        self.feature_length = self.compute_waveform_length_for_window_count(feature_window_count)
         self.feature_duration = self.sample_num_to_time(self.feature_length)
 
         self.feature_overlap_length = min(
@@ -52,7 +55,9 @@ class AudioFeatureExtractor:
         self.feature_stride = self.feature_length - self.feature_overlap_length
         self.feature_overlap_fraction = self.feature_overlap_length / self.feature_length
 
-        self.min_feature_energy = min_feature_energy
+        self.low_energy_threshold = low_energy_threshold
+        self.max_low_energy_feature_proportion = max_low_energy_feature_proportion
+        self.filter_features = self.low_energy_threshold is not None and self.max_low_energy_feature_proportion is not None
 
         self.mfcc_kwargs = dict(sr=self.sampling_rate,
                                 n_mfcc=self.n_mfc_coefs,
@@ -76,6 +81,12 @@ class AudioFeatureExtractor:
         else:
             return whole_windows
 
+    def compute_waveform_length_for_window_count(self, window_count):
+        return self.fft_length + (window_count - 1)*self.window_separation
+
+    def compute_waveform_duration_for_window_count(self, window_count):
+        return self.sample_num_to_time(self.compute_waveform_length_for_window_count(window_count))
+
     def adjust_waveform_length_to_fit_windows(self, waveform_length):
         _, cutoff_length = self.compute_window_count(waveform_length,
                                                      return_cutoff=True)
@@ -91,6 +102,9 @@ class AudioFeatureExtractor:
                                    mono=True)
         return waveform
 
+    def write_wav(self, file_path, waveform):
+        soundfile.write(file_path, waveform, self.sampling_rate)
+
     def convert_waveform(self, waveform):
         dtype = waveform.dtype
         converted_waveform = np.asfarray(waveform, dtype=self.dtype)
@@ -101,47 +115,51 @@ class AudioFeatureExtractor:
                 2 / float(np.iinfo(dtype).max)) - 1.0
         return converted_waveform
 
-    def __call__(self, waveform, split_into_features=True):
+    def feature_is_accepted(self, energies):
+        return np.mean(energies < self.low_energy_threshold) <= self.max_low_energy_feature_proportion
+
+    def __call__(self, waveform, split_into_features=True, allow_all_energies=False, return_waveforms=False):
         assert waveform.size > 0
         if split_into_features:
-            if self.min_feature_energy is None:
+            waveforms = self.split_waveform(waveform)
+            if allow_all_energies or not self.filter_features:
                 features = [
                     self.compute_mfcc(splitted_waveform)
-                    for splitted_waveform in self.split_waveform(waveform)
+                    for splitted_waveform in waveforms
                 ]
+                return (features, waveforms) if return_waveforms else (features,)
             else:
                 features = []
-                for splitted_waveform in self.split_waveform(waveform):
-                    feature, mean_energy = self.compute_mfcc(
-                        splitted_waveform, return_energy=True)
-                    if mean_energy >= self.min_feature_energy:
-                        features.append(feature)
-        else:
-            features = self.compute_mfcc(waveform)
+                is_accepted = []
+                for splitted_waveform in waveforms:
+                    accepted, feature = self.compute_mfcc(
+                        splitted_waveform, return_accepted=True)
+                    features.append(feature)
+                    is_accepted.append(accepted)
 
-        return features
+                return is_accepted, *((features, waveforms) if return_waveforms else (features,))
+        else:
+            return self.compute_mfcc(waveform)
 
     def split_waveform(self, waveform):
         return get_striding_windows(waveform,
                                     self.feature_length,
                                     stride=self.feature_stride)
 
-    def compute_mfcc(self, waveform, return_energy=False):
+    def compute_mfcc(self, waveform, return_accepted=False):
         mfcc = librosa.feature.mfcc(y=waveform, **self.mfcc_kwargs)
+
+        if return_accepted:
+            accepted = self.feature_is_accepted(mfcc[0, :])
+
         if self.normalize_coefs:
             mean = np.mean(mfcc, axis=1)
             mfcc -= mean[:, np.newaxis]
             standard_deviation = np.std(mfcc, axis=1)
             valid = standard_deviation > 0
             mfcc[valid, :] /= standard_deviation[valid, np.newaxis]
-            if return_energy:
-                return mfcc, mean[0]
-            else:
-                return mfcc
-        elif return_energy:
-            return mfcc, np.mean(mfcc[0, :])
-        else:
-            return mfcc
+
+        return (accepted, mfcc) if return_accepted else mfcc
 
     def benchmark(self, waveform, n_repeats=1000):
         start_time = time.time()
@@ -228,15 +246,15 @@ class AudioFeatureExtractor:
 
 if __name__ == '__main__':
     e = AudioFeatureExtractor()
-    # waveform = np.zeros(8000, dtype=np.float32)
+    # waveform = np.zeros(80000, dtype=np.float32)
     # waveform[10] = 0.1
     # waveform[4000:] = np.sin(np.linspace(0, 40 * 2 * np.pi, 4000))
     # e.plot(waveform, skip_first_filter=False, split_into_features=False)
-    waveform = e.read_wav('data/cry.wav')
+    # waveform = e.read_wav('data/cry.wav')
     # waveform = e.read_wav('data/train/bad/BNfclSQ7ZKk.wav')
 
-    e.plot(waveform[:80000],
-           skip_first_filter=False,
-           split_into_features=True,
-           show_feature_boundaries=True,
-           average_features_over_time=False)
+    # e.plot(waveform[:80000],
+    #        skip_first_filter=False,
+    #        split_into_features=True,
+    #        show_feature_boundaries=True,
+    #        average_features_over_time=False)

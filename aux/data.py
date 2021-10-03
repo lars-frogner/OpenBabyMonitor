@@ -1,3 +1,4 @@
+from math import ceil
 import os
 import pathlib
 import json
@@ -7,18 +8,17 @@ import random
 import requests
 import numpy as np
 import torch
+from torch._C import device
 import torch.utils.data as torch_data
-from torch.utils.data import dataset
-from torchvision.transforms import ToTensor
-from sklearn.model_selection import KFold
+from torchsampler import ImbalancedDatasetSampler
+import sklearn.model_selection
+from tqdm import tqdm
 
 SRC_DIR = pathlib.Path(os.path.realpath(os.path.dirname(__file__)))
 
 LABELS = ['bad', 'good', 'ambient']
-BAD_BABY_SOUNDS = ['Baby cry, infant cry', 'Crying, sobbing', 'Whimper']
-GOOD_BABY_SOUNDS = [
-    'Babbling', 'Baby laughter', 'Child speech, kid speaking', 'Giggle'
-]
+BAD_BABY_SOUNDS = ['Baby cry, infant cry']
+GOOD_BABY_SOUNDS = ['Babbling', 'Baby laughter']
 AMBIENT_SOUNDS = [
     'Silence', 'Wind noise (microphone)', 'Rain on surface', 'Conversation',
     'Female speech, woman speaking', 'Male speech, man speaking', 'Whispering',
@@ -32,6 +32,24 @@ CATEGORIES = {
     label: categories
     for label, categories in zip(
         LABELS, [BAD_BABY_SOUNDS, GOOD_BABY_SOUNDS, AMBIENT_SOUNDS])
+}
+
+numpy_to_torch_dtype_dict = {
+    np.bool: torch.bool,
+    np.uint8: torch.uint8,
+    np.int8: torch.int8,
+    np.int16: torch.int16,
+    np.int32: torch.int32,
+    np.int64: torch.int64,
+    np.float16: torch.float16,
+    np.float32: torch.float32,
+    np.float64: torch.float64,
+    np.complex64: torch.complex64,
+    np.complex128: torch.complex128
+}
+torch_to_numpy_dtype_dict = {
+    value: key
+    for (key, value) in numpy_to_torch_dtype_dict.items()
 }
 
 
@@ -264,6 +282,8 @@ class AudioSetDataManager:
         self.raw_label_file = LabelFile(self.data_dir / 'raw_labels.json')
         self.feature_label_file = LabelFile(self.data_dir /
                                             'feature_labels.json')
+        self.discarded_feature_label_file = LabelFile(
+            self.data_dir / 'discarded_feature_labels.json')
 
         self.raw_data_dir = self.data_dir / 'raw'
         self.raw_data_dir.mkdir(exist_ok=True)
@@ -376,12 +396,13 @@ class AudioSetDataManager:
                                       append=True):
         video_ids = []
         with open(self.error_log_file, 'a') as error_log:
-            for segment in self.find_videos_by_categories(
-                    at_least_one_category_from=at_least_one_category_from,
-                    only_categories_from=only_categories_from,
-                    no_categories_from=no_categories_from,
-                    max_video_count=max_video_count,
-                    data_groups=data_groups).segment_info_list:
+            for segment in tqdm(
+                    self.find_videos_by_categories(
+                        at_least_one_category_from=at_least_one_category_from,
+                        only_categories_from=only_categories_from,
+                        no_categories_from=no_categories_from,
+                        max_video_count=max_video_count,
+                        data_groups=data_groups).segment_info_list):
                 success = self.download_audio(label,
                                               segment.video_id,
                                               segment.start_time_s,
@@ -442,7 +463,9 @@ class AudioSetDataManager:
         audio_clip_dir.mkdir(exist_ok=True)
         if not overwrite:
             audio_file = audio_clip_dir / f'{video_id}.wav'
+            print(audio_file)
             if audio_file.exists():
+                print('Exists')
                 return True
 
         start_time = str(datetime.timedelta(seconds=start_time_s))
@@ -458,60 +481,155 @@ class AudioSetDataManager:
     def extract_features(self,
                          feature_extractor,
                          labels='all',
-                         use_test_dir=False,
+                         allow_all_energies_for_labels=[],
+                         save_audio=True,
+                         save_discarded=True,
                          **kwargs):
         raw_label_data = self.raw_label_file.get_data()
         labels = raw_label_data.keys() if labels == 'all' else labels
+
         for label in labels:
             audio_dir = self.raw_data_dir / label
             feature_dir = self.feature_data_dir / label
-            if use_test_dir:
-                audio_dir = audio_dir / 'test'
-                feature_dir = feature_dir / 'test'
             feature_dir.mkdir(parents=True, exist_ok=True)
 
+            allow_all_energies = label in allow_all_energies_for_labels
+
+            if save_discarded and not allow_all_energies:
+                discarded_feature_dir = feature_dir / 'discarded'
+                discarded_feature_dir.mkdir(parents=True, exist_ok=True)
+
+            if save_audio:
+                feature_audio_dir = feature_dir / 'audio'
+                feature_audio_dir.mkdir(parents=True, exist_ok=True)
+
+                if save_discarded and not allow_all_energies:
+                    discarded_feature_audio_dir = discarded_feature_dir / 'audio'
+                    discarded_feature_audio_dir.mkdir(parents=True,
+                                                      exist_ok=True)
+
             feature_ids = []
-            for video_id in raw_label_data[label]:
+            discarded_feature_ids = []
+
+            for video_id in tqdm(raw_label_data[label]):
                 audio_file_path = audio_dir / f'{video_id}.wav'
                 waveform = feature_extractor.read_wav(audio_file_path)
                 if waveform.size == 0:
                     continue
-                for idx, feature in enumerate(
-                        feature_extractor(waveform, **kwargs)):
+
+                for idx, result in enumerate(
+                        zip(*feature_extractor(
+                            waveform,
+                            allow_all_energies=allow_all_energies,
+                            return_waveforms=save_audio,
+                            **kwargs))):
+
                     feature_id = f'{video_id}_{idx}'
-                    np.save(feature_dir / f'{feature_id}.npy',
-                            feature,
-                            allow_pickle=False,
-                            fix_imports=False)
-                    feature_ids.append(feature_id)
+                    filename = f'{feature_id}.npy'
+
+                    if save_audio:
+                        audio_filename = f'{feature_id}.wav'
+
+                        if allow_all_energies:
+                            feature, waveform = result
+                            accepted = True
+                        else:
+                            accepted, feature, waveform = result
+
+                        if accepted:
+                            feature_extractor.write_wav(
+                                feature_audio_dir / audio_filename, waveform)
+                        elif save_discarded:
+                            feature_extractor.write_wav(
+                                discarded_feature_audio_dir / audio_filename,
+                                waveform)
+                    else:
+                        if allow_all_energies:
+                            feature, = result
+                            accepted = True
+                        else:
+                            accepted, feature = result
+
+                    if accepted:
+                        np.save(feature_dir / filename,
+                                feature,
+                                allow_pickle=False,
+                                fix_imports=False)
+                        feature_ids.append(feature_id)
+                    elif save_discarded:
+                        np.save(discarded_feature_dir / filename,
+                                feature,
+                                allow_pickle=False,
+                                fix_imports=False)
+                        discarded_feature_ids.append(feature_id)
 
             self.feature_label_file.update(label, feature_ids)
+
+            if save_discarded and not allow_all_energies:
+                self.discarded_feature_label_file.update(
+                    label, discarded_feature_ids)
 
 
 class AudioDataset(torch_data.Dataset):
     def __init__(self,
                  data_dir,
                  label_file_path,
-                 transform=None,
-                 target_transform=None):
+                 device='cpu',
+                 caching='initial',
+                 move_all_to_device=True,
+                 subset_proportion=None):
         self.data_dir = data_dir
+        self.device = device
+        self.caching = caching
+        self.move_all_to_device = move_all_to_device
+
         label_data = (label_file_path if isinstance(label_file_path, LabelFile)
                       else LabelFile(label_file_path)).get_data()
 
-        self.transform = transform
-        self.target_transform = target_transform
-
         self.label_names, self.id_lists = zip(*sorted(label_data.items()))
+        if subset_proportion is not None:
+            self.id_lists = [
+                id_list[:min(len(id_list
+                                 ), ceil(subset_proportion * len(id_list)))]
+                for id_list in self.id_lists
+            ]
         self.id_list_lengths = list(map(len, self.id_lists))
         self.length = sum(self.id_list_lengths)
 
         self.cumul_id_list_lengths = np.cumsum(
             np.array(self.id_list_lengths, dtype=int))
 
+        if self.caching == 'initial':
+            self._read_all_data()
+        else:
+            self.all_loaded = False
+
     def __len__(self):
         return self.length
 
-    def __idx_to_feature_id_and_label(self, idx):
+    def _read_all_data(self):
+        if self.length == 0:
+            return
+        feature, label = self._read_data(0)
+        feature = torch.from_numpy(feature[:, :, np.newaxis])
+        self.features = torch.empty((self.length, *feature.shape),
+                                    dtype=feature.dtype)
+        self.features[0, ...] = feature
+        self.labels = torch.empty(self.length, dtype=int)
+        self.labels[0] = label
+        for idx in tqdm(range(1, self.length)):
+            feature, label = self._read_data(idx)
+            self.features[idx, ...] = torch.from_numpy(feature[:, :,
+                                                               np.newaxis])
+            self.labels[idx] = label
+
+        if self.move_all_to_device and self.device != 'cpu':
+            self.features = self.features.to(self.device)
+            self.labels = self.labels.to(self.device)
+
+        self.all_loaded = True
+
+    def _idx_to_feature_id_and_label(self, idx):
         label_idx = np.searchsorted(self.cumul_id_list_lengths,
                                     idx,
                                     side='right')
@@ -520,6 +638,9 @@ class AudioDataset(torch_data.Dataset):
                                                                 1])]
         return feature_id, label_idx
 
+    def get_label_names(self):
+        return self.label_names
+
     def get_n_labels(self):
         return len(self.label_names)
 
@@ -527,30 +648,78 @@ class AudioDataset(torch_data.Dataset):
         return self.label_names[label]
 
     def get_feature_shape(self):
-        return self.__read_feature(
-            *self.__idx_to_feature_id_and_label(0)).shape
+        if self.all_loaded:
+            return self.features.shape[1:]
+        else:
+            return self.__read_feature(
+                *self._idx_to_feature_id_and_label(0)).shape
+
+    def get_all_labels(self):
+        assert self.all_loaded
+        return self.labels
 
     def get_n_features_for_label(self, label):
         return self.id_list_lengths[
             self.label_names.index(label) if isinstance(label, str) else label]
 
-    def __read_feature(self, feature_id, label):
+    def get_sampler(self, indices=None, **kwargs):
+        if indices is None:
+            callback_get_label = lambda dataset: dataset.get_all_labels()
+        else:
+            callback_get_label = lambda dataset: dataset.get_all_labels()[
+                indices]
+        return ImbalancedDatasetSampler(self,
+                                        indices=indices,
+                                        callback_get_label=callback_get_label,
+                                        **kwargs)
+
+    def _read_feature(self, feature_id, label):
         return np.load(self.data_dir / self.get_label_name(label) /
                        f'{feature_id}.npy')
 
-    def __getitem__(self, idx):
-        feature_id, label = self.__idx_to_feature_id_and_label(idx)
-        feature = self.__read_feature(feature_id, label)
-
-        if self.transform:
-            feature = self.transform(feature)
-        if self.target_transform:
-            label = self.target_transform(label)
-
+    def _read_data(self, idx):
+        feature_id, label = self._idx_to_feature_id_and_label(idx)
+        feature = self._read_feature(feature_id, label)
         return feature, label
 
+    def _apply_transforms(self, feature, label):
+        if self.all_loaded:
+            if not self.move_all_to_device:
+                feature, label = feature.to(self.device), label.to(self.device)
+        else:
+            feature = torch.from_numpy(feature[:, :,
+                                               np.newaxis]).to(self.device)
+            label = torch.Tensor([label]).to(int).to(self.device)
+        return feature, label
 
-def fetch_raw_data(max_video_count_per_label=2000, labels='all', **kwargs):
+    def __getitem__(self, idx):
+        assert idx < self.length
+        if self.all_loaded:
+            feature, label = self.features[idx], self.labels[idx]
+        else:
+            feature, label = self._read_data(idx)
+        return self._apply_transforms(feature, label)
+
+
+class AudioListenDataset(AudioDataset):
+    def __init__(self, *args, caching=None, **kwargs):
+        super().__init__(*args, caching=caching, **kwargs)
+
+    def _read_feature(self, feature_id, label):
+        return self.data_dir / self.get_label_name(
+            label) / 'audio' / f'{feature_id}.wav'
+
+
+class DiscardedAudioListenDataset(AudioDataset):
+    def __init__(self, *args, caching=None, **kwargs):
+        super().__init__(*args, caching=caching, **kwargs)
+
+    def _read_feature(self, feature_id, label):
+        return self.data_dir / self.get_label_name(
+            label) / 'discarded' / 'audio' / f'{feature_id}.wav'
+
+
+def fetch_raw_data(max_video_count_per_label=4000, labels='all', **kwargs):
     manager = AudioSetDataManager(**kwargs)
 
     labels = ['bad', 'good', 'ambient'] if labels == 'all' else labels
@@ -558,15 +727,12 @@ def fetch_raw_data(max_video_count_per_label=2000, labels='all', **kwargs):
         manager.create_raw_data_set_for_label(
             'bad',
             at_least_one_category_from=CATEGORIES['bad'],
-            only_categories_from=(CATEGORIES['bad'] + CATEGORIES['ambient']),
             max_video_count=max_video_count_per_label,
             data_groups='all')
     if 'good' in labels:
         manager.create_raw_data_set_for_label(
             'good',
             at_least_one_category_from=CATEGORIES['good'],
-            only_categories_from=(CATEGORIES['good'] + CATEGORIES['ambient']),
-            no_categories_from=manager.get_child_categories('Music'),
             max_video_count=max_video_count_per_label,
             data_groups='all')
     if 'ambient' in labels:
@@ -578,65 +744,113 @@ def fetch_raw_data(max_video_count_per_label=2000, labels='all', **kwargs):
             data_groups='all')
 
 
-def compute_features(**kwargs):
+def compute_features():
     from features import AudioFeatureExtractor
     manager = AudioSetDataManager()
-    extractor = AudioFeatureExtractor(**kwargs)
-    manager.extract_features(extractor)
+    extractor = AudioFeatureExtractor()
+    manager.extract_features(extractor,
+                             allow_all_energies_for_labels=['ambient'])
 
 
-def create_dataset():
+def create_dataset(**kwargs):
     manager = AudioSetDataManager()
     dataset = AudioDataset(manager.feature_data_dir,
-                           manager.feature_label_file,
-                           transform=ToTensor())
+                           manager.feature_label_file, **kwargs)
     return dataset
 
 
-def create_dataloaders(test_proportion=0.2,
+def create_listen_dataset():
+    manager = AudioSetDataManager()
+    dataset = AudioListenDataset(manager.feature_data_dir,
+                                 manager.feature_label_file)
+    return dataset
+
+
+def create_discarded_listen_dataset():
+    manager = AudioSetDataManager()
+    dataset = DiscardedAudioListenDataset(manager.feature_data_dir,
+                                          manager.discarded_feature_label_file)
+    return dataset
+
+
+def listen_to_dataset(dataset, n=10, shuffle=True, only_labels=None):
+    from simpleaudio import WaveObject
+    idx = 0
+    for audio_file, label in torch_data.DataLoader(
+            dataset,
+            batch_size=1,
+            shuffle=shuffle,
+            collate_fn=lambda results: results[0]):
+        if idx == n:
+            break
+        label_name = dataset.get_label_name(label)
+        if only_labels is not None and label_name not in only_labels:
+            continue
+        with open(audio_file, 'rb') as f:
+            wave_obj = WaveObject.from_wave_file(f)
+        print(label_name)
+        play_obj = wave_obj.play()
+        play_obj.wait_done()
+        idx += 1
+
+
+def create_dataloaders(dataset,
+                       test_proportion=0.2,
                        batch_size=32,
                        num_workers=6,
-                       seed=42):
-    dataset = create_dataset()
+                       seed=42,
+                       pin_memory=False):
     dataset_size = len(dataset)
-    test_size = int(test_proportion * dataset_size)
-    train_size = dataset_size - test_size
-    train_dataset, test_dataset = torch_data.random_split(
-        dataset, (train_size, test_size),
-        generator=torch.Generator().manual_seed(seed))
+    all_indices = np.arange(dataset_size)
+    train_indices, test_indices = sklearn.model_selection.train_test_split(
+        all_indices,
+        test_size=test_proportion,
+        random_state=seed,
+        shuffle=True)
 
-    train_dataloader = torch_data.DataLoader(train_dataset,
-                                             batch_size=batch_size,
-                                             num_workers=num_workers,
-                                             shuffle=True)
-    test_dataloader = torch_data.DataLoader(test_dataset,
-                                            batch_size=batch_size,
-                                            num_workers=num_workers,
-                                            shuffle=True)
+    train_dataloader = torch_data.DataLoader(
+        dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        generator=torch.Generator().manual_seed(seed),
+        sampler=dataset.get_sampler(indices=train_indices))
+    test_dataloader = torch_data.DataLoader(
+        dataset,
+        batch_size=batch_size,
+        num_workers=num_workers,
+        pin_memory=pin_memory,
+        generator=torch.Generator().manual_seed(seed),
+        sampler=dataset.get_sampler(indices=test_indices))
 
-    return dataset, train_dataloader, test_dataloader
+    return train_dataloader, test_dataloader
 
 
-def create_kfold_dataloaders(n_splits=5,
+def create_kfold_dataloaders(dataset,
+                             n_splits=5,
                              batch_size=32,
                              num_workers=6,
-                             seed=42):
-    dataset = create_dataset()
-    return dataset, [
+                             seed=42,
+                             pin_memory=False):
+    return [
         tuple(
             map(
                 lambda indices: torch_data.DataLoader(
                     dataset,
                     batch_size=batch_size,
                     num_workers=num_workers,
-                    sampler=torch_data.SubsetRandomSampler(
-                        indices, generator=torch.Generator().manual_seed(
-                            seed))), train_or_test_indices))
-        for train_or_test_indices in KFold(
+                    pin_memory=pin_memory,
+                    generator=torch.Generator().manual_seed(seed),
+                    sampler=dataset.get_sampler(indices=indices)),
+                train_or_test_indices))
+        for train_or_test_indices in sklearn.model_selection.KFold(
             n_splits=n_splits, shuffle=True, random_state=seed).split(dataset)
     ]
 
 
 if __name__ == '__main__':
+    None
     # fetch_raw_data()
-    compute_features()
+    # compute_features()
+    # listen_to_dataset(create_discarded_listen_dataset(), n=30)
+    # listen_to_dataset(create_listen_dataset(), n=30, only_labels=['good'])
