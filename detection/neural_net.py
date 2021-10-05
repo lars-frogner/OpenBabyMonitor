@@ -1,7 +1,6 @@
 import math
 import numpy as np
 import torch
-from torch._C import device
 import torch.nn as nn
 import torchmetrics
 import matplotlib.pyplot as plt
@@ -12,6 +11,7 @@ DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 def compute_conv_output_shape(input_shape, conv):
+    assert len(input_shape) == 3
     kernel_size = conv.kernel_size if isinstance(
         conv.kernel_size, tuple) else (conv.kernel_size, conv.kernel_size)
     if isinstance(conv.padding, str):
@@ -25,12 +25,12 @@ def compute_conv_output_shape(input_shape, conv):
         conv.dilation, tuple) else (conv.dilation, conv.dilation)
 
     get_output_size = lambda dim: math.floor(
-        ((input_shape[dim] + (2 * padding[dim]) -
+        ((input_shape[dim + 1] + (2 * padding[dim]) -
           (dilation[dim] * (kernel_size[dim] - 1)) - 1) / stride[dim]) + 1)
 
-    return tuple([get_output_size(dim)
-                  for dim in range(2)]) + (conv.out_channels if isinstance(
-                      conv, nn.Conv2d) else input_shape[2], )
+    return (
+        (conv.out_channels, ) if isinstance(conv, nn.Conv2d) else
+        (input_shape[0], )) + tuple([get_output_size(dim) for dim in range(2)])
 
 
 def compute_n_conv_weights(conv):
@@ -55,7 +55,7 @@ class CryNet(nn.Module):
                            stride=1,
                            padding='same',
                            bias=True):
-            conv = nn.Conv2d(in_shape[2],
+            conv = nn.Conv2d(in_shape[0],
                              out_channels,
                              kernel_size=kernel_size,
                              stride=stride,
@@ -99,11 +99,14 @@ class CryNet(nn.Module):
             self.layers.append(nn.LogSoftmax(dim=dim))
 
         if len(input_shape) == 2:
-            input_shape = input_shape + (1, )
+            input_shape = (1, ) + input_shape
         else:
             assert len(input_shape) == 3
 
-        shape = add_conv_layer(input_shape, 64)
+        shape = add_conv_layer(input_shape, 32)
+        shape = add_max_pool_layer(shape)
+        add_relu_activation()
+        shape = add_conv_layer(shape, 64)
         shape = add_max_pool_layer(shape)
         add_relu_activation()
         shape = add_conv_layer(shape, 128)
@@ -114,13 +117,14 @@ class CryNet(nn.Module):
         shape = add_conv_layer(shape, 256)
         add_relu_activation()
         shape = add_conv_layer(shape, 256)
+        shape = add_max_pool_layer(shape)
         add_relu_activation()
         size = add_flatten_layer(shape)
         size = add_dense_layer(size, 1024)
         add_relu_activation()
         size = add_dense_layer(size, 1024)
         add_relu_activation()
-        size = add_dense_layer(size, 3)
+        size = add_dense_layer(size, n_labels)
         add_softmax_activation()
 
         self.layers = nn.Sequential(*self.layers)
@@ -254,7 +258,7 @@ class TrainingVisualizer:
         texts = np.empty((n_classes, n_classes), dtype=object)
         for i in range(n_classes):
             for j in range(n_classes):
-                texts[i, j] = ax.text(i, j, '', ha='center')
+                texts[i, j] = ax.text(j, i, '', ha='center')
 
         self.plots[name] = dict(im=im, texts=texts)
 
@@ -271,7 +275,6 @@ class TrainingVisualizer:
                                        texts,
                                        confusion_matrix,
                                        draw=True):
-        print(confusion_matrix)
         im.set_data(confusion_matrix)
         for i in range(confusion_matrix.shape[0]):
             for j in range(confusion_matrix.shape[1]):
@@ -287,8 +290,10 @@ def create_model(*args, **kwargs):
     return model
 
 
-def create_optimizer(model, learning_rate=1e-3):
-    return torch.optim.Adam(model.parameters(), lr=learning_rate)
+def create_optimizer(model, learning_rate=1e-3, weight_decay=1e-2):
+    return torch.optim.AdamW(model.parameters(),
+                             lr=learning_rate,
+                             weight_decay=weight_decay)
 
 
 def create_loss_function():
@@ -440,13 +445,18 @@ def print_accuracy(epoch, *accuracies):
 
 if __name__ == '__main__':
     from data import create_dataset, create_dataloaders
-    config = dict(batch_size=32, learning_rate=1e-4, n_epochs=1000)
+    config = dict(batch_size=32,
+                  learning_rate=1e-3,
+                  weight_decay=1e-2,
+                  n_epochs=100)
     dataset = create_dataset(device=DEVICE)
     train_dataloader, test_dataloader = create_dataloaders(
-        dataset, batch_size=config['batch_size'])
+        dataset, batch_size=config['batch_size'], num_workers=0)
     model = create_model(dataset.get_feature_shape(), dataset.get_n_labels())
     loss_function = create_loss_function()
-    optimizer = create_optimizer(model, learning_rate=config['learning_rate'])
+    optimizer = create_optimizer(model,
+                                 learning_rate=config['learning_rate'],
+                                 weight_decay=config['weight_decay'])
     train_metric, test_metric = create_metrics()
     visualizer = create_visualizer(dataset, train_metric, test_metric)
 

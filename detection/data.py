@@ -8,11 +8,11 @@ import random
 import requests
 import numpy as np
 import torch
-from torch._C import device
 import torch.utils.data as torch_data
 from torchsampler import ImbalancedDatasetSampler
 import sklearn.model_selection
 from tqdm import tqdm
+from features import AudioFeatureExtractor
 
 SRC_DIR = pathlib.Path(os.path.realpath(os.path.dirname(__file__)))
 
@@ -35,7 +35,7 @@ CATEGORIES = {
 }
 
 numpy_to_torch_dtype_dict = {
-    np.bool: torch.bool,
+    bool: torch.bool,
     np.uint8: torch.uint8,
     np.int8: torch.int8,
     np.int16: torch.int16,
@@ -233,8 +233,6 @@ class VideoSegmentList:
                         (sum((tag_counts[tag] for tag in segment.tags))
                          for segment in self.segment_info_list), int)
                     most_common_idx = np.argmax(group_commonnesses)
-                    print(len(self),
-                          self.segment_info_list[most_common_idx].tags)
                     for tag in self.segment_info_list[most_common_idx].tags:
                         tag_counts[tag] -= 1
                     self.segment_info_list.pop(most_common_idx)
@@ -463,9 +461,7 @@ class AudioSetDataManager:
         audio_clip_dir.mkdir(exist_ok=True)
         if not overwrite:
             audio_file = audio_clip_dir / f'{video_id}.wav'
-            print(audio_file)
             if audio_file.exists():
-                print('Exists')
                 return True
 
         start_time = str(datetime.timedelta(seconds=start_time_s))
@@ -514,9 +510,8 @@ class AudioSetDataManager:
             for video_id in tqdm(raw_label_data[label]):
                 audio_file_path = audio_dir / f'{video_id}.wav'
                 waveform = feature_extractor.read_wav(audio_file_path)
-                if waveform.size == 0:
+                if not feature_extractor.can_extract_feature(waveform):
                     continue
-
                 for idx, result in enumerate(
                         zip(*feature_extractor(
                             waveform,
@@ -574,11 +569,13 @@ class AudioDataset(torch_data.Dataset):
     def __init__(self,
                  data_dir,
                  label_file_path,
+                 apply_transforms=True,
                  device='cpu',
                  caching='initial',
                  move_all_to_device=True,
                  subset_proportion=None):
         self.data_dir = data_dir
+        self.apply_transforms = apply_transforms
         self.device = device
         self.caching = caching
         self.move_all_to_device = move_all_to_device
@@ -611,7 +608,7 @@ class AudioDataset(torch_data.Dataset):
         if self.length == 0:
             return
         feature, label = self._read_data(0)
-        feature = torch.from_numpy(feature[:, :, np.newaxis])
+        feature = torch.from_numpy(feature[np.newaxis, :, :])
         self.features = torch.empty((self.length, *feature.shape),
                                     dtype=feature.dtype)
         self.features[0, ...] = feature
@@ -619,8 +616,8 @@ class AudioDataset(torch_data.Dataset):
         self.labels[0] = label
         for idx in tqdm(range(1, self.length)):
             feature, label = self._read_data(idx)
-            self.features[idx, ...] = torch.from_numpy(feature[:, :,
-                                                               np.newaxis])
+            self.features[idx,
+                          ...] = torch.from_numpy(feature[np.newaxis, :, :])
             self.labels[idx] = label
 
         if self.move_all_to_device and self.device != 'cpu':
@@ -656,7 +653,7 @@ class AudioDataset(torch_data.Dataset):
 
     def get_all_labels(self):
         assert self.all_loaded
-        return self.labels
+        return self.labels.cpu()
 
     def get_n_features_for_label(self, label):
         return self.id_list_lengths[
@@ -687,8 +684,8 @@ class AudioDataset(torch_data.Dataset):
             if not self.move_all_to_device:
                 feature, label = feature.to(self.device), label.to(self.device)
         else:
-            feature = torch.from_numpy(feature[:, :,
-                                               np.newaxis]).to(self.device)
+            feature = torch.from_numpy(feature[np.newaxis, :, :]).to(
+                self.device)
             label = torch.Tensor([label]).to(int).to(self.device)
         return feature, label
 
@@ -698,12 +695,25 @@ class AudioDataset(torch_data.Dataset):
             feature, label = self.features[idx], self.labels[idx]
         else:
             feature, label = self._read_data(idx)
-        return self._apply_transforms(feature, label)
+        return self._apply_transforms(
+            feature, label) if self.apply_transforms else (feature, label)
+
+
+class DiscardedAudioDataset(AudioDataset):
+    def __init__(self, *args, caching=None, **kwargs):
+        super().__init__(*args, caching=caching, **kwargs)
+
+    def _read_feature(self, feature_id, label):
+        return np.load(self.data_dir / self.get_label_name(label) /
+                       'discarded' / f'{feature_id}.npy')
 
 
 class AudioListenDataset(AudioDataset):
-    def __init__(self, *args, caching=None, **kwargs):
-        super().__init__(*args, caching=caching, **kwargs)
+    def __init__(self, *args, apply_transforms=False, caching=None, **kwargs):
+        super().__init__(*args,
+                         apply_transforms=apply_transforms,
+                         caching=caching,
+                         **kwargs)
 
     def _read_feature(self, feature_id, label):
         return self.data_dir / self.get_label_name(
@@ -711,8 +721,11 @@ class AudioListenDataset(AudioDataset):
 
 
 class DiscardedAudioListenDataset(AudioDataset):
-    def __init__(self, *args, caching=None, **kwargs):
-        super().__init__(*args, caching=caching, **kwargs)
+    def __init__(self, *args, apply_transforms=False, caching=None, **kwargs):
+        super().__init__(*args,
+                         apply_transforms=apply_transforms,
+                         caching=caching,
+                         **kwargs)
 
     def _read_feature(self, feature_id, label):
         return self.data_dir / self.get_label_name(
@@ -745,7 +758,6 @@ def fetch_raw_data(max_video_count_per_label=4000, labels='all', **kwargs):
 
 
 def compute_features():
-    from features import AudioFeatureExtractor
     manager = AudioSetDataManager()
     extractor = AudioFeatureExtractor()
     manager.extract_features(extractor,
@@ -756,6 +768,13 @@ def create_dataset(**kwargs):
     manager = AudioSetDataManager()
     dataset = AudioDataset(manager.feature_data_dir,
                            manager.feature_label_file, **kwargs)
+    return dataset
+
+
+def create_discarded_dataset():
+    manager = AudioSetDataManager()
+    dataset = DiscardedAudioDataset(manager.feature_data_dir,
+                                    manager.discarded_feature_label_file)
     return dataset
 
 
@@ -773,17 +792,17 @@ def create_discarded_listen_dataset():
     return dataset
 
 
-def listen_to_dataset(dataset, n=10, shuffle=True, only_labels=None):
+def listen_to_dataset(listen_dataset, n=10, shuffle=True, only_labels=None):
     from simpleaudio import WaveObject
     idx = 0
     for audio_file, label in torch_data.DataLoader(
-            dataset,
+            listen_dataset,
             batch_size=1,
             shuffle=shuffle,
             collate_fn=lambda results: results[0]):
         if idx == n:
             break
-        label_name = dataset.get_label_name(label)
+        label_name = listen_dataset.get_label_name(label)
         if only_labels is not None and label_name not in only_labels:
             continue
         with open(audio_file, 'rb') as f:
@@ -794,10 +813,43 @@ def listen_to_dataset(dataset, n=10, shuffle=True, only_labels=None):
         idx += 1
 
 
+def visualize_dataset(extractor,
+                      dataset,
+                      n=10,
+                      shuffle=True,
+                      only_labels=None):
+    features = []
+    for feature, label in torch_data.DataLoader(
+            dataset,
+            batch_size=1,
+            shuffle=shuffle,
+            collate_fn=lambda results: results[0]):
+        if len(features) == n:
+            break
+        label_name = dataset.get_label_name(label)
+        if only_labels is not None and label_name not in only_labels:
+            continue
+        features.append(feature.numpy().squeeze())
+
+    extractor.plot_cepstrum(features)
+
+
+def visualize_clip(manager, extractor, label_name, video_id):
+    data_path = manager.feature_data_dir / label_name
+    features = []
+    while True:
+        file_path = data_path / f'{video_id}_{len(features)}.npy'
+        if file_path.exists():
+            features.append(np.load(file_path))
+        else:
+            break
+    extractor.plot_cepstrum(features)
+
+
 def create_dataloaders(dataset,
                        test_proportion=0.2,
                        batch_size=32,
-                       num_workers=6,
+                       num_workers=0,
                        seed=42,
                        pin_memory=False):
     dataset_size = len(dataset)
@@ -829,7 +881,7 @@ def create_dataloaders(dataset,
 def create_kfold_dataloaders(dataset,
                              n_splits=5,
                              batch_size=32,
-                             num_workers=6,
+                             num_workers=0,
                              seed=42,
                              pin_memory=False):
     return [
@@ -849,8 +901,14 @@ def create_kfold_dataloaders(dataset,
 
 
 if __name__ == '__main__':
-    None
     # fetch_raw_data()
-    # compute_features()
-    # listen_to_dataset(create_discarded_listen_dataset(), n=30)
+    compute_features()
+    # listen_to_dataset(create_discarded_listen_dataset(),
+    #                   n=30,
+    #                   only_labels=['bad'])
     # listen_to_dataset(create_listen_dataset(), n=30, only_labels=['good'])
+    # visualize_dataset(AudioFeatureExtractor(),
+    #                   create_dataset(caching=None),
+    #                   shuffle=False)
+    # visualize_clip(AudioSetDataManager(), AudioFeatureExtractor(), 'bad',
+    #                '_-VqjVHYz5Y')
