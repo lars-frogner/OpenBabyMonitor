@@ -28,7 +28,7 @@ redirectIfLoggedIn('main.php');
                   <label class="visually-hidden" for="password">Passord</label>
                   <input type="password" name="password" class="form-control" id="password" placeholder="Passord" required>
                 </div>
-                <div class="form-group">
+                <div class="form-group text-center">
                   <button type="submit" name="submit" class="btn btn-primary">Logg inn</button>
                 </div>
               </form>
