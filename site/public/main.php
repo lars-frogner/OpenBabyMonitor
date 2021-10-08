@@ -94,7 +94,7 @@ define('HIDDEN_STYLE', 'style="display: none;"');
           </div>
 
           <div id="mode_content_waiting" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
-            <span class="spinner-grow text-dark"></span>
+            <span class="spinner-grow text-muted"></span>
           </div>
 
           <div id="mode_content_error" class="col-auto" <?php echo HIDDEN_STYLE; ?>>

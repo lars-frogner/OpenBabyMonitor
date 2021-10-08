@@ -8,22 +8,35 @@ redirectIfLoggedIn('main.php');
 
 <head>
   <?php require_once(TEMPLATES_PATH . '/head_common.php'); ?>
-  <link href="css/signin.css" rel="stylesheet">
 </head>
 
-<body class="text-center">
-  <main class="form-signin">
-    <?php
-    if (isset($_POST['submit'])) {
-      tryLogin($_DATABASE, $_POST['password'], 'main.php', '<div class="alert alert-danger">Feil passord</div>');
-    }
-    ?>
-    <form action="" method="post">
-      <h1 class="h3 mb-3 fw-normal">Vennligst logg inn</h1>
-      <label class="visually-hidden" for="password">Passord</label>
-      <input type="password" name="password" class="form-control" id="password" placeholder="Passord" required>
-      <button type="submit" name="submit" class="w-100 btn btn-lg btn-primary">Logg inn</button>
-    </form>
+<body>
+  <main class="vh-100">
+    <div class="container h-100">
+      <div class="row h-100 justify-content-center align-items-center">
+        <aside class="col-sm-4">
+          <div class="card">
+            <article class="card-body">
+              <h3 class="card-title text-center">Vennligst logg inn</h3>
+              <?php
+              if (isset($_POST['submit'])) {
+                tryLogin($_DATABASE, $_POST['password'], 'main.php', '<hr><p class="text-center text-danger">Feil passord</p>');
+              }
+              ?>
+              <form action="" method="post">
+                <div class="my-3 form-group">
+                  <label class="visually-hidden" for="password">Passord</label>
+                  <input type="password" name="password" class="form-control" id="password" placeholder="Passord" required>
+                </div>
+                <div class="form-group">
+                  <button type="submit" name="submit" class="btn btn-primary">Logg inn</button>
+                </div>
+              </form>
+            </article>
+          </div>
+        </aside>
+      </div>
+    </div>
   </main>
 </body>
 

@@ -202,7 +202,8 @@ if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
     mkdir -p $BM_LINKED_SITE_DIR/library/bootstrap
     mv $FILENAME_ROOT/* $BM_LINKED_SITE_DIR/library/bootstrap/
     rm  -r $FILENAME $FILENAME_ROOT
-    cd -
+    mv bootstrap-dark.min.css $BM_LINKED_SITE_DIR/library/bootstrap/css/
+    rm -r $FILENAME $FILENAME_ROOT
 fi
 
 INSTALL_VIDEOJS=true
