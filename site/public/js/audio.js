@@ -66,7 +66,7 @@ class AudiostreamContext {
     #lowpassFilter;
     #gain;
     #analyser;
-    #fftSizePower = 8;
+    #fftSizePower = 7;
     #visualizer;
     #analyserSamples;
     #analyserSamplesOffset;
