@@ -1,3 +1,4 @@
+const NAVBAR_ID = 'navbar';
 const MODES_NAV_LINK_ID = 'modes_nav_link';
 const LISTEN_SETTINGS_NAV_LINK_ID = 'listen_settings_nav_link';
 const AUDIOSTREAM_SETTINGS_NAV_LINK_ID = 'audiostream_settings_nav_link';
@@ -24,6 +25,7 @@ const AP_MODAL_BASE_BODY_SETTER = { text: 'Du er nå koblet til via et eksternt 
 const CLIENT_MODAL_BASE_BODY_SETTER = { text: 'Du er nå koblet til via enhetens tilgangspunkt, som vil deaktiveres. Du vil logges ut og midlertidig miste forbindelsen med enheten.', showText: () => { return true; } };
 
 $(function () {
+    $('#' + NAVBAR_ID).addClass(window.matchMedia('prefers-color-scheme: dark').matches ? 'navbar-dark' : 'navbar-light');
     $('.nav-link').on('click', '.disabled', function (event) {
         event.preventDefault();
         return false;
