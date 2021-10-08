@@ -449,6 +449,7 @@ class AudioVisualizer {
         AudioVisualizer.#clearCanvasFrequencyDomain(canvasContext, width, height);
 
         const barWidth = width / (samples.length - start_idx);
+        const actualBarWidth = barWidth * 0.95;
         var x = 0;
         var barHeight;
 
@@ -471,7 +472,7 @@ class AudioVisualizer {
                 sample_value = (1 - fraction) * samples[idx_lower] + fraction * samples[idx_upper];
             }
             barHeight = (sample_value + CANVAS_FREQUENCY_SAMPLE_OFFSET) * height * CANVAS_FREQUENCY_SAMPLE_SCALE;
-            canvasContext.fillRect(x, height - barHeight, barWidth, barHeight);
+            canvasContext.fillRect(x, height - barHeight, actualBarWidth, barHeight);
             x += barWidth;
         }
     }
@@ -511,6 +512,6 @@ class AudioVisualizer {
         var min_label = SETTING_MIN_FREQUENCY + ' Hz';
         var max_label = SETTING_MAX_FREQUENCY + ' Hz';
         canvasContext.fillText(min_label, CANVAS_FREQUENCY_FONT_OFFSET_X, CANVAS_FREQUENCY_FONT_OFFSET_Y);
-        canvasContext.fillText(max_label, width - Math.round(0.55 * CANVAS_FREQUENCY_FONT_SIZE * max_label.length) - CANVAS_FREQUENCY_FONT_OFFSET_X, CANVAS_FREQUENCY_FONT_OFFSET_Y);
+        canvasContext.fillText(max_label, width - Math.round(0.57 * CANVAS_FREQUENCY_FONT_SIZE * max_label.length) - CANVAS_FREQUENCY_FONT_OFFSET_X, CANVAS_FREQUENCY_FONT_OFFSET_Y);
     }
 }
