@@ -198,12 +198,15 @@ if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
     FILENAME_ROOT="${FILENAME%%.zip}"
     cd /tmp
     wget $DOWNLOAD_URL
+    wget https://cdn.jsdelivr.net/npm/bootstrap-dark-5@1.1.2/dist/css/bootstrap-dark.min.css
+    wget https://raw.githubusercontent.com/twbs/icons/main/bootstrap-icons.svg
     unzip $FILENAME
     mkdir -p $BM_LINKED_SITE_DIR/library/bootstrap
     mv $FILENAME_ROOT/* $BM_LINKED_SITE_DIR/library/bootstrap/
-    rm  -r $FILENAME $FILENAME_ROOT
     mv bootstrap-dark.min.css $BM_LINKED_SITE_DIR/library/bootstrap/css/
+    mv bootstrap-icons.svg $BM_LINKED_SITE_DIR/media/
     rm -r $FILENAME $FILENAME_ROOT
+    cd -
 fi
 
 INSTALL_VIDEOJS=true

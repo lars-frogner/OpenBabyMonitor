@@ -25,8 +25,22 @@ function registerModeChangeHandler() {
     MODE_RADIO_IDS.forEach(id => {
         var radio = $('#' + id);
         radio.change(function () {
+            swapRadio(radio);
             requestModeChange(radio);
         });
+    });
+}
+
+function swapRadio(radio) {
+    MODE_RADIO_IDS.forEach(radioId => {
+        if (radioId == radio.prop('id')) {
+            radio.prop('checked', true);
+            radio.parent().addClass('active');
+        } else {
+            otherRadio = $('#' + radioId);
+            otherRadio.prop('checked', false);
+            otherRadio.parent().removeClass('active');
+        }
     });
 }
 
@@ -71,7 +85,13 @@ function handleModeChangeResponse(checkedRadioId, checkedRadioValue, responseTex
 
 function setDisabledForModeRadios(isDisabled) {
     MODE_RADIO_IDS.forEach(radioId => {
-        $('#' + radioId).prop('disabled', isDisabled);
+        radio = $('#' + radioId);
+        radio.prop('disabled', isDisabled);
+        if (isDisabled) {
+            radio.parent().addClass('disabled');
+        } else {
+            radio.parent().removeClass('disabled');
+        }
     });
 }
 
