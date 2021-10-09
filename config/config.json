@@ -172,6 +172,12 @@
                 "1080p": 1080
             }
         },
+        "encrypted": {
+            "group": "video",
+            "name": "Kryptert",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
         "use_variable_framerate": {
             "group": "video",
             "name": "Variabel bildefrekvens",

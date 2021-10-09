@@ -15,7 +15,8 @@ def stream_video():
             **control.read_settings(mode, config, database)))
 
 
-def stream_video_with_settings(vertical_resolution=720,
+def stream_video_with_settings(encrypted=True,
+                               vertical_resolution=720,
                                use_variable_framerate=True,
                                framerate=30,
                                rotation=0,
@@ -74,13 +75,18 @@ def stream_video_with_settings(vertical_resolution=720,
     time_args = ['--time', '--timeformat', r'%a %d.%m.%Y %T'
                  ] if show_time else []
 
+    encryption_args = [
+        '--hlsenc', '--hlsenckeyuri', 'stream.key', '--hlsenckey',
+        os.environ['BM_PICAM_ENCRYPTION_KEY']
+    ] if encrypted else []
+
     output_args = ['--hlsdir', picam_output_dir]
 
     with open(log_path, 'a') as log_file:
         subprocess.check_call([os.path.join(picam_dir, 'picam')] +
-                              output_args + resolution_args + fps_args +
-                              orientation_args + brightness_args + color_args +
-                              audio_args + time_args,
+                              output_args + encryption_args + resolution_args +
+                              fps_args + orientation_args + brightness_args +
+                              color_args + audio_args + time_args,
                               stdout=subprocess.DEVNULL,
                               stderr=log_file,
                               cwd=picam_output_dir)
