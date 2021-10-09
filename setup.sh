@@ -115,7 +115,7 @@ if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     sed -i 's/# "\\e\[B": history-search-forward/"\\e[B": history-search-forward/g' ~/.inputrc
     sed -i 's/# "\\e\[A": history-search-backward/"\\e[A": history-search-backward/g' ~/.inputrc
 
-    echo -e "source $BM_ENV_PATH\n" >> ~/.bashrc
+    echo -e "source $BM_ENV_EXPORTS_PATH\n" >> ~/.bashrc
 
     sudo sed -i 's/pi ALL=(ALL) NOPASSWD: ALL/pi ALL=(ALL) PASSWD: ALL/g' /etc/sudoers.d/010_pi-nopasswd
 
@@ -393,9 +393,32 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Enable SSL module
     sudo a2enmod ssl
 
+    echo "[req]
+default_bits  = 2048
+distinguished_name = req_distinguished_name
+req_extensions = req_ext
+x509_extensions = v3_req
+prompt = no
+
+[req_distinguished_name]
+commonName = babymonitor.local: Self-signed certificate
+
+[req_ext]
+subjectAltName = @alt_names
+
+[v3_req]
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1 = babymonitor.local
+DNS.2 = babymonitor.home
+DNS.3 = babymonitor.lan
+" > babymonitor.cnf
+
     SSL_KEY_PATH=/etc/ssl/private/babymonitor.key
     SSL_CERT_PATH=/etc/ssl/certs/babymonitor.crt
-    sudo openssl req -x509 -nodes -days 36524 -newkey rsa:4096 -subj "/CN=babymonitor.local" -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH
+    sudo openssl req -x509 -nodes -days 36524 -newkey rsa:2048 -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH -config babymonitor.cnf
+    rm babymonitor.cnf
 
     # Setup new site
     SITE_NAME=$(basename $BM_SITE_DIR)
@@ -404,7 +427,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     ErrorLog $BM_APACHE_LOG_PATH
     CustomLog $APACHE_LOG_DIR/access.log combined
     ServerName babymonitor.local
-    ServerAlias babymonitor.home
+    ServerAlias babymonitor.*
 
     <Directory \"$BM_SITE_DIR\">
         AllowOverride All
@@ -420,7 +443,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     ErrorLog $BM_APACHE_LOG_PATH
     CustomLog $APACHE_LOG_DIR/access.log combined
     ServerName babymonitor.local
-    ServerAlias babymonitor.home
+    ServerAlias babymonitor.*
 
     SSLEngine On
     SSLProtocol all -SSLv2

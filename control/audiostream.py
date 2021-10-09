@@ -62,7 +62,7 @@ def update_headers(header_filepath):
     # 'Cache-Control: no-cache' prevents browsers from caching the streamed file
     # 'Access-Control-Allow-Origin: <origin>' allows the Apache server to request the stream endpoint
     ip = subprocess.check_output(['hostname', '-I']).decode().strip()
-    origins = [ip, 'babymonitor.local', 'babymonitor.home']
+    origins = [ip, 'babymonitor.*']
     headers = {
         'Cache-Control':
         'no-cache',
