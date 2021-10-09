@@ -143,7 +143,7 @@ function deleteTableRows($database, $table_name, $condition) {
 }
 
 function readValuesFromTable($database, $table_name, $columns, $return_with_numeric_keys = false, $condition = 'id = 0') {
-  $column_string = is_array($columns) ? join(', ', $columns) : $columns;
+  $column_string = is_array($columns) ? ('`' . join('`, `', $columns) . '`') : "`$columns`";
 
   $command = "SELECT $column_string FROM `$table_name`" . (($condition === true) ? ';' : " WHERE $condition;");
   $result = $database->query($command);

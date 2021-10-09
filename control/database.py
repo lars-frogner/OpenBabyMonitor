@@ -57,7 +57,8 @@ class Database:
     def read_values_from_table(self, table_name, columns, condition='id = 0'):
         multiple_columns = hasattr(
             columns, '__iter__') and not isinstance(columns, str)
-        column_string = ', '.join(columns) if multiple_columns else columns
+        column_string = '`{}`'.format('`, `'.join(
+            columns)) if multiple_columns else '`{}`'.format(columns)
 
         self.cursor.execute('SELECT {} FROM `{}` WHERE {};'.format(
             column_string, table_name, condition))
