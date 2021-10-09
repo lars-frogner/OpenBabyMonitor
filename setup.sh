@@ -404,6 +404,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     ErrorLog $BM_APACHE_LOG_PATH
     CustomLog $APACHE_LOG_DIR/access.log combined
     ServerName babymonitor.local
+    ServerAlias babymonitor.home
 
     <Directory \"$BM_SITE_DIR\">
         AllowOverride All
@@ -419,6 +420,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     ErrorLog $BM_APACHE_LOG_PATH
     CustomLog $APACHE_LOG_DIR/access.log combined
     ServerName babymonitor.local
+    ServerAlias babymonitor.home
 
     SSLEngine On
     SSLProtocol all -SSLv2
