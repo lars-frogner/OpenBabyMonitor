@@ -85,7 +85,7 @@ require_once(TEMPLATES_PATH . '/main.php');
               <div class="col-auto">
                 <div class="row flex-nowrap">
                   <div class="col-10">
-                    <input type="range" class="form-range" value="7" min="5" max="15" step="1" id="audiostream_fftsize_range" oninput="$('#audiostream_fftsize_range_value').html(2**this.value); switchFFTSizePowerTo(this.value);">
+                    <input type="range" class="form-range" value="7" min="5" max="13" step="1" id="audiostream_fftsize_range" oninput="$('#audiostream_fftsize_range_value').html(2**this.value); switchFFTSizePowerTo(this.value);">
                   </div>
                   <div class="col-1">
                     <output id="audiostream_fftsize_range_value">128</output>
