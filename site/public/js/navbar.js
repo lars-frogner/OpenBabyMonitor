@@ -24,8 +24,17 @@ const CLIENT_MODAL_BASE_PROPERTIES = { href: 'activate_client_mode.php', header:
 const AP_MODAL_BASE_BODY_SETTER = { text: 'Du er nå koblet til via et eksternt trådløst nettverk. Enheten vil koble seg av nettverket og opprette sitt eget tilgangspunkt. Du vil logges ut og midlertidig miste forbindelsen med enheten. Enheten vil ikke lenger ha tilgang til internett.', showText: () => { return true; } };
 const CLIENT_MODAL_BASE_BODY_SETTER = { text: 'Du er nå koblet til via enhetens tilgangspunkt, som vil deaktiveres. Du vil logges ut og midlertidig miste forbindelsen med enheten.', showText: () => { return true; } };
 
+const BACKGROUND_COLOR = $(document.body).css('background-color');
+const FOREGROUND_COLOR = $(document.body).css('color');
+
 $(function () {
-    $('#' + NAVBAR_ID).addClass(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'navbar-dark' : 'navbar-light');
+    const uses_dark_mode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (uses_dark_mode) {
+        $('<style>.text-bm, .btn-bm { color: ' + FOREGROUND_COLOR + '; filter: brightness(80%); } .btn-bm:hover { color: ' + FOREGROUND_COLOR + '; filter: brightness(100%); }</style>').appendTo('head');
+    } else {
+        $('<style>.text-bm, .btn-bm { color: ' + FOREGROUND_COLOR + '; filter: brightness(120%); } .btn-bm:hover { color: ' + FOREGROUND_COLOR + '; filter: brightness(200%); }</style>').appendTo('head');
+    }
+    $('#' + NAVBAR_ID).addClass(uses_dark_mode ? 'navbar-dark' : 'navbar-light');
     $('.nav-link').on('click', '.disabled', function (event) {
         event.preventDefault();
         return false;

@@ -104,7 +104,7 @@ require_once(TEMPLATES_PATH . '/main.php');
             </div>
           </div>
 
-          <div id="mode_content_standby" class="col-auto text-center text-muted" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
+          <div id="mode_content_standby" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
             <svg class="bi" style="height: 50vh" fill="currentColor">
               <use xlink:href="media/bootstrap-icons.svg#moon-fill" />
             </svg>
@@ -112,7 +112,7 @@ require_once(TEMPLATES_PATH . '/main.php');
           </div>
 
           <div id="mode_content_waiting" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
-            <span class="spinner-grow text-muted"></span>
+            <span class="spinner-grow text-bm"></span>
           </div>
 
           <div id="mode_content_error" class="col-auto" <?php echo HIDDEN_STYLE; ?>>

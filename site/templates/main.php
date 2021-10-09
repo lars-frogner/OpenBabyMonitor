@@ -21,7 +21,7 @@ function createModeRadioButtonIcons($name, $icon) {
 }
 
 function createModeRadioButton($current_mode, $mode_name, $text, $icon) {
-  echo "<label class=\"btn btn-dark px-3" . (($current_mode == MODE_VALUES[$mode_name]) ? ' active' : '') . " disabled\">\n";
+  echo "<label class=\"btn btn-bm px-3" . (($current_mode == MODE_VALUES[$mode_name]) ? ' active' : '') . " disabled\">\n";
   echo "<input type=\"radio\" class=\"btn-check\" name=\"mode_radio\" id=\"mode_radio_$mode_name\" autocomplete=\"off\" disabled" . (($current_mode == MODE_VALUES[$mode_name]) ? ' checked' : '') . " value=\"" . MODE_VALUES[$mode_name] . "\">\n";
   createModeRadioButtonIcons($text, $icon);
   echo "</label>\n";
