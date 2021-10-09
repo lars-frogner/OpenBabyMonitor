@@ -132,7 +132,7 @@ require_once(TEMPLATES_PATH . '/main.php');
     <footer class="d-flex flex-grow-0 flex-shrink-1 justify-content-center">
       <div class="btn-group" data-toggle="buttons">
         <?php
-        createModeRadioButton($mode, 'listen', 'Varsle', 'exclamation-circle');
+        createModeRadioButton($mode, 'listen', 'Varsle', 'bell');
         createModeRadioButton($mode, 'audiostream', 'Lytte', 'mic');
         createModeRadioButton($mode, 'videostream', 'Se', 'camera-video');
         createModeRadioButton($mode, 'standby', 'Hvile', 'moon');
