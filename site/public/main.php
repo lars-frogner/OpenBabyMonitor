@@ -52,8 +52,16 @@ require_once(TEMPLATES_PATH . '/main.php');
       <div class="container-fluid h-100">
         <div class="row h-100 align-items-center justify-content-center px-0">
 
-          <div id="mode_content_listen" class="col-auto" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : '' ?>>
-            Varsle
+          <div id="mode_content_listen" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : '' ?>>
+            <svg id="listen_inactive_icon" class="bi mb-5" style="width: 25vh; height: 25vh; display: none;" fill="currentColor">
+              <use xlink:href="media/bootstrap-icons.svg#bell" />
+            </svg>
+            <svg id="listen_active_icon" class="bi mb-5" style="width: 25vh; height: 25vh; display: none;" fill="currentColor">
+              <use xlink:href="media/bootstrap-icons.svg#bell-fill" />
+            </svg>
+            <p id="listen_notifications_msg"></p>
+            <button id="listen_enable_notifications_button" class="btn btn-primary" <?php echo HIDDEN_STYLE ?>>Tillat varsler</button>
+            <a id="listen_redirect_secure_link" class="btn btn-primary" href="https://<?php echo "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>" <?php echo HIDDEN_STYLE ?>>Gå til kryptert versjon av siden</a>
           </div>
 
           <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
@@ -105,7 +113,7 @@ require_once(TEMPLATES_PATH . '/main.php');
           </div>
 
           <div id="mode_content_standby" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
-            <svg class="bi" style="height: 50vh" fill="currentColor">
+            <svg class="bi mb-5" style="width: 25vh; height: 25vh" fill="currentColor">
               <use xlink:href="media/bootstrap-icons.svg#moon-fill" />
             </svg>
             <p>Enheten er i hvilemodus</p>
@@ -120,7 +128,7 @@ require_once(TEMPLATES_PATH . '/main.php');
               <div class="row">
                 <span id="mode_content_error_message" class="alert alert-danger text-center">Error
                 </span>
-                <a class=" btn btn-secondary" href="main.php">Forny siden</a>
+                <a class="btn btn-secondary" href="main.php">Forny siden</a>
               </div>
             </div>
           </div>
@@ -149,9 +157,12 @@ require_once(TEMPLATES_PATH . '/main.php');
 
   <script>
     const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
+    const LISTEN_MODE = <?php echo MODE_VALUES['listen']; ?>;
     const AUDIOSTREAM_MODE = <?php echo MODE_VALUES['audiostream']; ?>;
     const VIDEOSTREAM_MODE = <?php echo MODE_VALUES['videostream']; ?>;
     const INITIAL_MODE = <?php echo $mode; ?>;
+
+    const USES_SECURE_PROTOCOL = <?php echo USES_SECURE_PROTOCOL ? 'true' : 'false' ?>;
 
     const AUDIO_SRC = <?php echo '\'http://' . SERVER_IP . ':' . getenv('BM_MICSTREAM_PORT') . getenv('BM_MICSTREAM_ENDPOINT') . '\''; ?>;
 
@@ -164,6 +175,7 @@ require_once(TEMPLATES_PATH . '/main.php');
   </script>
   <script src="js/confirmation_modal.js"></script>
   <script src="js/navbar.js"></script>
+  <script src="js/listen.js"></script>
   <script src="js/navbar_main.js"></script>
   <script src="js/audio_video.js"></script>
   <script src="js/audio.js"></script>
