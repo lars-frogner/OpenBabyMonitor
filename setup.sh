@@ -35,6 +35,8 @@ BM_WEB_GROUP=www-data
 BM_READ_PERMISSIONS=750
 BM_WRITE_PERMISSIONS=770
 
+SWAP_SIZE=1024
+
 PHP_TIMEZONE=Europe/Oslo
 
 APACHE_LOG_DIR=/var/log/apache2
@@ -69,6 +71,14 @@ UPDATE=true
 if [[ "$UPDATE" = true ]]; then
     sudo apt -y update
     sudo apt -y dist-upgrade
+fi
+
+SETUP_SWAPSPACE=true
+if [[ "$SETUP_SWAPSPACE" = true ]]; then
+    sudo dphys-swapfile swapoff
+    sudo sed -i "s/CONF_SWAPSIZE=100/CONF_SWAPSIZE=$SWAP_SIZE/g" /etc/dphys-swapfile
+    sudo dphys-swapfile setup
+    sudo dphys-swapfile swapon
 fi
 
 INSTALL_PACKAGES=true
