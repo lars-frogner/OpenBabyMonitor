@@ -67,7 +67,10 @@ def update_headers(header_filepath):
         'Cache-Control':
         'no-cache',
         'Access-Control-Allow-Origin':
-        ' '.join(['http://{}'.format(origin) for origin in origins])
+        ' '.join([
+            'http{}://{}'.format(s, origin) for origin in origins
+            for s in ['', 's']
+        ])
     }
     with open(header_filepath, 'w') as f:
         json.dump(headers, f)

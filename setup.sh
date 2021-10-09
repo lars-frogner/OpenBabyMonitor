@@ -50,6 +50,7 @@ BM_SITE_DIR=/var/www/babymonitor
 BM_LINKED_SITE_DIR=$BM_DIR/site/public
 BM_SHAREDMEM_DIR=/run/shm
 BM_MICSTREAM_DIR=/usr/local/bin
+BM_MICSTREAM_SRC_DIR=/home/pi/micstream
 BM_MICSTREAM_ENDPOINT=/audiostream.mp3
 BM_MICSTREAM_HEADERS_FILE=$BM_LINKED_SITE_DIR/audiostream_headers.json
 BM_MICSTREAM_PORT=8080
@@ -135,12 +136,10 @@ fi
 SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
     WD="$(pwd)"
-    cd /tmp
+    cd $(dirname $BM_MICSTREAM_SRC_DIR)
     git clone https://github.com/lars-frogner/micstream.git
     cd micstream
     sudo python3 setup.py install # Installs /usr/local/bin/micstream
-    cd -
-    sudo rm -rf micstream
     cd "$WD"
 
     sudo adduser $BM_SERVER_USER audio
@@ -168,6 +167,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_SERVER_LOG_PATH=$BM_SERVER_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MICSTREAM_DIR=$BM_MICSTREAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_MICSTREAM_SRC_DIR=$BM_MICSTREAM_SRC_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MICSTREAM_ENDPOINT=$BM_MICSTREAM_ENDPOINT" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MICSTREAM_PORT=$BM_MICSTREAM_PORT" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MICSTREAM_HEADERS_FILE=$BM_MICSTREAM_HEADERS_FILE" >> $BM_ENV_EXPORTS_PATH
@@ -390,14 +390,47 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     sudo rm -f /etc/apache2/sites-available/000-default.conf
     sudo rm -f /etc/apache2/sites-available/default-ssl.conf
 
+    # Enable SSL module
+    sudo a2enmod ssl
+
+    SSL_KEY_PATH=/etc/ssl/private/babymonitor.key
+    SSL_CERT_PATH=/etc/ssl/certs/babymonitor.crt
+    sudo openssl req -x509 -nodes -days 36524 -newkey rsa:4096 -subj "/CN=babymonitor.local" -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH
+
     # Setup new site
     SITE_NAME=$(basename $BM_SITE_DIR)
     echo "<VirtualHost *:80>
     DocumentRoot $BM_SITE_DIR
     ErrorLog $BM_APACHE_LOG_PATH
     CustomLog $APACHE_LOG_DIR/access.log combined
+    ServerName babymonitor.local
 
-    <Directory "$BM_SITE_DIR">
+    <Directory \"$BM_SITE_DIR\">
+        AllowOverride All
+    </Directory>
+
+    <Directory \"$BM_SITE_DIR/audiostream\">
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:443>
+    DocumentRoot $BM_SITE_DIR
+    ErrorLog $BM_APACHE_LOG_PATH
+    CustomLog $APACHE_LOG_DIR/access.log combined
+    ServerName babymonitor.local
+
+    SSLEngine On
+    SSLProtocol all -SSLv2
+    SSLCipherSuite HIGH:MEDIUM:!aNULL:!MD5
+    SSLCertificateFile \"$SSL_CERT_PATH\"
+    SSLCertificateKeyFile \"$SSL_KEY_PATH\"
+
+    <Directory \"$BM_SITE_DIR\">
+        AllowOverride All
+    </Directory>
+
+    <Directory \"$BM_SITE_DIR/audiostream\">
         AllowOverride All
     </Directory>
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
