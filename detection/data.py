@@ -479,20 +479,25 @@ class AudioSetDataManager:
                          labels='all',
                          allow_all_energies_for_labels=[],
                          adjust_overlaps_to_balance_feature_counts=True,
+                         drop_overrepresented_features=True,
                          save_audio=True,
                          save_discarded=True,
                          **kwargs):
         raw_label_data = self.raw_label_file.get_data()
         labels = raw_label_data.keys() if labels == 'all' else labels
+        n_videos = np.array([len(raw_label_data[label]) for label in labels])
+        sort_indices = np.argsort(n_videos)
+        n_videos = n_videos[sort_indices]
+        labels = [labels[i] for i in sort_indices]
 
         if adjust_overlaps_to_balance_feature_counts:
-            n_videos = np.array(
-                [len(raw_label_data[label]) for label in labels])
             overlaps = 1 - (1 - feature_extractor.feature_overlap_fraction
-                            ) * n_videos / n_videos.max()
+                            ) * n_videos / n_videos[-1]
         else:
             overlaps = [feature_extractor.feature_overlap_fraction
                         ] * len(labels)
+
+        target_feature_num = None
 
         for label_idx, label in enumerate(labels):
             audio_dir = self.raw_data_dir / label
@@ -570,6 +575,13 @@ class AudioSetDataManager:
                                 allow_pickle=False,
                                 fix_imports=False)
                         discarded_feature_ids.append(feature_id)
+
+            if drop_overrepresented_features:
+                if target_feature_num is None:
+                    target_feature_num = len(feature_ids)
+                else:
+                    random.shuffle(feature_ids)
+                    feature_ids = feature_ids[:target_feature_num]
 
             self.feature_label_file.update(label, feature_ids)
 
