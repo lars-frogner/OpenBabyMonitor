@@ -28,7 +28,7 @@ class AudioFeatureExtractor:
                  max_frequency=3600,
                  log_offset=1e-9,
                  feature_window_count=64,
-                 feature_overlap_fraction=0.5,
+                 feature_overlap_fraction=0.25,
                  low_energy_threshold=0.15,
                  max_low_energy_feature_proportion=0.8):
         self.dtype = np.dtype(dtype)
@@ -46,11 +46,7 @@ class AudioFeatureExtractor:
         self.feature_length = self.compute_waveform_length_for_window_count(feature_window_count)
         self.feature_duration = self.sample_num_to_time(self.feature_length)
 
-        self.feature_overlap_length = min(
-            int(feature_overlap_fraction * self.feature_length),
-            self.feature_length - 1)
-        self.feature_stride = self.feature_length - self.feature_overlap_length
-        self.feature_overlap_fraction = self.feature_overlap_length / self.feature_length
+        self.set_feature_overlap_fraction(feature_overlap_fraction)
 
         self.low_energy_threshold = low_energy_threshold
         self.max_low_energy_feature_proportion = max_low_energy_feature_proportion
@@ -65,6 +61,13 @@ class AudioFeatureExtractor:
                                 n_fft=self.fft_length,
                                 htk=False,
                                 center=False, power=1)
+
+    def set_feature_overlap_fraction(self, feature_overlap_fraction):
+        self.feature_overlap_fraction = feature_overlap_fraction
+        self.feature_overlap_length = min(
+            int(feature_overlap_fraction * self.feature_length),
+            self.feature_length - 1)
+        self.feature_stride = self.feature_length - self.feature_overlap_length
 
     def can_extract_feature(self, waveform):
         return waveform.size >= self.feature_length
