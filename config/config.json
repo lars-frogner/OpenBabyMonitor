@@ -87,6 +87,22 @@
             "type": "VARCHAR(64) PRIMARY KEY"
         }
     },
+    "listen_settings": {
+        "interval": {
+            "group": "detection",
+            "name": "Lytteinterval (s)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 5,
+            "range": {
+                "min": 1,
+                "max": 60,
+                "step": 1
+            }
+        }
+    },
+    "listen_groups": {
+        "detection": "Deteksjon"
+    },
     "audiostream_settings": {
         "gain": {
             "group": "volume",
