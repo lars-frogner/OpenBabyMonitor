@@ -478,13 +478,23 @@ class AudioSetDataManager:
                          feature_extractor,
                          labels='all',
                          allow_all_energies_for_labels=[],
+                         adjust_overlaps_to_balance_feature_counts=True,
                          save_audio=True,
                          save_discarded=True,
                          **kwargs):
         raw_label_data = self.raw_label_file.get_data()
         labels = raw_label_data.keys() if labels == 'all' else labels
 
-        for label in labels:
+        if adjust_overlaps_to_balance_feature_counts:
+            n_videos = np.array(
+                [len(raw_label_data[label]) for label in labels])
+            overlaps = 1 - (1 - feature_extractor.feature_overlap_fraction
+                            ) * n_videos / n_videos.max()
+        else:
+            overlaps = [feature_extractor.feature_overlap_fraction
+                        ] * len(labels)
+
+        for label_idx, label in enumerate(labels):
             audio_dir = self.raw_data_dir / label
             feature_dir = self.feature_data_dir / label
             feature_dir.mkdir(parents=True, exist_ok=True)
@@ -503,6 +513,9 @@ class AudioSetDataManager:
                     discarded_feature_audio_dir = discarded_feature_dir / 'audio'
                     discarded_feature_audio_dir.mkdir(parents=True,
                                                       exist_ok=True)
+
+            print(label, overlaps[label_idx])
+            feature_extractor.set_feature_overlap_fraction(overlaps[label_idx])
 
             feature_ids = []
             discarded_feature_ids = []
@@ -569,12 +582,14 @@ class AudioDataset(torch_data.Dataset):
     def __init__(self,
                  data_dir,
                  label_file_path,
+                 standardize=True,
                  apply_transforms=True,
                  device='cpu',
                  caching='initial',
                  move_all_to_device=True,
                  subset_proportion=None):
         self.data_dir = data_dir
+        self.standardize = standardize
         self.apply_transforms = apply_transforms
         self.device = device
         self.caching = caching
@@ -596,8 +611,10 @@ class AudioDataset(torch_data.Dataset):
         self.cumul_id_list_lengths = np.cumsum(
             np.array(self.id_list_lengths, dtype=int))
 
-        if self.caching == 'initial':
+        if self.caching == 'initial' or self.standardize:
             self._read_all_data()
+            if self.standardize:
+                self._standardize()
         else:
             self.all_loaded = False
 
@@ -625,6 +642,16 @@ class AudioDataset(torch_data.Dataset):
             self.labels = self.labels.to(self.device)
 
         self.all_loaded = True
+
+    def _standardize(self):
+        if not self.all_loaded:
+            self._read_all_data()
+
+        self.standard_deviation, self.mean = torch.std_mean(
+            self.features, True)
+
+        self.features -= self.mean
+        self.features /= self.standard_deviation
 
     def _idx_to_feature_id_and_label(self, idx):
         label_idx = np.searchsorted(self.cumul_id_list_lengths,
@@ -700,8 +727,11 @@ class AudioDataset(torch_data.Dataset):
 
 
 class DiscardedAudioDataset(AudioDataset):
-    def __init__(self, *args, caching=None, **kwargs):
-        super().__init__(*args, caching=caching, **kwargs)
+    def __init__(self, *args, standardize=False, caching=None, **kwargs):
+        super().__init__(*args,
+                         standardize=standardize,
+                         caching=caching,
+                         **kwargs)
 
     def _read_feature(self, feature_id, label):
         return np.load(self.data_dir / self.get_label_name(label) /
@@ -709,8 +739,14 @@ class DiscardedAudioDataset(AudioDataset):
 
 
 class AudioListenDataset(AudioDataset):
-    def __init__(self, *args, apply_transforms=False, caching=None, **kwargs):
+    def __init__(self,
+                 *args,
+                 standardize=False,
+                 apply_transforms=False,
+                 caching=None,
+                 **kwargs):
         super().__init__(*args,
+                         standardize=standardize,
                          apply_transforms=apply_transforms,
                          caching=caching,
                          **kwargs)
@@ -721,8 +757,14 @@ class AudioListenDataset(AudioDataset):
 
 
 class DiscardedAudioListenDataset(AudioDataset):
-    def __init__(self, *args, apply_transforms=False, caching=None, **kwargs):
+    def __init__(self,
+                 *args,
+                 standardize=False,
+                 apply_transforms=False,
+                 caching=None,
+                 **kwargs):
         super().__init__(*args,
+                         standardize=standardize,
                          apply_transforms=apply_transforms,
                          caching=caching,
                          **kwargs)
@@ -851,7 +893,8 @@ def create_dataloaders(dataset,
                        batch_size=32,
                        num_workers=0,
                        seed=42,
-                       pin_memory=False):
+                       pin_memory=False,
+                       use_imbalanced_sampler=False):
     dataset_size = len(dataset)
     all_indices = np.arange(dataset_size)
     train_indices, test_indices = sklearn.model_selection.train_test_split(
@@ -860,20 +903,30 @@ def create_dataloaders(dataset,
         random_state=seed,
         shuffle=True)
 
-    train_dataloader = torch_data.DataLoader(
-        dataset,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-        generator=torch.Generator().manual_seed(seed),
-        sampler=dataset.get_sampler(indices=train_indices))
-    test_dataloader = torch_data.DataLoader(
-        dataset,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        pin_memory=pin_memory,
-        generator=torch.Generator().manual_seed(seed),
-        sampler=dataset.get_sampler(indices=test_indices))
+    generator = torch.Generator().manual_seed(seed)
+    if use_imbalanced_sampler:
+        train_sampler = dataset.get_imbalanced_dataset_sampler(
+            indices=train_indices)
+        test_sampler = dataset.get_imbalanced_dataset_sampler(
+            indices=test_indices)
+    else:
+        train_sampler = torch_data.SubsetRandomSampler(train_indices,
+                                                       generator=generator)
+        test_sampler = torch_data.SubsetRandomSampler(test_indices,
+                                                      generator=generator)
+
+    train_dataloader = torch_data.DataLoader(dataset,
+                                             batch_size=batch_size,
+                                             num_workers=num_workers,
+                                             pin_memory=pin_memory,
+                                             generator=generator,
+                                             sampler=train_sampler)
+    test_dataloader = torch_data.DataLoader(dataset,
+                                            batch_size=batch_size,
+                                            num_workers=num_workers,
+                                            pin_memory=pin_memory,
+                                            generator=generator,
+                                            sampler=test_sampler)
 
     return train_dataloader, test_dataloader
 
