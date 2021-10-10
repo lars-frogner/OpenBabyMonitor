@@ -484,7 +484,7 @@ class AudioSetDataManager:
                          save_discarded=True,
                          **kwargs):
         raw_label_data = self.raw_label_file.get_data()
-        labels = raw_label_data.keys() if labels == 'all' else labels
+        labels = list(raw_label_data.keys()) if labels == 'all' else labels
         n_videos = np.array([len(raw_label_data[label]) for label in labels])
         sort_indices = np.argsort(n_videos)
         n_videos = n_videos[sort_indices]
