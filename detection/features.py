@@ -213,10 +213,9 @@ class AudioFeatureExtractor:
                                   -down_adjustment else down_adjustment)
 
     def read_wav(self, file_path):
-        waveform, _ = self.soundfile.read(file_path,
-                                          samplerate=self.sampling_rate,
-                                          channels=1,
-                                          dtype=self.dtype)
+        waveform, sampling_rate = self.soundfile.read(file_path,
+                                                      dtype=self.dtype)
+        assert sampling_rate == self.sampling_rate
         return waveform
 
     def write_wav(self, file_path, waveform):
