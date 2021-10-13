@@ -1,13 +1,22 @@
 import math
+import pathlib
+import pickle
 import numpy as np
 import torch
 import torch.nn as nn
+import torch.onnx
 import torchmetrics
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from tqdm import tqdm
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
+def get_conv_same_padding(kernel_size):
+    return nn.Conv2d(
+        1, 1, kernel_size=kernel_size,
+        padding='same')._reversed_padding_repeated_twice[::-1][::2]
 
 
 def compute_conv_output_shape(input_shape, conv):
@@ -42,12 +51,19 @@ def compute_n_dense_weights(dense):
 
 
 class CryNet(nn.Module):
-    def __init__(self, input_shape, n_labels, dtype=None):
+    def __init__(self,
+                 input_shape,
+                 n_labels,
+                 complexity=0,
+                 use_batch_norm=False,
+                 use_dropout=False,
+                 dtype=None):
         super().__init__()
         self.dtype = dtype
 
         self.n_weights = 0
         self.layers = []
+        self.description = ''
 
         def add_conv_layer(in_shape,
                            out_channels,
@@ -59,18 +75,21 @@ class CryNet(nn.Module):
                              out_channels,
                              kernel_size=kernel_size,
                              stride=stride,
-                             padding=padding,
+                             padding=(get_conv_same_padding(kernel_size)
+                                      if padding == 'same' else padding),
                              bias=bias,
                              dtype=self.dtype)
             out_shape = compute_conv_output_shape(in_shape, conv)
             self.n_weights += compute_n_conv_weights(conv)
             self.layers.append(conv)
+            self.description += f'c{out_channels}'
             return out_shape
 
         def add_max_pool_layer(in_shape, kernel_size=2, stride=2):
             max_pool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride)
             out_shape = compute_conv_output_shape(in_shape, max_pool)
             self.layers.append(max_pool)
+            self.description += 'mp'
             return out_shape
 
         def add_flatten_layer(in_shape):
@@ -86,11 +105,26 @@ class CryNet(nn.Module):
                               dtype=self.dtype)
             self.n_weights += compute_n_dense_weights(dense)
             self.layers.append(dense)
+            self.description += f'd{out_features}'
             return out_features
 
+        def add_conv_batch_normalization_layer(out_shape):
+            if use_batch_norm:
+                batch_norm = nn.BatchNorm2d(out_shape[0])
+                self.layers.append(batch_norm)
+                self.description += 'bn'
+
+        def add_dense_batch_normalization_layer(out_size):
+            if use_batch_norm:
+                batch_norm = nn.BatchNorm1d(out_size)
+                self.layers.append(batch_norm)
+                self.description += 'bn'
+
         def add_dropout_layer(p=0.5):
-            dropout = nn.Dropout(p=p)
-            self.layers.append(dropout)
+            if use_dropout:
+                dropout = nn.Dropout(p=p)
+                self.layers.append(dropout)
+                self.description += 'do'
 
         def add_relu_activation():
             self.layers.append(nn.ReLU())
@@ -103,27 +137,44 @@ class CryNet(nn.Module):
         else:
             assert len(input_shape) == 3
 
-        shape = add_conv_layer(input_shape, 32)
+        self.input_shape = input_shape
+
+        self.description += f'i={input_shape[1]}x{input_shape[2]}'
+
+        modify = lambda n: int(n * 2**complexity)
+
+        shape = add_conv_layer(input_shape, modify(32))
         shape = add_max_pool_layer(shape)
+        add_conv_batch_normalization_layer(shape)
         add_relu_activation()
-        shape = add_conv_layer(shape, 64)
+
+        shape = add_conv_layer(shape, modify(64))
         shape = add_max_pool_layer(shape)
+        add_conv_batch_normalization_layer(shape)
         add_relu_activation()
-        shape = add_conv_layer(shape, 128)
-        add_relu_activation()
-        shape = add_conv_layer(shape, 128)
+
+        shape = add_conv_layer(shape, modify(128))
         shape = add_max_pool_layer(shape)
+        add_conv_batch_normalization_layer(shape)
         add_relu_activation()
-        shape = add_conv_layer(shape, 256)
-        add_relu_activation()
-        shape = add_conv_layer(shape, 256)
+
+        shape = add_conv_layer(shape, modify(256))
         shape = add_max_pool_layer(shape)
+        add_conv_batch_normalization_layer(shape)
         add_relu_activation()
+
         size = add_flatten_layer(shape)
-        size = add_dense_layer(size, 1024)
+
+        size = add_dense_layer(size, modify(512))
+        add_dense_batch_normalization_layer(size)
+        add_dropout_layer()
         add_relu_activation()
-        size = add_dense_layer(size, 1024)
-        add_relu_activation()
+
+        #size = add_dense_layer(size, 512)
+        #add_dense_batch_normalization_layer(size)
+        #add_dropout_layer()
+        #add_relu_activation()
+
         size = add_dense_layer(size, n_labels)
         add_softmax_activation()
 
@@ -138,12 +189,15 @@ class TrainingVisualizer:
                  metric_names,
                  label_names,
                  max_cols=None,
+                 run_params=None,
                  figsize=(12, 8),
                  dpi=100):
-        self.metric_names = metric_names
+        self.metric_names = sorted(metric_names)
         self.label_names = label_names
+        self.figure_name = None if run_params is None else self.create_figure_name(
+            run_params)
 
-        self.n_axes = len(metric_names)
+        self.n_axes = len(self.metric_names)
 
         if max_cols is None:
             max_cols = int(np.ceil(np.sqrt(self.n_axes)))
@@ -175,6 +229,14 @@ class TrainingVisualizer:
         self.fig.tight_layout()
         plt.ion()
 
+    def close(self):
+        plt.close(fig=self.fig)
+
+    def create_figure_name(self, run_params):
+        return '_'.join(
+            [f'{name}={value}'
+             for name, value in sorted(run_params.items())]) + '_training.png'
+
     def draw(self):
         for ax in map(self.__get_axis, range(self.n_axes)):
             ax.relim()
@@ -183,8 +245,15 @@ class TrainingVisualizer:
         self.fig.canvas.flush_events()
         plt.pause(0.01)
 
+        if self.figure_name is not None:
+            try:
+                with open(self.figure_name, 'wb') as f:
+                    plt.savefig(f)
+            except Exception as e:
+                print(e)
+
     def stay_awake(self):
-        plt.pause(np.inf)
+        plt.pause(np.iinfo(np.int32).max)
 
     def update_metric_results(self, epoch, train_metric_results,
                               test_metric_results):
@@ -213,7 +282,13 @@ class TrainingVisualizer:
                                             label='Test')
         ax.set_xlabel('Epoch')
         ax.set_ylabel(name)
-        ax.legend(loc='best')
+        ax.legend(loc='lower right')
+        text = ax.text(0.02,
+                       0.98,
+                       '',
+                       ha='left',
+                       va='top',
+                       transform=ax.transAxes)
 
         def updater(epoch, train_data, test_data):
             self.__append_to_line_plot(self.plots[name]['train'],
@@ -224,6 +299,7 @@ class TrainingVisualizer:
                                        epoch,
                                        test_data.item(),
                                        draw=False)
+            text.set_text(f'{name} = {test_data.item()*100:.1f} %')
 
         return updater
 
@@ -300,6 +376,55 @@ def create_loss_function():
     return nn.CrossEntropyLoss()
 
 
+class EarlyStopper:
+    def __init__(self, num_classes, patience=15):
+        self.patience = patience
+        self.metric = torchmetrics.Accuracy(num_classes=num_classes,
+                                            average=None,
+                                            multiclass=True).to(DEVICE)
+        self.accuracies = []
+        self.last_epoch = None
+        self.best_epoch = None
+        self.best_accuracy = -np.inf
+
+    def reset(self):
+        self.metric.reset()
+
+    def __call__(self, predictions, labels):
+        self.metric(predictions, labels)
+
+    def compute(self):
+        lowest_accuracy = torch.min(self.metric.compute()).cpu().item()
+
+        self.last_epoch = len(self.accuracies)
+        self.accuracies.append(lowest_accuracy)
+
+        if lowest_accuracy >= self.best_accuracy:
+            self.best_accuracy = lowest_accuracy
+            self.best_epoch = self.last_epoch
+
+        return lowest_accuracy
+
+    def has_data(self):
+        return len(self.accuracies) > 0
+
+    def should_stop(self):
+        if self.has_data():
+            return self.last_epoch - self.best_epoch >= self.patience
+        else:
+            return False
+
+    def print_result(self):
+        if self.has_data():
+            print(
+                f'Best minimal accuracy: {self.best_accuracy*100:.2f} % in epoch {self.best_epoch}'
+            )
+
+
+def create_early_stopper():
+    return EarlyStopper(3)
+
+
 def create_metrics():
     metric_kwargs = dict(num_classes=3, average='macro', multiclass=True)
     train_metric = torchmetrics.MetricCollection(
@@ -317,15 +442,17 @@ def create_metrics():
     return train_metric.to(DEVICE), test_metric.to(DEVICE)
 
 
-def create_visualizer(dataset, train_metric, test_metric):
-    return TrainingVisualizer(
-        list(set(train_metric.keys()).union(set(test_metric.keys()))),
-        dataset.get_label_names())
+def create_visualizer(dataset, train_metric, test_metric, run_params=None):
+    return TrainingVisualizer(list(
+        set(train_metric.keys()).union(set(test_metric.keys()))),
+                              dataset.get_label_names(),
+                              run_params=run_params)
 
 
 def calculate_initial_metrics(train_dataloader,
                               test_dataloader,
                               model,
+                              early_stopper,
                               test_metric,
                               train_metric,
                               callback,
@@ -335,10 +462,11 @@ def calculate_initial_metrics(train_dataloader,
                model,
                train_metric,
                show_progress=show_train_progress)
-    test_model(test_dataloader,
-               model,
-               test_metric,
-               show_progress=show_test_progress)
+    test_model_with_early_stopper(test_dataloader,
+                                  model,
+                                  early_stopper,
+                                  test_metric,
+                                  show_progress=show_test_progress)
     callback(0, train_metric.compute(), test_metric.compute())
 
 
@@ -347,8 +475,9 @@ def run_model_training(train_dataloader,
                        model,
                        loss_function,
                        optimizer,
+                       early_stopper,
                        test_metric,
-                       n_epochs=1,
+                       max_epochs=1000,
                        train_metric=None,
                        callback=None,
                        save_path=None,
@@ -359,9 +488,8 @@ def run_model_training(train_dataloader,
         train_results = []
     test_results = []
 
-    for epoch in range(1, n_epochs + 1):
-        if n_epochs > 1:
-            print(f'Starting epoch {epoch}')
+    for epoch in range(1, max_epochs + 1):
+        print(f'Starting epoch {epoch}')
 
         train_model(train_dataloader,
                     model,
@@ -372,10 +500,11 @@ def run_model_training(train_dataloader,
         if train_metric is not None:
             train_results.append(train_metric.compute())
 
-        test_model(test_dataloader,
-                   model,
-                   test_metric,
-                   show_progress=show_test_progress)
+        test_model_with_early_stopper(test_dataloader,
+                                      model,
+                                      early_stopper,
+                                      test_metric,
+                                      show_progress=show_test_progress)
         test_results.append(test_metric.compute())
 
         if callback is not None:
@@ -383,6 +512,10 @@ def run_model_training(train_dataloader,
                 callback(epoch, test_results[-1])
             else:
                 callback(epoch, train_results[-1], test_results[-1])
+
+        if early_stopper.should_stop():
+            early_stopper.print_result()
+            break
 
     if save_path is not None:
         torch.save(model.state_dict(), save_path)
@@ -436,6 +569,26 @@ def test_model(dataloader, model, metric, show_progress=True):
             metric(predictions, labels)
 
 
+def test_model_with_early_stopper(dataloader,
+                                  model,
+                                  early_stopper,
+                                  metric,
+                                  show_progress=True):
+    model.eval()
+    early_stopper.reset()
+    metric.reset()
+
+    if show_progress:
+        dataloader = tqdm(dataloader)
+    with torch.no_grad():
+        for examples, labels in dataloader:
+            predictions = model(examples)
+            early_stopper(predictions, labels)
+            metric(predictions, labels)
+
+    early_stopper.compute()
+
+
 def print_accuracy(epoch, *accuracies):
     test_accuracy = accuracies[-1]
     print(
@@ -443,38 +596,105 @@ def print_accuracy(epoch, *accuracies):
     )
 
 
+def export_model(model, output_path='model.onnx'):
+    model.eval()
+    dummy_feature = torch.zeros(1, *model.input_shape)
+    torch.onnx.export(model, dummy_feature, output_path)
+
+
 if __name__ == '__main__':
     from data import create_dataset, create_dataloaders
-    config = dict(batch_size=32,
-                  learning_rate=1e-3,
-                  weight_decay=1e-2,
-                  n_epochs=100)
+
+    export_model(create_model((64, 64), 3), 'test_model.onnx')
+    assert 0
+
     dataset = create_dataset(device=DEVICE)
-    train_dataloader, test_dataloader = create_dataloaders(
-        dataset, batch_size=config['batch_size'], num_workers=0)
-    model = create_model(dataset.get_feature_shape(), dataset.get_n_labels())
-    loss_function = create_loss_function()
-    optimizer = create_optimizer(model,
-                                 learning_rate=config['learning_rate'],
-                                 weight_decay=config['weight_decay'])
-    train_metric, test_metric = create_metrics()
-    visualizer = create_visualizer(dataset, train_metric, test_metric)
 
-    calculate_initial_metrics(train_dataloader,
-                              test_dataloader,
-                              model,
-                              test_metric,
-                              train_metric,
-                              callback=visualizer.update_metric_results)
-    train_results, test_results = run_model_training(
-        train_dataloader,
-        test_dataloader,
-        model,
-        loss_function,
-        optimizer,
-        test_metric,
-        train_metric=train_metric,
-        n_epochs=config['n_epochs'],
-        callback=visualizer.update_metric_results)
+    complexities = [-2, -1, 0, 1, 2]
+    batch_sizes = [16, 32, 64]
+    learning_rates = [1e-6, 1e-5, 1e-4, 1e-3]
+    weight_decays = [0, 1e-4, 1e-3, 1e-2]
+    use_batch_norms = [False, True]
 
-    visualizer.stay_awake()
+    results_path = pathlib.Path('run_results.pickle')
+    if results_path.exists():
+        with open(results_path, 'rb') as f:
+            results = pickle.load(f)
+    else:
+        results = []
+
+    for complexity in complexities:
+        for batch_size in batch_sizes:
+            for learning_rate in learning_rates:
+                for weight_decay in weight_decays:
+                    for use_batch_norm in use_batch_norms:
+
+                        params = dict(complexity=complexity,
+                                      batch_size=batch_size,
+                                      learning_rate=learning_rate,
+                                      weight_decay=weight_decay,
+                                      use_batch_norm=use_batch_norm)
+
+                        config = dict(batch_size=batch_size,
+                                      learning_rate=learning_rate,
+                                      weight_decay=weight_decay)
+
+                        train_dataloader, test_dataloader = create_dataloaders(
+                            dataset,
+                            batch_size=config['batch_size'],
+                            num_workers=0)
+
+                        model = create_model(dataset.get_feature_shape(),
+                                             dataset.get_n_labels(),
+                                             complexity=complexity,
+                                             use_batch_norm=use_batch_norm)
+
+                        loss_function = create_loss_function()
+
+                        optimizer = create_optimizer(
+                            model,
+                            learning_rate=config['learning_rate'],
+                            weight_decay=config['weight_decay'])
+
+                        early_stopper = create_early_stopper()
+
+                        train_metric, test_metric = create_metrics()
+
+                        config['model'] = model.description
+                        visualizer = create_visualizer(dataset,
+                                                       train_metric,
+                                                       test_metric,
+                                                       run_params=config)
+
+                        calculate_initial_metrics(
+                            train_dataloader,
+                            test_dataloader,
+                            model,
+                            early_stopper,
+                            test_metric,
+                            train_metric,
+                            callback=visualizer.update_metric_results)
+
+                        train_results, test_results = run_model_training(
+                            train_dataloader,
+                            test_dataloader,
+                            model,
+                            loss_function,
+                            optimizer,
+                            early_stopper,
+                            test_metric,
+                            train_metric=train_metric,
+                            callback=visualizer.update_metric_results)
+
+                        visualizer.close()
+
+                        if len(
+                                list(
+                                    filter(lambda r: r['params'] == params,
+                                           results))) == 0:
+                            results.append(
+                                dict(params=params,
+                                     train_results=train_results,
+                                     test_results=test_results))
+                            with open(results_path, 'wb') as f:
+                                pickle.dump(results, f)
