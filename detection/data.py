@@ -665,6 +665,10 @@ class AudioDataset(torch_data.Dataset):
         self.features -= self.mean
         self.features /= self.standard_deviation
 
+        np.savez(self.data_dir / 'standardization.npz',
+                 mean=self.mean.cpu().numpy(),
+                 standard_deviation=self.standard_deviation.cpu().numpy())
+
     def _idx_to_feature_id_and_label(self, idx):
         label_idx = np.searchsorted(self.cumul_id_list_lengths,
                                     idx,
@@ -698,7 +702,7 @@ class AudioDataset(torch_data.Dataset):
         return self.id_list_lengths[
             self.label_names.index(label) if isinstance(label, str) else label]
 
-    def get_sampler(self, indices=None, **kwargs):
+    def get_imbalanced_dataset_sampler(self, indices=None, **kwargs):
         if indices is None:
             callback_get_label = lambda dataset: dataset.get_all_labels()
         else:
@@ -739,11 +743,8 @@ class AudioDataset(torch_data.Dataset):
 
 
 class DiscardedAudioDataset(AudioDataset):
-    def __init__(self, *args, standardize=False, caching=None, **kwargs):
-        super().__init__(*args,
-                         standardize=standardize,
-                         caching=caching,
-                         **kwargs)
+    def __init__(self, *args, caching=None, **kwargs):
+        super().__init__(*args, caching=caching, **kwargs)
 
     def _read_feature(self, feature_id, label):
         return np.load(self.data_dir / self.get_label_name(label) /
@@ -751,14 +752,8 @@ class DiscardedAudioDataset(AudioDataset):
 
 
 class AudioListenDataset(AudioDataset):
-    def __init__(self,
-                 *args,
-                 standardize=False,
-                 apply_transforms=False,
-                 caching=None,
-                 **kwargs):
+    def __init__(self, *args, apply_transforms=False, caching=None, **kwargs):
         super().__init__(*args,
-                         standardize=standardize,
                          apply_transforms=apply_transforms,
                          caching=caching,
                          **kwargs)
@@ -769,14 +764,8 @@ class AudioListenDataset(AudioDataset):
 
 
 class DiscardedAudioListenDataset(AudioDataset):
-    def __init__(self,
-                 *args,
-                 standardize=False,
-                 apply_transforms=False,
-                 caching=None,
-                 **kwargs):
+    def __init__(self, *args, apply_transforms=False, caching=None, **kwargs):
         super().__init__(*args,
-                         standardize=standardize,
                          apply_transforms=apply_transforms,
                          caching=caching,
                          **kwargs)
