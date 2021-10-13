@@ -479,6 +479,33 @@ class Recorder:
         return waveform
 
 
+class FeatureProvider:
+    def __init__(self,
+                 audio_device,
+                 feature_extractor,
+                 standardization_file='standardization.npz'):
+        self.feature_extractor = feature_extractor
+        self.recorder = Recorder(audio_device,
+                                 sampling_rate=feature_extractor.sampling_rate)
+        self.read_standardization_file(standardization_file)
+
+    def read_standardization_file(self, standardization_file):
+        standardization = np.load(standardization_file)
+        self.mean = standardization['mean']
+        self.standard_deviation = standardization['standard_deviation']
+
+    def standardize(self, feature):
+        feature -= self.mean
+        feature /= self.standard_deviation
+
+    def __call__(self):
+        waveform = self.recorder.record_waveform(
+            self.feature_extractor.feature_length)
+        feature = self.feature_extractor.compute_feature(waveform)
+        self.standardize(feature)
+        return feature
+
+
 if __name__ == '__main__':
 
     e = AudioFeatureExtractor()
