@@ -418,11 +418,66 @@ class AudioFeatureExtractor:
         ax.set_xlabel('Time [s]')
         ax.set_ylabel('Filter')
 
-        if show:
-            fig.tight_layout()
-            plt.show()
 
-        return fig, ax
+class AudioByteInterpreter:
+    def __init__(self, output_format='FLOAT_LE'):
+        self.output_format = output_format
+        self.parse_format()
+
+    def __call__(self, bytes):
+        return np.frombuffer(bytes, dtype=self.dtype)
+
+    def compute_n_bytes(self, n_samples):
+        return n_samples * self.dtype.itemsize
+
+    def parse_format(self):
+        byteorders = dict(LE='<', BE='>')
+        kinds = dict(S='i', U='u', FLOAT='f')
+        bits2bytes = lambda x: int(x) // 8
+
+        if '_' in self.output_format:
+            type_size, byteorder = self.output_format.split('_')
+        else:
+            type_size = self.output_format
+            byteorder = 'LE'
+
+        if 'FLOAT' in type_size:
+            if type_size == 'FLOAT':
+                kind = type_size
+                bits = 32
+            else:
+                kind = 'FLOAT'
+                bits = int(type_size[5:])
+        else:
+            kind = type_size[0]
+            bits = int(type_size[1:])
+
+        self.dtype = np.dtype('{}{}{:d}'.format(byteorders[byteorder],
+                                                kinds[kind], bits2bytes(bits)))
+
+
+class Recorder:
+    def __init__(self, device, sampling_rate=8000, output_format='FLOAT_LE'):
+        self.device = device
+        self.sampling_rate = sampling_rate
+        self.output_format = output_format
+
+        self.interpreter = AudioByteInterpreter(
+            output_format=self.output_format)
+
+        self.arecord_args = [
+            'arecord', f'--device={device}', '--quiet', '--file-type', 'raw',
+            f'--format={self.output_format}', f'--rate={sampling_rate:d}'
+        ]
+
+    def record_waveform(self, n_samples):
+        with subprocess.Popen(self.arecord_args,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.DEVNULL) as process:
+            waveform = self.interpreter(
+                process.stdout.read(
+                    self.interpreter.compute_n_bytes(n_samples)))
+        return waveform
 
 
 if __name__ == '__main__':
