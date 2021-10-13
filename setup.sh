@@ -106,7 +106,9 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     sudo apt -y install alsa-utils ffmpeg lame
 
     # Install required Python packages
-    pip3 install -r requirements.txt
+    sudo apt -y install libatlas-base-dev # Requirement for numpy
+    sudo apt -y install libopenexr-dev libgtk-3-dev # Requirements for OpenCV
+    pip3 install --no-cache-dir -r requirements.txt
 
     sudo apt -y autoremove
 fi
