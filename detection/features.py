@@ -84,10 +84,11 @@ class AudioFeatureExtractor:
             return whole_windows
 
     def compute_waveform_length_for_window_count(self, window_count):
-        return self.fft_length + (window_count - 1)*self.window_separation
+        return self.fft_length + (window_count - 1) * self.window_separation
 
     def compute_waveform_duration_for_window_count(self, window_count):
-        return self.sample_num_to_time(self.compute_waveform_length_for_window_count(window_count))
+        return self.sample_num_to_time(
+            self.compute_waveform_length_for_window_count(window_count))
 
     def adjust_waveform_length_to_fit_windows(self, waveform_length):
         _, cutoff_length = self.compute_window_count(waveform_length,
@@ -118,25 +119,41 @@ class AudioFeatureExtractor:
         return converted_waveform
 
     def feature_is_accepted(self, energies):
-        return np.mean(energies < self.low_energy_threshold) <= self.max_low_energy_feature_proportion
+        return np.mean(energies < self.low_energy_threshold
+                       ) <= self.max_low_energy_feature_proportion
 
-    def __call__(self, waveform, split_into_features=True, allow_all_energies=False, return_waveforms=False):
+    def __call__(self,
+                 waveform,
+                 split_into_features=True,
+                 allow_all_energies=False,
+                 return_waveforms=False):
         if split_into_features:
-            assert self.can_extract_feature(waveform), 'Input waveform shorter than feature length'
+            assert self.can_extract_feature(
+                waveform), 'Input waveform shorter than feature length'
             waveforms = self.split_waveform(waveform)
             if allow_all_energies or not self.filter_features:
                 features = self.compute_splitted_features(waveforms)
-                return (features, waveforms) if return_waveforms else (features,)
+                return (features,
+                        waveforms) if return_waveforms else (features, )
             else:
-                features, energies = self.compute_splitted_features(waveforms, return_energies=True)
+                features, energies = self.compute_splitted_features(
+                    waveforms, return_energies=True)
                 is_accepted = list(map(self.feature_is_accepted, energies))
-                return is_accepted, *((features, waveforms) if return_waveforms else (features,))
+                return (is_accepted,
+                        *((features, waveforms) if return_waveforms else
+                          (features, )))
         else:
             return self.compute_feature(waveform)
 
     def compute_splitted_features(self, waveform, return_energies=False):
-        waveforms = waveform if (isinstance(waveform, (list, tuple)) or waveform.ndim == 2) else self.split_waveform(waveform)
-        features = [self.compute_feature(splitted_waveform, return_energies=return_energies) for splitted_waveform in waveforms]
+        waveforms = waveform if (isinstance(waveform,
+                                            (list, tuple)) or waveform.ndim
+                                 == 2) else self.split_waveform(waveform)
+        features = [
+            self.compute_feature(splitted_waveform,
+                                 return_energies=return_energies)
+            for splitted_waveform in waveforms
+        ]
         return zip(*features) if return_energies else features
 
     def split_waveform(self, waveform):
@@ -221,23 +238,26 @@ class AudioFeatureExtractor:
         start_time = self.windown_num_to_time(0)
         end_time = self.windown_num_to_time(feature.shape[1] - 1)
 
-        im = ax.imshow(feature,
-                  origin='lower',
-                  interpolation='nearest',
-                  aspect='auto',
-                  extent=[
-                      start_time,
-                      end_time,
-                      0.5, feature.shape[0] + 0.5
-                  ])
+        im = ax.imshow(
+            feature,
+            origin='lower',
+            interpolation='nearest',
+            aspect='auto',
+            extent=[start_time, end_time, 0.5, feature.shape[0] + 0.5])
 
         for time in times:
             ax.axvline(time, color='white', lw=1.0, ls='--')
 
         if energy is not None:
             energy_ax = ax.twinx()
-            energy_ax.plot(np.linspace(start_time, end_time, energy.size), energy, color='tab:orange', lw=1.0)
-            energy_ax.axhline(self.low_energy_threshold, color='tab:red', lw=1.0, ls='--')
+            energy_ax.plot(np.linspace(start_time, end_time, energy.size),
+                           energy,
+                           color='tab:orange',
+                           lw=1.0)
+            energy_ax.axhline(self.low_energy_threshold,
+                              color='tab:red',
+                              lw=1.0,
+                              ls='--')
             energy_ax.set_ylabel('Energy')
 
         divider = make_axes_locatable(ax)
