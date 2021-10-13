@@ -1,9 +1,6 @@
 import time
+import subprocess
 import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-import librosa
-import soundfile
 
 
 def next_power_of_2(x):
@@ -15,6 +12,108 @@ def get_striding_windows(arr, window_size, stride=1):
     shape = (1 + (arr.size - window_size) // stride, window_size)
     strides = (stride * arr.strides[0], arr.strides[0])
     return np.lib.stride_tricks.as_strided(arr, shape=shape, strides=strides)
+
+
+def librosa_hz_to_mel(frequencies):
+    frequencies = np.asanyarray(frequencies)
+
+    # Fill in the linear part
+    f_min = 0.0
+    f_sp = 200.0 / 3
+
+    mels = (frequencies - f_min) / f_sp
+
+    # Fill in the log-scale part
+
+    min_log_hz = 1000.0  # beginning of log region (Hz)
+    min_log_mel = (min_log_hz - f_min) / f_sp  # same (Mels)
+    logstep = np.log(6.4) / 27.0  # step size for log region
+
+    if frequencies.ndim:
+        # If we have array data, vectorize
+        log_t = frequencies >= min_log_hz
+        mels[log_t] = min_log_mel + np.log(
+            frequencies[log_t] / min_log_hz) / logstep
+    elif frequencies >= min_log_hz:
+        # If we have scalar data, heck directly
+        mels = min_log_mel + np.log(frequencies / min_log_hz) / logstep
+
+    return mels
+
+
+def librosa_mel_to_hz(mels):
+    mels = np.asanyarray(mels)
+
+    # Fill in the linear scale
+    f_min = 0.0
+    f_sp = 200.0 / 3
+    freqs = f_min + f_sp * mels
+
+    # And now the nonlinear scale
+    min_log_hz = 1000.0  # beginning of log region (Hz)
+    min_log_mel = (min_log_hz - f_min) / f_sp  # same (Mels)
+    logstep = np.log(6.4) / 27.0  # step size for log region
+
+    if mels.ndim:
+        # If we have vector data, vectorize
+        log_t = mels >= min_log_mel
+        freqs[log_t] = min_log_hz * np.exp(logstep *
+                                           (mels[log_t] - min_log_mel))
+    elif mels >= min_log_mel:
+        # If we have scalar data, check directly
+        freqs = min_log_hz * np.exp(logstep * (mels - min_log_mel))
+
+    return freqs
+
+
+def librosa_fft_frequencies(sr, n_fft):
+    return np.linspace(0, float(sr) / 2, int(1 + n_fft // 2), endpoint=True)
+
+
+def librosa_mel_frequencies(n_mels, fmin, fmax):
+    min_mel = librosa_hz_to_mel(fmin)
+    max_mel = librosa_hz_to_mel(fmax)
+
+    mels = np.linspace(min_mel, max_mel, n_mels)
+
+    return librosa_mel_to_hz(mels)
+
+
+def librosa_mel_filters(sr,
+                        n_fft,
+                        n_mels=128,
+                        fmin=0.0,
+                        fmax=None,
+                        dtype=np.float32):
+    if fmax is None:
+        fmax = float(sr) / 2
+
+    # Initialize the weights
+    n_mels = int(n_mels)
+    weights = np.zeros((n_mels, int(1 + n_fft // 2)), dtype=dtype)
+
+    # Center freqs of each FFT bin
+    fftfreqs = librosa_fft_frequencies(sr, n_fft)
+
+    # 'Center freqs' of mel bands - uniformly spaced between limits
+    mel_f = librosa_mel_frequencies(n_mels + 2, fmin, fmax)
+
+    fdiff = np.diff(mel_f)
+    ramps = np.subtract.outer(mel_f, fftfreqs)
+
+    for i in range(n_mels):
+        # lower and upper slopes for all bins
+        lower = -ramps[i] / fdiff[i]
+        upper = ramps[i + 2] / fdiff[i + 1]
+
+        # .. then intersect them with each other and zero
+        weights[i] = np.maximum(0, np.minimum(lower, upper))
+
+    # Slaney-style mel is scaled to be approx constant energy per channel
+    enorm = 2.0 / (mel_f[2:n_mels + 2] - mel_f[:n_mels])
+    weights *= enorm[:, np.newaxis]
+
+    return weights
 
 
 class AudioFeatureExtractor:
@@ -30,7 +129,9 @@ class AudioFeatureExtractor:
                  feature_window_count=64,
                  feature_overlap_fraction=0.25,
                  low_energy_threshold=0.15,
-                 max_low_energy_feature_proportion=0.8):
+                 max_low_energy_feature_proportion=0.8,
+                 backend='librosa',
+                 disable_io=False):
         self.dtype = np.dtype(dtype)
         assert self.dtype.kind == 'f'
         self.sampling_rate = sampling_rate
@@ -43,7 +144,8 @@ class AudioFeatureExtractor:
         self.fft_length = next_power_of_2(self.window_length)
 
         self.feature_window_count = feature_window_count
-        self.feature_length = self.compute_waveform_length_for_window_count(feature_window_count)
+        self.feature_length = self.compute_waveform_length_for_window_count(
+            feature_window_count)
         self.feature_duration = self.sample_num_to_time(self.feature_length)
 
         self.set_feature_overlap_fraction(feature_overlap_fraction)
@@ -52,15 +154,27 @@ class AudioFeatureExtractor:
         self.max_low_energy_feature_proportion = max_low_energy_feature_proportion
         self.filter_features = self.low_energy_threshold is not None and self.max_low_energy_feature_proportion is not None
 
-        self.mel_spectrogram_kwargs = dict(sr=self.sampling_rate,
-                                win_length=self.window_length,
-                                hop_length=self.window_separation,
-                                fmin=self.min_frequency,
-                                fmax=self.max_frequency,
-                                n_mels=self.n_mel_bands,
-                                n_fft=self.fft_length,
-                                htk=False,
-                                center=False, power=1)
+        self.select_backend(backend)
+
+        if not disable_io:
+            import soundfile
+            self.soundfile = soundfile
+
+    def select_backend(self, backend):
+        self.backend = backend
+        if backend == 'librosa':
+            import librosa
+            self.librosa = librosa
+            self.compute_mel_spectrogram = self.compute_mel_spectrogram_librosa
+        elif backend == 'python_speech_features':
+            import python_speech_features
+            from scipy.signal.windows import hann
+            self.python_speech_features = python_speech_features
+            self.hann_window = hann
+            self.create_mel_filterbank()
+            self.compute_mel_spectrogram = self.compute_mel_spectrogram_python_speech_features
+        else:
+            raise ValueError(f'Invalid backend {backend}')
 
     def set_feature_overlap_fraction(self, feature_overlap_fraction):
         self.feature_overlap_fraction = feature_overlap_fraction
@@ -99,14 +213,14 @@ class AudioFeatureExtractor:
                                   -down_adjustment else down_adjustment)
 
     def read_wav(self, file_path):
-        waveform, _ = librosa.load(file_path,
-                                   sr=self.sampling_rate,
-                                   dtype=self.dtype,
-                                   mono=True)
+        waveform, _ = self.soundfile.read(file_path,
+                                          samplerate=self.sampling_rate,
+                                          channels=1,
+                                          dtype=self.dtype)
         return waveform
 
     def write_wav(self, file_path, waveform):
-        soundfile.write(file_path, waveform, self.sampling_rate)
+        self.soundfile.write(file_path, waveform, self.sampling_rate)
 
     def convert_waveform(self, waveform):
         dtype = waveform.dtype
@@ -164,8 +278,42 @@ class AudioFeatureExtractor:
     def take_log_of_mel_spectrogram(self, mel_spectrogram):
         return np.log(mel_spectrogram + self.log_offset)
 
+    def compute_mel_spectrogram_librosa(self, waveform):
+        mel_spectrogram = self.librosa.feature.melspectrogram(
+            y=waveform,
+            sr=self.sampling_rate,
+            win_length=self.window_length,
+            hop_length=self.window_separation,
+            fmin=self.min_frequency,
+            fmax=self.max_frequency,
+            n_mels=self.n_mel_bands,
+            n_fft=self.fft_length,
+            htk=False,
+            center=False,
+            power=1)
+        return mel_spectrogram
+
+    def create_mel_filterbank(self):
+        self.mel_filterbank = librosa_mel_filters(self.sampling_rate,
+                                                  self.fft_length,
+                                                  n_mels=self.n_mel_bands,
+                                                  fmin=self.min_frequency,
+                                                  fmax=self.max_frequency)
+
+    def compute_mel_spectrogram_python_speech_features(self, waveform):
+        frames = self.python_speech_features.sigproc.framesig(
+            waveform,
+            self.window_length,
+            self.window_separation,
+            winfunc=self.hann_window)
+        spectrogram = self.python_speech_features.sigproc.magspec(
+            frames, self.fft_length).T
+        mel_spectrogram = np.dot(self.mel_filterbank, spectrogram)
+        return mel_spectrogram
+
     def compute_log_mel_spectrogram(self, waveform, return_energies=False):
-        mel_spectrogram = librosa.feature.melspectrogram(y=waveform, **self.mel_spectrogram_kwargs)
+        mel_spectrogram = self.compute_mel_spectrogram(waveform)
+
         if return_energies:
             energies = np.sum(mel_spectrogram, axis=0)
             return self.take_log_of_mel_spectrogram(mel_spectrogram), energies
@@ -196,14 +344,17 @@ class AudioFeatureExtractor:
     def plot(self,
              waveform,
              show_feature_boundaries=True,
+             fig_kwargs={},
              **kwargs):
-        fig, axes = plt.subplots(nrows=2)
+        import matplotlib.pyplot as plt
+        fig, axes = plt.subplots(nrows=2, **fig_kwargs)
         self.plot_waveform(axes[0], waveform, xlabel=None)
-        self.plot_feature(
-            self(waveform, **kwargs),
-            fig=fig,
-            ax=axes[1],
-            show_feature_boundaries=show_feature_boundaries)
+        self.plot_feature(fig,
+                          axes[1],
+                          self(waveform, **kwargs),
+                          show_feature_boundaries=show_feature_boundaries)
+        fig.tight_layout()
+        plt.show()
 
     def plot_waveform(self, ax, waveform, xlabel='Time [s]'):
         end_time = self.sample_num_to_time(waveform.size - 1)
@@ -214,15 +365,11 @@ class AudioFeatureExtractor:
         ax.set_ylabel('Amplitude')
 
     def plot_feature(self,
-                      feature,
-                      energy=None,
-                      fig=None,
-                      ax=None,
-                      show_feature_boundaries=True,
-                      fig_kwargs={},
-                      show=True):
-        if fig is None or ax is None:
-            fig, ax = plt.subplots(**fig_kwargs)
+                     fig,
+                     ax,
+                     feature,
+                     energy=None,
+                     show_feature_boundaries=True):
 
         if isinstance(feature, (list, tuple)):
             times = self.windown_num_to_time(
@@ -260,6 +407,7 @@ class AudioFeatureExtractor:
                               ls='--')
             energy_ax.set_ylabel('Energy')
 
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('top', size='5%', pad=0.05)
         fig.colorbar(im, cax=cax, orientation='horizontal')
