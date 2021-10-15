@@ -14,7 +14,7 @@ redirectIfLoggedIn('main.php');
   <main class="vh-100">
     <div class="container h-100">
       <div class="row h-100 justify-content-center align-items-center">
-        <aside class="col-sm-4">
+        <aside class="col-sm-6">
           <div class="card">
             <article class="card-body">
               <h3 class="card-title text-center">Vennligst logg inn</h3>
