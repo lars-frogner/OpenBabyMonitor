@@ -3,7 +3,6 @@
 import os
 import subprocess
 import control
-import json
 
 MODE = 'audiostream'
 
@@ -15,37 +14,47 @@ def stream_audio():
             **control.read_settings(mode, config, database)))
 
 
-def stream_audio_with_settings(gain=100,
+def stream_audio_with_settings(encrypted=True,
+                               gain=100,
                                sampling_rate=8000,
                                mp3_bitrate=128,
+                               hls_segment_time=1,
+                               hls_list_size=3,
                                **kwargs):
+    output_dir = os.environ['BM_AUDIO_STREAM_DIR']
+    output_file = os.environ['BM_AUDIO_STREAM_FILE']
+    log_path = os.environ['BM_SERVER_LOG_PATH']
     mic_id = os.environ['BM_MIC_ID']
     sound_card_number = os.environ['BM_SOUND_CARD_NUMBER']
-    log_path = os.environ['BM_SERVER_LOG_PATH']
-    micstream_dir = os.environ['BM_MICSTREAM_DIR']
-    micstream_endpoint = os.environ['BM_MICSTREAM_ENDPOINT']
-    micstream_port = os.environ['BM_MICSTREAM_PORT']
-    micstream_header_filepath = os.environ['BM_MICSTREAM_HEADERS_FILE']
 
     update_gain(sound_card_number, gain, log_path)
 
-    update_headers(micstream_header_filepath)
-
-    input_args = ['--device', 'plug{}'.format(mic_id)]
-    output_args = [
-        '--endpoint', micstream_endpoint, '--headers',
-        micstream_header_filepath, '--port', micstream_port
+    input_args = [
+        '-f', 'alsa', '-channels', '1', '-sample_rate',
+        '{:d}'.format(sampling_rate), '-i', 'plug{}'.format(mic_id)
     ]
-    quality_args = [
-        '--sample-rate', '{}'.format(sampling_rate), '--bitrate',
-        '{}'.format(int(round(mp3_bitrate)))
+    codec_args = [
+        '-vn',
+        '-acodec',
+        'libmp3lame',
+        '-b:a',
+        '{:d}k'.format(mp3_bitrate),
     ]
+    stream_args = [
+        '-f', 'hls', '-hls_time', '{}'.format(hls_segment_time),
+        '-hls_list_size', '{}'.format(hls_list_size), '-hls_flags',
+        'delete_segments', '-hls_allow_cache', '0'
+    ]
+    encryption_args = ['-hls_key_info_file', 'stream.keyinfo'
+                       ] if encrypted else []
 
     with open(log_path, 'a') as log_file:
-        subprocess.check_call([os.path.join(micstream_dir, 'micstream')] +
-                              input_args + output_args + quality_args,
-                              stdout=subprocess.DEVNULL,
-                              stderr=log_file)
+        subprocess.check_call(
+            ['ffmpeg', '-hide_banner', '-loglevel', 'error'] + input_args +
+            codec_args + stream_args + encryption_args + [output_file],
+            stdout=subprocess.DEVNULL,
+            stderr=log_file,
+            cwd=output_dir)
 
 
 def update_gain(sound_card_number, gain, log_path):
@@ -56,24 +65,6 @@ def update_gain(sound_card_number, gain, log_path):
         ],
                               stdout=subprocess.DEVNULL,
                               stderr=log_file)
-
-
-def update_headers(header_filepath):
-    # 'Cache-Control: no-cache' prevents browsers from caching the streamed file
-    # 'Access-Control-Allow-Origin: <origin>' allows the Apache server to request the stream endpoint
-    ip = subprocess.check_output(['hostname', '-I']).decode().strip()
-    origins = [ip, 'babymonitor.*']
-    headers = {
-        'Cache-Control':
-        'no-cache',
-        'Access-Control-Allow-Origin':
-        ' '.join([
-            'http{}://{}'.format(s, origin) for origin in origins
-            for s in ['', 's']
-        ])
-    }
-    with open(header_filepath, 'w') as f:
-        json.dump(headers, f)
 
 
 if __name__ == '__main__':

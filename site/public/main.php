@@ -65,6 +65,12 @@ require_once(TEMPLATES_PATH . '/main.php');
           </div>
 
           <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
+            <div class="row justify-content-center align-items-center">
+              <div class="col-sm-6 mb-5 text-center" <?php echo HIDDEN_STYLE ?>>
+                <p id="mode_content_audio_error" class="alert alert-danger text-center"></p>
+                <a class="btn btn-secondary" href="main.php">Forny siden</a>
+              </div>
+            </div>
             <div class="row align-items-center justify-content-center" id="audiostream_visualization_mode_box" <?php echo HIDDEN_STYLE; ?>>
               <div class="col-auto fw-bold">
                 Visualisering
@@ -153,6 +159,7 @@ require_once(TEMPLATES_PATH . '/main.php');
   <?php
   require_once(TEMPLATES_PATH . '/bootstrap_js.php');
   require_once(TEMPLATES_PATH . '/video-js_js.php');
+  require_once(TEMPLATES_PATH . '/hls-js_js.php');
   require_once(TEMPLATES_PATH . '/jquery_js.php');
   ?>
 
@@ -164,8 +171,6 @@ require_once(TEMPLATES_PATH . '/main.php');
     const INITIAL_MODE = <?php echo $mode; ?>;
 
     const USES_SECURE_PROTOCOL = <?php echo USES_SECURE_PROTOCOL ? 'true' : 'false' ?>;
-
-    const AUDIO_SRC = <?php echo '\'http://' . SERVER_IP . ':' . getenv('BM_MICSTREAM_PORT') . getenv('BM_MICSTREAM_ENDPOINT') . '\''; ?>;
 
     const SETTING_SAMPLING_RATE = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'sampling_rate', true); ?>;
     const SETTING_VOLUME = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'volume', true); ?>;

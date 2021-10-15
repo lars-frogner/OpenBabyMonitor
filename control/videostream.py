@@ -33,10 +33,10 @@ def stream_video_with_settings(encrypted=True,
                                capture_audio=True,
                                show_time=True,
                                **kwargs):
-    mic_id = os.environ['BM_MIC_ID']
-    log_path = os.environ['BM_SERVER_LOG_PATH']
     picam_dir = os.environ['BM_PICAM_DIR']
-    picam_output_dir = os.environ['BM_PICAM_STREAM_DIR']
+    output_dir = os.environ['BM_PICAM_STREAM_DIR']
+    log_path = os.environ['BM_SERVER_LOG_PATH']
+    mic_id = os.environ['BM_MIC_ID']
 
     assert vertical_resolution in HORIZONTAL_RESOLUTIONS, \
         'Vertical resolution ({}) is not one of {}'.format(
@@ -75,12 +75,17 @@ def stream_video_with_settings(encrypted=True,
     time_args = ['--time', '--timeformat', r'%a %d.%m.%Y %T'
                  ] if show_time else []
 
-    encryption_args = [
-        '--hlsenc', '--hlsenckeyuri', 'stream.key', '--hlsenckey',
-        os.environ['BM_PICAM_ENCRYPTION_KEY']
-    ] if encrypted else []
+    if encrypted:
+        with open(os.path.join(output_dir, 'stream.hexkey')) as f:
+            encryption_key = f.read()
+        encryption_args = [
+            '--hlsenc', '--hlsenckeyuri', 'stream.key', '--hlsenckey',
+            encryption_key
+        ]
+    else:
+        encryption_args = []
 
-    output_args = ['--hlsdir', picam_output_dir]
+    output_args = ['--hlsdir', output_dir]
 
     with open(log_path, 'a') as log_file:
         subprocess.check_call([os.path.join(picam_dir, 'picam')] +
@@ -89,7 +94,7 @@ def stream_video_with_settings(encrypted=True,
                               color_args + audio_args + time_args,
                               stdout=subprocess.DEVNULL,
                               stderr=log_file,
-                              cwd=picam_output_dir)
+                              cwd=output_dir)
 
 
 if __name__ == '__main__':

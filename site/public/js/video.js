@@ -2,7 +2,7 @@ const MODE_CONTENT_VIDEO_ID = 'mode_content_video';
 const VIDEO_STREAM_PARENT_ID = MODE_CONTENT_VIDEO_ID + '_box';
 const VIDEO_STREAM_DIV_ID = 'video_stream';
 const VIDEO_STREAM_ID = VIDEO_STREAM_DIV_ID + '_html5_api';
-const VIDEO_STREAM_SRC = 'hls/index.m3u8';
+const VIDEO_STREAM_SRC = 'streaming/picam/index.m3u8';
 const VIDEO_STREAM_TYPE = 'application/x-mpegURL';
 
 var _AUDIO_CONTEXT;

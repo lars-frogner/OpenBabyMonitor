@@ -51,15 +51,11 @@ BM_ENV_PATH=$BM_ENV_DIR/envvars
 BM_SITE_DIR=/var/www/babymonitor
 BM_LINKED_SITE_DIR=$BM_DIR/site/public
 BM_SHAREDMEM_DIR=/run/shm
-BM_MICSTREAM_DIR=/usr/local/bin
-BM_MICSTREAM_SRC_DIR=/home/pi/micstream
-BM_MICSTREAM_ENDPOINT=/audiostream.mp3
-BM_MICSTREAM_HEADERS_FILE=$BM_LINKED_SITE_DIR/audiostream_headers.json
-BM_MICSTREAM_PORT=8080
-BM_PICAM_ENCRYPTION_KEY=$(openssl rand -hex 16)
+BM_LINKED_STREAM_DIR=$BM_LINKED_SITE_DIR/streaming
+BM_AUDIO_STREAM_DIR=$BM_SHAREDMEM_DIR/audiostream
+BM_AUDIO_STREAM_FILE=$BM_AUDIO_STREAM_DIR/index.m3u8
 BM_PICAM_DIR=$BM_DIR/picam
-BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/hls
-BM_PICAM_LINKED_STREAM_DIR=$BM_LINKED_SITE_DIR/hls
+BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/picam
 BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
 BM_SERVERCONTROL_DIR=$BM_DIR/site/servercontrol
 BM_SERVER_ACTION_DIR=$BM_SERVERCONTROL_DIR/.hook
@@ -148,13 +144,6 @@ fi
 
 SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
-    WD="$(pwd)"
-    cd $(dirname $BM_MICSTREAM_SRC_DIR)
-    git clone https://github.com/lars-frogner/micstream.git
-    cd micstream
-    sudo python3 setup.py install # Installs /usr/local/bin/micstream
-    cd "$WD"
-
     sudo adduser $BM_SERVER_USER audio
 
     BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
@@ -162,8 +151,16 @@ if [[ "$SETUP_AUDIO" = true ]]; then
     echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SOUND_CARD_NUMBER='$BM_SOUND_CARD_NUMBER'" >> $BM_ENV_EXPORTS_PATH
 
-    echo '{}' > $BM_MICSTREAM_HEADERS_FILE
-    chmod $BM_WRITE_PERMISSIONS $BM_MICSTREAM_HEADERS_FILE
+    sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
+
+    echo "#!/bin/bash
+rm -rf \$BM_AUDIO_STREAM_DIR
+install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_AUDIO_STREAM_DIR
+openssl rand 16 > \$BM_AUDIO_STREAM_DIR/stream.key
+chown $BM_SERVER_USER:$BM_WEB_GROUP \$BM_AUDIO_STREAM_DIR/stream.key
+chmod $BM_READ_PERMISSIONS \$BM_AUDIO_STREAM_DIR/stream.key
+" > $BM_DIR/control/prepare_audio_streaming.sh
+    chmod $BM_READ_PERMISSIONS $BM_DIR/control/prepare_audio_streaming.sh
 fi
 
 SETUP_ENV=true
@@ -179,12 +176,10 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_DIR=$BM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_LOG_PATH=$BM_SERVER_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_MICSTREAM_DIR=$BM_MICSTREAM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_MICSTREAM_SRC_DIR=$BM_MICSTREAM_SRC_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_MICSTREAM_ENDPOINT=$BM_MICSTREAM_ENDPOINT" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_MICSTREAM_PORT=$BM_MICSTREAM_PORT" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_LINKED_STREAM_DIR=$BM_LINKED_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_AUDIO_STREAM_DIR=$BM_AUDIO_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_AUDIO_STREAM_FILE=$BM_AUDIO_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MICSTREAM_HEADERS_FILE=$BM_MICSTREAM_HEADERS_FILE" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_ENCRYPTION_KEY=$BM_PICAM_ENCRYPTION_KEY" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
@@ -223,6 +218,25 @@ if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
     cd -
 fi
 
+INSTALL_HLS_JS=true
+if [[ "$INSTALL_HLS_JS" = true ]]; then
+    HLS_JS_VERSION=1.0.11
+    if [[ "$HLS_JS_VERSION" = "latest" ]]; then
+        DOWNLOAD_URL=$(curl https://api.github.com/repos/video-dev/hls.js/releases/latest | grep browser_download_url | grep release.zip | cut -d '"' -f 4)
+        FILENAME=$(echo $DOWNLOAD_URL | cut -d "/" -f 9)
+    else
+        FILENAME="release.zip"
+        DOWNLOAD_URL="https://github.com/video-dev/hls.js/releases/download/v${HLS_JS_VERSION}/$FILENAME"
+    fi
+    cd /tmp
+    wget $DOWNLOAD_URL
+    unzip $FILENAME
+    mkdir -p $BM_LINKED_SITE_DIR/library/hls-js
+    mv dist/hls.min.js* $BM_LINKED_SITE_DIR/library/hls-js/
+    rm -r $FILENAME dist
+    cd -
+fi
+
 INSTALL_VIDEOJS=true
 if [[ "$INSTALL_VIDEOJS" = true ]]; then
     VIDEOJS_VERSION=7.13.3
@@ -258,21 +272,22 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     # Create directories and symbolic links
     sudo install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS $BM_PICAM_DIR{,/archive}
 
-    ln -sfn {$BM_PICAM_DIR,$BM_SHAREDMEM_DIR/rec}/archive
-    ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/rec
-    ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/hooks
-    ln -sfn {$BM_SHAREDMEM_DIR,$BM_PICAM_DIR}/state
+    ln -sfn {$BM_PICAM_STREAM_DIR,$BM_PICAM_DIR}/rec
+    ln -sfn {$BM_PICAM_STREAM_DIR,$BM_PICAM_DIR}/hooks
+    ln -sfn {$BM_PICAM_STREAM_DIR,$BM_PICAM_DIR}/state
 
-    sudo ln -s $BM_PICAM_STREAM_DIR $BM_PICAM_LINKED_STREAM_DIR
+    sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
 
     echo "#!/bin/bash
-install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_SHAREDMEM_DIR/{rec,hooks,state} \$BM_PICAM_STREAM_DIR
-rm -rf \$BM_PICAM_STREAM_DIR/*
-echo -ne \"\$(echo \$BM_PICAM_ENCRYPTION_KEY | sed -e 's/../\\\\x&/g')\" > \$BM_PICAM_STREAM_DIR/stream.key
-chown $BM_SERVER_USER:$BM_WEB_GROUP \$BM_PICAM_STREAM_DIR/stream.key
-chmod $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/stream.key
-" > $BM_PICAM_DIR/create_sharedmem_dirs.sh
-    chmod $BM_READ_PERMISSIONS $BM_PICAM_DIR/create_sharedmem_dirs.sh
+rm -rf \$BM_PICAM_STREAM_DIR
+install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/{,rec,hooks,state}
+ENCRYPTION_KEY_HEX=\$(openssl rand -hex 16)
+echo \$ENCRYPTION_KEY_HEX > \$BM_PICAM_STREAM_DIR/stream.hexkey
+echo -ne \"\$(echo \$ENCRYPTION_KEY_HEX | sed -e 's/../\\\\x&/g')\" > \$BM_PICAM_STREAM_DIR/stream.key
+chown $BM_SERVER_USER:$BM_WEB_GROUP \$BM_PICAM_STREAM_DIR/stream.{hex,}key
+chmod $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/stream.{hex,}key
+" > $BM_DIR/control/prepare_video_streaming.sh
+    chmod $BM_READ_PERMISSIONS $BM_DIR/control/prepare_video_streaming.sh
 
     # Install picam binary
     PICAM_VERSION=1.4.9

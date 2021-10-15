@@ -40,7 +40,7 @@
                     "start_command": "sudo systemctl start bm_audiostream",
                     "stop_command": "sudo systemctl stop bm_audiostream",
                     "restart_command": "sudo systemctl restart bm_audiostream",
-                    "wait_for": "socket=localhost:BM_MICSTREAM_PORT"
+                    "wait_for": "file=BM_AUDIO_STREAM_FILE"
                 },
                 "videostream": {
                     "value": 3,
@@ -104,6 +104,12 @@
         "detection": "Deteksjon"
     },
     "audiostream_settings": {
+        "encrypted": {
+            "group": "streaming",
+            "name": "Kryptert",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
         "gain": {
             "group": "volume",
             "name": "Mikrofonforsterkning (%)",
@@ -172,6 +178,7 @@
         }
     },
     "audiostream_groups": {
+        "streaming": "Strømming",
         "volume": "Volum",
         "quality": "Kvalitet",
         "filtration": "Filtrering"

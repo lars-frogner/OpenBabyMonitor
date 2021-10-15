@@ -5,6 +5,9 @@ const AUDIO_VISUALIZATION_MODE_PARENT_ID = 'audiostream_visualization_mode_box';
 const AUDIO_FFTSIZE_PARENT_ID = 'audiostream_fftsize_range_box';
 const AUDIO_PLAYER_ID = 'audiostream_audio';
 const AUDIO_CANVAS_ID = 'audiostream_canvas';
+const AUDIO_ERROR_ID = 'mode_content_audio_error';
+
+let AUDIO_STREAM_SRC = 'streaming/audiostream/index.m3u8';
 
 const CANVAS_ASPECT_RATIO = 1.0;
 const CANVAS_MAX_WIDTH = 600;
@@ -40,6 +43,7 @@ $(function () {
     }
 });
 
+
 function enableAudioStreamPlayer() {
     _AUDIOSTREAM_CONTEXT = new AudiostreamContext();
 }
@@ -61,6 +65,7 @@ function switchFFTSizePowerTo(fftSizePower) {
 
 class AudiostreamContext {
     #context;
+    #hls;
     #source;
     #highpassFilter;
     #lowpassFilter;
@@ -73,7 +78,7 @@ class AudiostreamContext {
     #rebuildAnalyserSamplesArray = true;
 
     constructor() {
-        this.playerObject = AudiostreamContext.#createPlayer();
+        [this.playerObject, this.#hls] = AudiostreamContext.#createPlayer();
 
         this.#context = new (window.AudioContext || window.webkitAudioContext)({
             latencyHint: 'balanced',
@@ -207,6 +212,9 @@ class AudiostreamContext {
             this.#visualizer.destroy();
         }
         this.#context.close();
+        if (this.#hls) {
+            this.#hls.destroy();
+        }
         this.player.remove();
     }
 
@@ -243,13 +251,51 @@ class AudiostreamContext {
         if (document.getElementById(AUDIO_PLAYER_ID) != null) {
             alert('AudiostreamContext constructor called when player already exists');
         }
-        var src = AUDIO_SRC + '?salt=' + new Date().getTime();
         var playerObject = $('<audio></audio>')
-            .prop({ id: AUDIO_PLAYER_ID, controls: true, autoplay: true, crossOrigin: 'anonymous' }).css('max-width', CANVAS_MAX_WIDTH + 'px')
-            .append($('<source></source>').prop({ src: src, type: 'audio/mpeg' }))
+            .prop({ id: AUDIO_PLAYER_ID, controls: true, autoplay: true }).css('max-width', CANVAS_MAX_WIDTH + 'px')
             .append('Denne funksjonaliteten er ikke tilgjengelig i din nettleser.');
         $('#' + AUDIO_PLAYER_PARENT_ID).append(playerObject);
-        return playerObject;
+
+        var hls = null;
+        if (Hls.isSupported()) {
+            hls = new Hls({ backBufferLength: 0 });
+            hls.attachMedia(playerObject.get()[0]);
+
+            hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+                hls.loadSource(AUDIO_STREAM_SRC);
+            });
+
+            hls.on(Hls.Events.MANIFEST_LOADED, () => {
+                $('#' + AUDIO_ERROR_ID).parent().hide();
+            });
+
+            hls.on(Hls.Events.ERROR, function (event, data) {
+                if (data.fatal) {
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            $('#' + AUDIO_ERROR_ID).html('Kunne ikke laste inn lydstrømmen grunnet et nettverksproblem');
+                            $('#' + AUDIO_ERROR_ID).parent().show();
+                            hls.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            $('#' + AUDIO_ERROR_ID).html('Kunne ikke laste inn lydstrømmen grunnet et mediaproblem');
+                            $('#' + AUDIO_ERROR_ID).parent().show();
+                            hls.recoverMediaError();
+                            break;
+                        default:
+                            hls.destroy();
+                            $('#' + AUDIO_ERROR_ID).html('Kunne ikke laste inn lydstrømmen');
+                            $('#' + AUDIO_ERROR_ID).parent().show();
+                            break;
+                    }
+                }
+            });
+        } else {
+            $('#' + AUDIO_ERROR_ID).html('Denne funksjonaliteten (HLS-strømming) er ikke tilgjengelig i din nettleser');
+            $('#' + AUDIO_ERROR_ID).parent().show();
+        }
+
+        return [playerObject, hls];
     }
 }
 
