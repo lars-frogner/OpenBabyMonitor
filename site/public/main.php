@@ -125,10 +125,11 @@ require_once(TEMPLATES_PATH . '/main.php');
 
           <div id="mode_content_error" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
             <div class="container">
-              <div class="row">
-                <span id="mode_content_error_message" class="alert alert-danger text-center">Error
-                </span>
-                <a class="btn btn-secondary" href="main.php">Forny siden</a>
+              <div class="row ">
+                <div class="col-sm-6 text-center">
+                  <p id="mode_content_error_message" class="alert alert-danger text-center"></p>
+                  <a class="btn btn-secondary" href="main.php">Forny siden</a>
+                </div>
               </div>
             </div>
           </div>
