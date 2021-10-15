@@ -3,7 +3,7 @@ define('NAV_ICON_STYLE', 'height: 1.1em; width: 1.1em;');
 ?>
 <nav id="navbar" class="navbar navbar-expand-lg">
   <div class="container-fluid">
-    <a class="navbar-brand">Babymonitor</a>
+    <a class="navbar-brand" href="main.php">Babymonitor</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_entries">
       <span class="navbar-toggler-icon"></span>
     </button>
