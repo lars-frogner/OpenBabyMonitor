@@ -15,7 +15,7 @@ function sendClientTimestampToServer() {
         .then(response => response.text())
         .then(logoutIfSessionExpired)
         .catch(error => {
-            console.log(error)
+            console.error('Time synchronization failed:', error)
         });
 
 }

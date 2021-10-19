@@ -5,7 +5,7 @@ redirectIfLoggedOut('index.php');
 waitForModeLock();
 $mode = readCurrentMode($_DATABASE);
 define('HIDDEN_STYLE', 'style="display: none;"');
-require_once(TEMPLATES_PATH . '/main.php');
+require_once(TEMPLATES_DIR . '/main.php');
 ?>
 
 <!DOCTYPE html>
@@ -13,8 +13,8 @@ require_once(TEMPLATES_PATH . '/main.php');
 
 <head>
   <?php
-  require_once(TEMPLATES_PATH . '/head_common.php');
-  require_once(TEMPLATES_PATH . '/video-js_css.php');
+  require_once(TEMPLATES_DIR . '/head_common.php');
+  require_once(TEMPLATES_DIR . '/video-js_css.php');
   ?>
 
   <style>
@@ -42,8 +42,8 @@ require_once(TEMPLATES_PATH . '/main.php');
   <div class="d-flex flex-column min-vh-100 vh-100">
     <header>
       <?php
-      require_once(TEMPLATES_PATH . '/navbar.php');
-      require_once(TEMPLATES_PATH . '/confirmation_modal.php');
+      require_once(TEMPLATES_DIR . '/navbar.php');
+      require_once(TEMPLATES_DIR . '/confirmation_modal.php');
       ?>
     </header>
 
@@ -208,10 +208,10 @@ require_once(TEMPLATES_PATH . '/main.php');
   </div>
 
   <?php
-  require_once(TEMPLATES_PATH . '/bootstrap_js.php');
-  require_once(TEMPLATES_PATH . '/video-js_js.php');
-  require_once(TEMPLATES_PATH . '/hls-js_js.php');
-  require_once(TEMPLATES_PATH . '/jquery_js.php');
+  require_once(TEMPLATES_DIR . '/bootstrap_js.php');
+  require_once(TEMPLATES_DIR . '/video-js_js.php');
+  require_once(TEMPLATES_DIR . '/hls-js_js.php');
+  require_once(TEMPLATES_DIR . '/jquery_js.php');
   ?>
 
   <script>

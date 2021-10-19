@@ -202,7 +202,7 @@ async function timeDataRequest(fileSize) {
     const startTime = performance.now();
     const response = await fetch('send_bandwidth_test_data.php?file_size=' + (fileSize * 1000).toFixed())
         .catch(error => {
-            console.log(error)
+            console.error('Bandwidth test request failed:', error)
         });
     const firstResponseTimeMS = performance.now() - startTime;
 

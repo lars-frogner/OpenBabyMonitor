@@ -6,7 +6,7 @@ header('Pragma: no-cache');
 header('Content-Type: application/octet-stream');
 
 require_once(dirname(__DIR__) . '/config/path_config.php');
-$file_path = SITE_PATH . "/bandwidth_test/test_data.bin";
+$file_path = SITE_DIR . "/bandwidth_test/test_data.bin";
 
 header("Content-Length: $file_size");
 

@@ -128,6 +128,8 @@ function setVisibleContent(visibleContentId) {
     });
     if (visibleContentId == MODE_CONTENT_LISTEN_ID) {
         initializeListenMode();
+    } else {
+        deactivateListenMode();
     }
     if (visibleContentId == MODE_CONTENT_AUDIO_ID) {
         enableAudioStreamPlayer();

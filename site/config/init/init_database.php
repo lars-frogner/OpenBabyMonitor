@@ -1,8 +1,8 @@
 <?php
 include_once(dirname(__DIR__) . '/error_config.php');
 require_once(dirname(__DIR__) . '/config.php');
-require_once(SRC_PATH . '/database.php');
-require_once(SRC_PATH . '/security.php');
+require_once(SRC_DIR . '/database.php');
+require_once(SRC_DIR . '/security.php');
 
 if (count($argv) < 2) {
   bm_error('Password must be passed as first command line argument');

@@ -7,7 +7,7 @@ redirectIfLoggedIn('main.php');
 <html>
 
 <head>
-  <?php require_once(TEMPLATES_PATH . '/head_common.php'); ?>
+  <?php require_once(TEMPLATES_DIR . '/head_common.php'); ?>
 </head>
 
 <body>

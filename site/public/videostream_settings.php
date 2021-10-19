@@ -1,8 +1,8 @@
 <?php
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
-require_once(SRC_PATH . '/settings.php');
-require_once(SRC_PATH . '/control.php');
+require_once(SRC_DIR . '/settings.php');
+require_once(SRC_DIR . '/control.php');
 
 $mode = readCurrentMode($_DATABASE);
 
@@ -22,7 +22,7 @@ if (isset($_POST['submit'])) {
   $values = readValuesFromTable($_DATABASE, $table_name, readTableColumnNamesFromConfig($table_name));
 }
 $grouped_values = groupSettingValues($setting_type, $values);
-require_once(TEMPLATES_PATH . '/settings.php');
+require_once(TEMPLATES_DIR . '/settings.php');
 ?>
 
 <!DOCTYPE html>
@@ -30,15 +30,15 @@ require_once(TEMPLATES_PATH . '/settings.php');
 
 <head>
   <?php
-  require_once(TEMPLATES_PATH . '/head_common.php');
+  require_once(TEMPLATES_DIR . '/head_common.php');
   ?>
 </head>
 
 <body>
   <header>
     <?php
-    require_once(TEMPLATES_PATH . '/navbar.php');
-    require_once(TEMPLATES_PATH . '/confirmation_modal.php');
+    require_once(TEMPLATES_DIR . '/navbar.php');
+    require_once(TEMPLATES_DIR . '/confirmation_modal.php');
     ?>
   </header>
 
@@ -60,8 +60,8 @@ require_once(TEMPLATES_PATH . '/settings.php');
 </body>
 
 <?php
-require_once(TEMPLATES_PATH . '/bootstrap_js.php');
-require_once(TEMPLATES_PATH . '/jquery_js.php');
+require_once(TEMPLATES_DIR . '/bootstrap_js.php');
+require_once(TEMPLATES_DIR . '/jquery_js.php');
 ?>
 
 <script>

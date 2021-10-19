@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/config/path_config.php');
-require_once(SRC_PATH . '/database.php');
-require_once(SRC_PATH . '/control.php');
+require_once(SRC_DIR . '/database.php');
+require_once(SRC_DIR . '/control.php');
 
 define('KNOWN_NETWORKS_TABLE_NAME', 'known_networks');
 

@@ -2,7 +2,7 @@
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 
-require_once(TEMPLATES_PATH . '/server_settings.php');
+require_once(TEMPLATES_DIR . '/server_settings.php');
 
 $connection_succeeded = null;
 if (isset($_POST['connect'])) {
@@ -26,16 +26,16 @@ $connected_network = obtainConnectedNetworkSSID();
 
 <head>
   <?php
-  require_once(TEMPLATES_PATH . '/head_common.php');
+  require_once(TEMPLATES_DIR . '/head_common.php');
   ?>
 </head>
 
 <body>
   <header>
     <?php
-    require_once(TEMPLATES_PATH . '/navbar.php');
-    require_once(TEMPLATES_PATH . '/confirmation_modal.php');
-    require_once(TEMPLATES_PATH . '/jquery_js.php');
+    require_once(TEMPLATES_DIR . '/navbar.php');
+    require_once(TEMPLATES_DIR . '/confirmation_modal.php');
+    require_once(TEMPLATES_DIR . '/jquery_js.php');
     ?>
   </header>
 
@@ -104,7 +104,7 @@ $connected_network = obtainConnectedNetworkSSID();
 </body>
 
 <?php
-require_once(TEMPLATES_PATH . '/bootstrap_js.php');
+require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 ?>
 
 <script>

@@ -9,6 +9,6 @@
 <meta name="theme-color" content="#111111" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)">
 
-<?php require_once(TEMPLATES_PATH . '/bootstrap_css.php'); ?>
+<?php require_once(TEMPLATES_DIR . '/bootstrap_css.php'); ?>
 
 <script src="js/session.js"></script>
