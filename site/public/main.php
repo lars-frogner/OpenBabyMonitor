@@ -118,11 +118,62 @@ require_once(TEMPLATES_PATH . '/main.php');
             </div>
           </div>
 
-          <div id="mode_content_standby" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
-            <svg class="bi mb-5" style="width: 25vh; height: 25vh" fill="currentColor">
+          <div id="mode_content_standby" class="col-auto text-center" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
+            <svg class="bi mb-5 text-bm" style="width: 25vh; height: 25vh" fill="currentColor">
               <use xlink:href="media/bootstrap-icons.svg#moon-fill" />
             </svg>
-            <p>Enheten er i hvilemodus</p>
+            <p class="mb-5 text-bm">Enheten er i hvilemodus</p>
+
+            <div class="row mb-3 align-items-center justify-content-center">
+              <div id="latency_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none">
+                <svg id="latency_icon" class="bi" style="width: 2em; height: 2em" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#stopwatch" />
+                </svg>
+                <p id="latency_text" class="mb-0"></p>
+              </div>
+              <div class="col-auto text-center">
+                <p class="mb-0 text-bm">Forbindelse</p>
+                <button id="measure_bandwidth_button" class="btn btn-bm" data-toggle="tooltip" data-placement="top" title="Mål ned- og opplastningshastighet" disabled>
+                  <svg class="bi" style="width: 2.5em; height: 2.5em" fill="currentColor">
+                    <use xlink:href="media/bootstrap-icons.svg#speedometer2" />
+                  </svg>
+                  <p class="mb-0">Test</p>
+                </button>
+                <span id="measure_bandwidth_busy_spinner" class="spinner-border mt-3" <?php echo HIDDEN_STYLE; ?>></span>
+              </div>
+              <div id="download_speed_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none">
+                <svg id="download_speed_icon" class="bi" style="width: 2em; height: 2em" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#cloud-arrow-down" />
+                </svg>
+                <p id="download_speed_text" class="mb-0"></p>
+              </div>
+            </div>
+
+            <div id="connection_progress_bar_container" class="progress" <?php echo HIDDEN_STYLE; ?>>
+              <div id="connection_progress_bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+
+            <div class="row mb-5 align-items-start justify-content-center">
+              <p id="connection_results_message" class="mb-3 text-bm" <?php echo HIDDEN_STYLE; ?>>Tilgjengelige funksjoner</p>
+              <div id="connection_results_listen" class="col-auto text-center text-bm" <?php echo HIDDEN_STYLE; ?>>
+                <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#bell-fill" />
+                </svg>
+                <p id="connection_results_listen_text" class="mb-0"></p>
+              </div>
+              <div id="connection_results_audio" class="col-auto text-center text-bm" <?php echo HIDDEN_STYLE; ?>>
+                <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#mic-fill" />
+                </svg>
+                <p id="connection_results_audio_text" class="mb-0"></p>
+              </div>
+              <div id="connection_results_video" class="col-auto text-center text-bm" <?php echo HIDDEN_STYLE; ?>>
+                <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#camera-video-fill" />
+                </svg>
+                <p id="connection_results_video_text" class="mb-0"></p>
+              </div>
+            </div>
           </div>
 
           <div id="mode_content_waiting" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
@@ -187,6 +238,7 @@ require_once(TEMPLATES_PATH . '/main.php');
   <script src="js/audio.js"></script>
   <script src="js/video.js"></script>
   <script src="js/main.js"></script>
+  <script src="js/network.js"></script>
 
 </body>
 
