@@ -43,7 +43,6 @@ $(function () {
     }
 });
 
-
 function enableAudioStreamPlayer() {
     _AUDIOSTREAM_CONTEXT = new AudiostreamContext();
 }
