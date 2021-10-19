@@ -145,7 +145,7 @@
         },
         "mp3_bitrate": {
             "group": "quality",
-            "name": "MP3 bitrate (kbit/s)",
+            "name": "MP3 bitrate (kbps)",
             "type": "INT UNSIGNED NOT NULL",
             "initial_value": 128,
             "range": {
