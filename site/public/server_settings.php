@@ -66,7 +66,7 @@ $connected_network = obtainConnectedNetworkSSID();
       <h1 class="my-4">Nettverksinnstillinger</h1>
       <form id="server_settings_form" action="" method="post">
         <div class="row mb-3">
-          <div class="col">
+          <div class="col-auto">
             <div class="form-group">
               <label class="form-label h3" for="available_networks">Tilgjengelige nettverk</label>
               <?php generateAvailableNetworksSelect($available_networks, $known_networks, $connected_network, 'available_networks'); ?>
@@ -84,13 +84,13 @@ $connected_network = obtainConnectedNetworkSSID();
                   <label class="form-check-label" for="remember_check">Husk</label>
                 </div>
               </div>
-              <div class="col-auto">
+              <div class="col-auto mt-3">
                 <button type="submit" name="connect" style="display: none;" id="connect_submit_button"></button><button class="btn btn-secondary" id="connect_button" disabled>Koble til</button>
                 <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button"></a><button class="btn btn-secondary" id="disconnect_button" disabled>Koble fra</button>
               </div>
             </div>
           </div>
-          <div class="col">
+          <div class="col-auto">
             <label class="form-label h3" for="known_networks">Kjente nettverk</label>
             <?php generateKnownNetworksSelect($known_networks, 'known_networks'); ?>
             <div class="form-group my-3">

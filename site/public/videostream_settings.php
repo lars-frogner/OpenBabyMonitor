@@ -43,7 +43,7 @@ require_once(TEMPLATES_PATH . '/settings.php');
   </header>
 
   <main>
-    <div class="container-fluid">
+    <div class="container">
       <h1 class="my-4">Videoinnstillinger</h1>
       <form id="videostream_settings_form" action="" method="post">
         <div class="row">
