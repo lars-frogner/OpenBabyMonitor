@@ -16,16 +16,3 @@ function parseJSON($string) {
   }
   return $json_data;
 }
-
-function readLines($filepath) {
-  $f = fopen($filepath, 'r');
-  if ($f) {
-    while (($line = fgets($f)) !== false) {
-      $lines[] = str_replace("\n", '', $line);
-    }
-    fclose($f);
-  } else {
-    bm_error("Could not open $filepath");
-  }
-  return $lines;
-}

@@ -63,6 +63,7 @@ BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
 BM_SERVER_ACTION_RESULT_FILE=$BM_SERVER_ACTION_DIR/result
 BM_MODE_LOCK_DIR=$BM_DIR/control/.lock
 BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/free
+BM_MODE_COMM_DIR=$BM_DIR/control/.comm
 
 UPDATE=true
 if [[ "$UPDATE" = true ]]; then
@@ -93,7 +94,8 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     sudo apt -y install python3 python3-pip
 
     # Install Apache, PHP and MySQL (MariaDB)
-    sudo apt -y install apache2 mariadb-server php php-mysql libapache2-mod-php
+    sudo apt -y install apache2 mariadb-server php php-dev php-pear php-mysql libapache2-mod-php
+    sudo pecl install inotify
 
     # Install dependencies for picam
     sudo apt -y install libharfbuzz0b libfontconfig1
@@ -234,6 +236,27 @@ if [[ "$INSTALL_HLS_JS" = true ]]; then
     mkdir -p $BM_LINKED_SITE_DIR/library/hls-js
     mv dist/hls.min.js* $BM_LINKED_SITE_DIR/library/hls-js/
     rm -r $FILENAME dist
+    cd -
+fi
+
+INSTALL_ANIME=true
+if [[ "$INSTALL_ANIME" = true ]]; then
+    ANIME_VERSION=3.2.1
+    if [[ "$ANIME_VERSION" = "latest" ]]; then
+        FILENAME_ROOT="master"
+        FILENAME="$FILENAME_ROOT.zip"
+        DOWNLOAD_URL=https://github.com/juliangarnier/anime/archive/$FILENAME
+    else
+        FILENAME_ROOT=$ANIME_VERSION
+        FILENAME=v$ANIME_VERSION.zip
+        DOWNLOAD_URL=https://github.com/juliangarnier/anime/archive/refs/tags/$FILENAME
+    fi
+    cd /tmp
+    wget $DOWNLOAD_URL
+    unzip $FILENAME
+    mkdir -p $BM_LINKED_SITE_DIR/library/anime
+    mv anime-$FILENAME_ROOT/lib/anime.min.js $BM_LINKED_SITE_DIR/library/anime/
+    rm -r $FILENAME anime-$FILENAME_ROOT
     cd -
 fi
 
@@ -385,9 +408,18 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     echo 'NOTE: Setup with root password according to root_account entry in config/config.json'
     sudo mysql_secure_installation
 
-    # Set time zone
+    # Configure PHP
     PHP_INI_CLI_PATH=$(php -i | grep /.+/php.ini -oE)
-    PHP_INI_APACHE_PATH=$(dirname $(dirname $PHP_INI_CLI_PATH))/apache2/php.ini
+    PHP_DIR=$(dirname $(dirname $PHP_INI_CLI_PATH))
+    PHP_INI_APACHE_PATH=$PHP_DIR/apache2/php.ini
+
+    # Make sure inotify PHP extension is loaded
+    echo 'extension=inotify.so' | sudo tee $PHP_DIR/mods-available/inotify.ini
+    sudo phpenmod inotify
+    sudo sed -i "/;extension=xsl/aextension=inotify" $PHP_INI_CLI_PATH
+    sudo sed -i "/;extension=xsl/aextension=inotify" $PHP_INI_APACHE_PATH
+
+    # Set time zone
     sudo sed -i "s/;date.timezone =/date.timezone = ${PHP_TIMEZONE/'/'/'\/'}/g" $PHP_INI_CLI_PATH
     sudo sed -i "s/;date.timezone =/date.timezone = ${PHP_TIMEZONE/'/'/'\/'}/g" $PHP_INI_APACHE_PATH
 
@@ -399,7 +431,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     sudo adduser $BM_SERVER_USER $BM_WEB_GROUP
 
     # Create folders where the group has write permissions
-    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR
+    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_MODE_COMM_DIR
 
     # Ensure permissions are correct in project folder
     sudo chmod -R $BM_READ_PERMISSIONS $BM_DIR
@@ -408,6 +440,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Set write permissions
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
     sudo chmod $BM_WRITE_PERMISSIONS $BM_MODE_LOCK_DIR
+    sudo chmod $BM_WRITE_PERMISSIONS $BM_MODE_COMM_DIR
 
     sudo mkdir -p $SERVER_LOG_DIR
     sudo touch $BM_SERVER_LOG_PATH

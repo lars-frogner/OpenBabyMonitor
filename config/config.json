@@ -73,6 +73,13 @@
             "release": "touch $BM_MODE_LOCK_FILE"
         }
     },
+    "inference": {
+        "labels": {
+            "ambient": 0,
+            "bad": 1,
+            "good": 2
+        }
+    },
     "network": {
         "network_query_interval": 1e-1,
         "network_switch_timeout": 300.0,
@@ -98,10 +105,53 @@
                 "max": 60,
                 "step": 1
             }
+        },
+        "probability_threshold": {
+            "group": "detection",
+            "name": "Varsle ved sikkerhet over (%)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 85,
+            "range": {
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+        "notify_on_crying": {
+            "group": "notify_on",
+            "name": "Gråt",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "notify_on_babbling": {
+            "group": "notify_on",
+            "name": "Babling",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": false
+        },
+        "ask_secure_redirect": {
+            "group": "browser_notifications",
+            "name": "Spør om å gå til sikker side",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "show_unsupported_message": {
+            "group": "browser_notifications",
+            "name": "Vis beskjed om manglende støtte",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "ask_notification_permission": {
+            "group": "browser_notifications",
+            "name": "Spør om tillatelse",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
         }
     },
     "listen_groups": {
-        "detection": "Deteksjon"
+        "detection": "Lydgjenkjenning",
+        "notify_on": "Varsle om",
+        "browser_notifications": "Nettleservarsler"
     },
     "audiostream_settings": {
         "encrypted": {

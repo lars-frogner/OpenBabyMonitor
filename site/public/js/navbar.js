@@ -1,4 +1,5 @@
 const NAVBAR_ID = 'navbar';
+const TITLE_NAV_LINK_ID = 'title_nav_link';
 const MODES_NAV_LINK_ID = 'modes_nav_link';
 const LISTEN_SETTINGS_NAV_LINK_ID = 'listen_settings_nav_link';
 const AUDIOSTREAM_SETTINGS_NAV_LINK_ID = 'audiostream_settings_nav_link';

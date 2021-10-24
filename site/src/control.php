@@ -203,7 +203,7 @@ function executeServerControlAction($action, $arguments = null) {
 function executeServerControlActionWithResult($action, $arguments = null, $return_result_code = false) {
   executeServerControlAction($action, $arguments);
   waitForFileToExist(SERVER_ACTION_RESULT_FILE, NETWORK_QUERY_INTERVAL, NETWORK_SWITCH_TIMEOUT);
-  $result = readLines(SERVER_ACTION_RESULT_FILE);
+  $result = file(SERVER_ACTION_RESULT_FILE, FILE_IGNORE_NEW_LINES);
   $result_code = $result[0];
   $output = (count($result) > 1) ? array_slice($result, 1) : array();
   if ($return_result_code) {
