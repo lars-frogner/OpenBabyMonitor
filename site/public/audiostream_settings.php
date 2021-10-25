@@ -47,7 +47,7 @@ require_once(TEMPLATES_DIR . '/settings.php');
       <h1 class="my-4">Lydinnstillinger</h1>
       <form id="audiostream_settings_form" action="" method="post">
         <div class="row">
-          <?php generateInputs($setting_type, $grouped_values); ?>
+          <?php generateInputs($setting_type, $grouped_values, [], []); ?>
         </div>
         <div class="my-4">
           <button type="submit" name="submit" class="btn btn-primary">Bekreft</button>

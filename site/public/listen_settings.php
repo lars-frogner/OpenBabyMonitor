@@ -47,7 +47,10 @@ require_once(TEMPLATES_DIR . '/settings.php');
       <h1 class="my-4">Varselinnstillinger</h1>
       <form id="listen_settings_form" action="" method="post">
         <div class="row">
-          <?php generateInputs($setting_type, $grouped_values); ?>
+          <?php
+          $permission_button_html = '<div class="border text-center my-3"><p class="my-2" id="notification_message"></p><button id="notification_button" class="btn btn-primary mb-2" style="display: none"></button></div>';
+          generateInputs($setting_type, $grouped_values, ['browser_notifications' => $permission_button_html], []);
+          ?>
         </div>
         <div class="my-4">
           <button type="submit" name="submit" class="btn btn-primary">Bekreft</button>
@@ -65,6 +68,8 @@ require_once(TEMPLATES_DIR . '/jquery_js.php');
 ?>
 
 <script>
+  const USES_SECURE_PROTOCOL = <?php echo USES_SECURE_PROTOCOL ? 'true' : 'false' ?>;
+  const SECURE_URL = 'https://<?php echo "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>';
   const SETTINGS_FORM_ID = 'listen_settings_form';
   const SETTINGS_EDITED = <?php echo $settings_edited ? 'true' : 'false'; ?>;
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
@@ -77,6 +82,7 @@ require_once(TEMPLATES_DIR . '/jquery_js.php');
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
+<script src="js/listen_settings.js"></script>
 <script>
   <?php generateBehavior($setting_type); ?>
 </script>

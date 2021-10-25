@@ -5,11 +5,15 @@ function line($string) {
   echo $string . "\n";
 }
 
-function generateInputs($setting_type, $grouped_setting_values) {
+function generateInputs($setting_type, $grouped_setting_values, $pre_group_html, $post_group_html) {
   $settings = getSettings($setting_type);
   $group_names = getSettingGroups($setting_type);
   foreach ($grouped_setting_values as $group => $content) {
-    generateGroupStart($group_names[$group]);
+    $group_name = $group_names[$group];
+    generateGroupStart($group_name);
+    if (array_key_exists($group, $pre_group_html)) {
+      echo $pre_group_html[$group];
+    }
     foreach ($content as $setting_name => $initial_value) {
       $setting = $settings[$setting_name];
       if (array_key_exists('values', $setting)) {
@@ -19,6 +23,9 @@ function generateInputs($setting_type, $grouped_setting_values) {
       } else {
         generateCheckbox($setting, $setting_name, $initial_value);
       }
+    }
+    if (array_key_exists($group, $post_group_html)) {
+      echo $post_group_html[$group];
     }
     generateGroupEnd();
   }
