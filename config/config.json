@@ -198,6 +198,12 @@
                 "max": 1800,
                 "step": 1
             }
+        },
+        "autoplay_on_notify": {
+            "group": "notifications",
+            "name": "Automatisk lydavspilling ved varsel",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
         }
     },
     "listen_groups": {

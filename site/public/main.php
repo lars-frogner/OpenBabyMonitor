@@ -261,6 +261,7 @@ require_once(TEMPLATES_DIR . '/main.php');
     var SETTING_ASK_SECURE_REDIRECT = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'ask_secure_redirect', true); ?>;
     var SETTING_SHOW_UNSUPPORTED_MESSAGE = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'show_unsupported_message', true); ?>;
     var SETTING_ASK_NOTIFICATION_PERMISSION = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'ask_notification_permission', true); ?>;
+    const SETTING_AUTOPLAY_ON_NOTIFY = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'autoplay_on_notify', true); ?>;
     const SETTING_SAMPLING_RATE = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'sampling_rate', true); ?>;
     const SETTING_VOLUME = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'volume', true); ?>;
     const min_frequency = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'min_frequency', true); ?>;

@@ -172,7 +172,11 @@ function handleNotificationEvent(event) {
     } else {
         playNotificationSound();
     }
-    displayNotificationModal(notificationType)
+    if (SETTING_AUTOPLAY_ON_NOTIFY) {
+        changeModeTo('audiostream');
+    } else {
+        displayNotificationModal(notificationType)
+    }
 }
 
 function playNotificationSound() {
