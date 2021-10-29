@@ -504,21 +504,3 @@ class FeatureProvider:
         feature = self.feature_extractor.compute_feature(waveform)
         self.standardize(feature)
         return feature
-
-
-if __name__ == '__main__':
-
-    e = AudioFeatureExtractor()
-    waveform = e.read_wav('speech_whistling2.wav')
-    e.plot(waveform, split_into_features=False)
-
-    # plt.ion()
-    # e = AudioFeatureExtractor()
-    # waveform = e.read_wav('data/cry.wav')[:80000]
-    # e.plot_feature(*e.compute_splitted_features(waveform, return_energies=True))
-
-    # for video_id in ['_-VqjVHYz5Y', '_0OTlXMOt0g', '_2KRnyRFSAk', '_4a8kWWGCxY', '_8rm9cSEjnM']:
-    #     waveform = e.read_wav(f'data/raw/bad/{video_id}.wav')
-    #     e.plot_feature(*e.compute_splitted_features(waveform, return_energies=True))
-
-    # plt.pause(np.inf)
