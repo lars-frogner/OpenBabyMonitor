@@ -802,7 +802,7 @@ def fetch_raw_data(max_video_count_per_label=4000, labels='all', **kwargs):
 
 def compute_features():
     manager = AudioSetDataManager()
-    extractor = AudioFeatureExtractor()
+    extractor = AudioFeatureExtractor(feature_window_count=64)
     manager.extract_features(extractor,
                              allow_all_energies_for_labels=['ambient'])
 
@@ -957,12 +957,3 @@ def create_kfold_dataloaders(dataset,
 if __name__ == '__main__':
     # fetch_raw_data()
     compute_features()
-    # listen_to_dataset(create_discarded_listen_dataset(),
-    #                   n=30,
-    #                   only_labels=['bad'])
-    # listen_to_dataset(create_listen_dataset(), n=30, only_labels=['good'])
-    # visualize_dataset(AudioFeatureExtractor(),
-    #                   create_dataset(caching=None),
-    #                   shuffle=False)
-    # visualize_clip(AudioSetDataManager(), AudioFeatureExtractor(), 'bad',
-    #                '_-VqjVHYz5Y')
