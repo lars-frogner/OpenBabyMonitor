@@ -4,19 +4,12 @@ import pickle
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.onnx
 import torchmetrics
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from tqdm import tqdm
 
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-
-def get_conv_same_padding(kernel_size):
-    return nn.Conv2d(
-        1, 1, kernel_size=kernel_size,
-        padding='same')._reversed_padding_repeated_twice[::-1][::2]
 
 
 def compute_conv_output_shape(input_shape, conv):
@@ -55,6 +48,7 @@ class CryNet(nn.Module):
                  input_shape,
                  n_labels,
                  complexity=0,
+                 repeats=[1, 1, 1, 1, 1],
                  use_batch_norm=False,
                  use_dropout=False,
                  dtype=None):
@@ -75,8 +69,7 @@ class CryNet(nn.Module):
                              out_channels,
                              kernel_size=kernel_size,
                              stride=stride,
-                             padding=(get_conv_same_padding(kernel_size)
-                                      if padding == 'same' else padding),
+                             padding=padding,
                              bias=bias,
                              dtype=self.dtype)
             out_shape = compute_conv_output_shape(in_shape, conv)
@@ -137,43 +130,46 @@ class CryNet(nn.Module):
         else:
             assert len(input_shape) == 3
 
-        self.input_shape = input_shape
-
         self.description += f'i={input_shape[1]}x{input_shape[2]}'
 
         modify = lambda n: int(n * 2**complexity)
 
-        shape = add_conv_layer(input_shape, modify(32))
-        shape = add_max_pool_layer(shape)
-        add_conv_batch_normalization_layer(shape)
-        add_relu_activation()
+        shape = input_shape
+        for i in range(repeats[0]):
+            shape = add_conv_layer(shape, modify(32))
+            if i == repeats[0] - 1:
+                shape = add_max_pool_layer(shape)
+            add_conv_batch_normalization_layer(shape)
+            add_relu_activation()
 
-        shape = add_conv_layer(shape, modify(64))
-        shape = add_max_pool_layer(shape)
-        add_conv_batch_normalization_layer(shape)
-        add_relu_activation()
+        for _ in range(repeats[1]):
+            shape = add_conv_layer(shape, modify(64))
+            if i == repeats[1] - 1:
+                shape = add_max_pool_layer(shape)
+            add_conv_batch_normalization_layer(shape)
+            add_relu_activation()
 
-        shape = add_conv_layer(shape, modify(128))
-        shape = add_max_pool_layer(shape)
-        add_conv_batch_normalization_layer(shape)
-        add_relu_activation()
+        for _ in range(repeats[2]):
+            shape = add_conv_layer(shape, modify(128))
+            if i == repeats[2] - 1:
+                shape = add_max_pool_layer(shape)
+            add_conv_batch_normalization_layer(shape)
+            add_relu_activation()
 
-        shape = add_conv_layer(shape, modify(256))
-        shape = add_max_pool_layer(shape)
-        add_conv_batch_normalization_layer(shape)
-        add_relu_activation()
+        for _ in range(repeats[3]):
+            shape = add_conv_layer(shape, modify(256))
+            if i == repeats[3] - 1:
+                shape = add_max_pool_layer(shape)
+            add_conv_batch_normalization_layer(shape)
+            add_relu_activation()
 
         size = add_flatten_layer(shape)
 
-        size = add_dense_layer(size, modify(512))
-        add_dense_batch_normalization_layer(size)
-        add_dropout_layer()
-        add_relu_activation()
-
-        #size = add_dense_layer(size, 512)
-        #add_dense_batch_normalization_layer(size)
-        #add_dropout_layer()
-        #add_relu_activation()
+        for _ in range(repeats[4]):
+            size = add_dense_layer(size, modify(512))
+            add_dense_batch_normalization_layer(size)
+            add_dropout_layer()
+            add_relu_activation()
 
         size = add_dense_layer(size, n_labels)
         add_softmax_activation()
@@ -421,8 +417,8 @@ class EarlyStopper:
             )
 
 
-def create_early_stopper():
-    return EarlyStopper(3)
+def create_early_stopper(patience=15):
+    return EarlyStopper(3, patience=patience)
 
 
 def create_metrics():
@@ -485,8 +481,13 @@ def run_model_training(train_dataloader,
                        show_train_progress=True,
                        show_test_progress=True):
     if train_metric is not None:
-        train_results = []
-    test_results = []
+        train_results = {}
+        for name in train_metric.keys():
+            train_results[name] = []
+
+    test_results = {}
+    for name in test_metric.keys():
+        test_results[name] = []
 
     for epoch in range(1, max_epochs + 1):
         print(f'Starting epoch {epoch}')
@@ -497,21 +498,33 @@ def run_model_training(train_dataloader,
                     optimizer,
                     metric=train_metric,
                     show_progress=show_train_progress)
+
         if train_metric is not None:
-            train_results.append(train_metric.compute())
+            train_result = train_metric.compute()
+            for name, value in train_result.items():
+                if name == 'ConfusionMatrix':
+                    train_results[name].append(value.cpu().numpy())
+                else:
+                    train_results[name].append(value.cpu().item())
 
         test_model_with_early_stopper(test_dataloader,
                                       model,
                                       early_stopper,
                                       test_metric,
                                       show_progress=show_test_progress)
-        test_results.append(test_metric.compute())
+
+        test_result = test_metric.compute()
+        for name, value in test_result.items():
+            if name == 'ConfusionMatrix':
+                test_results[name].append(value.cpu().numpy())
+            else:
+                test_results[name].append(value.cpu().item())
 
         if callback is not None:
             if train_metric is None:
-                callback(epoch, test_results[-1])
+                callback(epoch, test_result)
             else:
-                callback(epoch, train_results[-1], test_results[-1])
+                callback(epoch, train_result, test_result)
 
         if early_stopper.should_stop():
             early_stopper.print_result()
@@ -596,27 +609,12 @@ def print_accuracy(epoch, *accuracies):
     )
 
 
-def export_model(model, output_path='model.onnx'):
-    model.eval()
-    dummy_feature = torch.zeros(1, *model.input_shape)
-    torch.onnx.export(model, dummy_feature, output_path)
-
-
-if __name__ == '__main__':
-    from data import create_dataset, create_dataloaders
-
-    export_model(create_model((64, 64), 3), 'test_model.onnx')
-    assert 0
+def test_model_variations(result_file, complexities, repeats, batch_sizes,
+                          learning_rates, weight_decays, use_batch_norms):
 
     dataset = create_dataset(device=DEVICE)
 
-    complexities = [-2, -1, 0, 1, 2]
-    batch_sizes = [16, 32, 64]
-    learning_rates = [1e-6, 1e-5, 1e-4, 1e-3]
-    weight_decays = [0, 1e-4, 1e-3, 1e-2]
-    use_batch_norms = [False, True]
-
-    results_path = pathlib.Path('run_results.pickle')
+    results_path = pathlib.Path(result_file)
     if results_path.exists():
         with open(results_path, 'rb') as f:
             results = pickle.load(f)
@@ -624,77 +622,148 @@ if __name__ == '__main__':
         results = []
 
     for complexity in complexities:
-        for batch_size in batch_sizes:
-            for learning_rate in learning_rates:
-                for weight_decay in weight_decays:
-                    for use_batch_norm in use_batch_norms:
+        for repeat in repeats:
+            for batch_size in batch_sizes:
+                for learning_rate in learning_rates:
+                    for weight_decay in weight_decays:
+                        for use_batch_norm in use_batch_norms:
 
-                        params = dict(complexity=complexity,
-                                      batch_size=batch_size,
-                                      learning_rate=learning_rate,
-                                      weight_decay=weight_decay,
-                                      use_batch_norm=use_batch_norm)
+                            params = dict(cplx=complexity,
+                                          rep=repeat,
+                                          bs=batch_size,
+                                          lr=learning_rate,
+                                          wd=weight_decay,
+                                          bn=use_batch_norm)
+                            print(params)
 
-                        config = dict(batch_size=batch_size,
-                                      learning_rate=learning_rate,
-                                      weight_decay=weight_decay)
+                            if len(
+                                    list(
+                                        filter(lambda r: r['params'] == params,
+                                               results))) > 0:
+                                print('Skipping')
+                                continue
 
-                        train_dataloader, test_dataloader = create_dataloaders(
-                            dataset,
-                            batch_size=config['batch_size'],
-                            num_workers=0)
+                            config = dict(bs=batch_size,
+                                          lr=learning_rate,
+                                          wd=weight_decay)
 
-                        model = create_model(dataset.get_feature_shape(),
-                                             dataset.get_n_labels(),
-                                             complexity=complexity,
-                                             use_batch_norm=use_batch_norm)
+                            train_dataloader, test_dataloader = create_dataloaders(
+                                dataset,
+                                batch_size=config['bs'],
+                                num_workers=0)
 
-                        loss_function = create_loss_function()
+                            model = create_model(dataset.get_feature_shape(),
+                                                 dataset.get_n_labels(),
+                                                 complexity=complexity,
+                                                 repeats=repeat,
+                                                 use_batch_norm=use_batch_norm)
 
-                        optimizer = create_optimizer(
-                            model,
-                            learning_rate=config['learning_rate'],
-                            weight_decay=config['weight_decay'])
+                            loss_function = create_loss_function()
 
-                        early_stopper = create_early_stopper()
+                            optimizer = create_optimizer(
+                                model,
+                                learning_rate=config['lr'],
+                                weight_decay=config['wd'])
 
-                        train_metric, test_metric = create_metrics()
+                            early_stopper = create_early_stopper()
 
-                        config['model'] = model.description
-                        visualizer = create_visualizer(dataset,
-                                                       train_metric,
-                                                       test_metric,
-                                                       run_params=config)
+                            train_metric, test_metric = create_metrics()
 
-                        calculate_initial_metrics(
-                            train_dataloader,
-                            test_dataloader,
-                            model,
-                            early_stopper,
-                            test_metric,
-                            train_metric,
-                            callback=visualizer.update_metric_results)
+                            config['m'] = model.description
+                            visualizer = create_visualizer(dataset,
+                                                           train_metric,
+                                                           test_metric,
+                                                           run_params=config)
 
-                        train_results, test_results = run_model_training(
-                            train_dataloader,
-                            test_dataloader,
-                            model,
-                            loss_function,
-                            optimizer,
-                            early_stopper,
-                            test_metric,
-                            train_metric=train_metric,
-                            callback=visualizer.update_metric_results)
+                            calculate_initial_metrics(
+                                train_dataloader,
+                                test_dataloader,
+                                model,
+                                early_stopper,
+                                test_metric,
+                                train_metric,
+                                callback=visualizer.update_metric_results)
 
-                        visualizer.close()
+                            torch.cuda.empty_cache()
 
-                        if len(
-                                list(
-                                    filter(lambda r: r['params'] == params,
-                                           results))) == 0:
-                            results.append(
-                                dict(params=params,
-                                     train_results=train_results,
-                                     test_results=test_results))
-                            with open(results_path, 'wb') as f:
-                                pickle.dump(results, f)
+                            train_results, test_results = run_model_training(
+                                train_dataloader,
+                                test_dataloader,
+                                model,
+                                loss_function,
+                                optimizer,
+                                early_stopper,
+                                test_metric,
+                                train_metric=train_metric,
+                                callback=visualizer.update_metric_results)
+
+                            visualizer.close()
+
+                            torch.cuda.empty_cache()
+
+                            if len(
+                                    list(
+                                        filter(lambda r: r['params'] == params,
+                                               results))) == 0:
+                                results.append(
+                                    dict(params=params,
+                                         train_results=train_results,
+                                         test_results=test_results))
+                                with open(results_path, 'wb') as f:
+                                    pickle.dump(results, f)
+
+
+if __name__ == '__main__':
+    from data import create_dataset, create_dataloaders
+
+    dataset = create_dataset(device=DEVICE)
+
+    config = dict(batch_size=32, learning_rate=3e-3, weight_decay=3e-3)
+
+    train_dataloader, test_dataloader = create_dataloaders(
+        dataset, batch_size=config['batch_size'], num_workers=0)
+
+    model = create_model(dataset.get_feature_shape(),
+                         dataset.get_n_labels(),
+                         complexity=0,
+                         repeats=[1, 1, 1, 2, 1],
+                         use_batch_norm=True)
+
+    loss_function = create_loss_function()
+
+    optimizer = create_optimizer(model,
+                                 learning_rate=config['learning_rate'],
+                                 weight_decay=config['weight_decay'])
+
+    early_stopper = create_early_stopper(patience=np.inf)
+
+    train_metric, test_metric = create_metrics()
+
+    visualizer = create_visualizer(dataset,
+                                   train_metric,
+                                   test_metric,
+                                   run_params=config)
+
+    calculate_initial_metrics(train_dataloader,
+                              test_dataloader,
+                              model,
+                              early_stopper,
+                              test_metric,
+                              train_metric,
+                              callback=visualizer.update_metric_results)
+
+    train_results, test_results = run_model_training(
+        train_dataloader,
+        test_dataloader,
+        model,
+        loss_function,
+        optimizer,
+        early_stopper,
+        test_metric,
+        train_metric=train_metric,
+        max_epochs=44,
+        callback=visualizer.update_metric_results,
+        save_path='final_model.pickle',
+        metric_save_path='final_model_metrics.pickle')
+
+    visualizer.close()
