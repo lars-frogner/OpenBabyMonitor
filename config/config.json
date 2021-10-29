@@ -95,40 +95,6 @@
         }
     },
     "listen_settings": {
-        "interval": {
-            "group": "detection",
-            "name": "Lytteinterval (s)",
-            "type": "INT UNSIGNED NOT NULL",
-            "initial_value": 5,
-            "range": {
-                "min": 1,
-                "max": 60,
-                "step": 1
-            }
-        },
-        "probability_threshold": {
-            "group": "detection",
-            "name": "Varsle ved sikkerhet over (%)",
-            "type": "INT UNSIGNED NOT NULL",
-            "initial_value": 85,
-            "range": {
-                "min": 0,
-                "max": 100,
-                "step": 1
-            }
-        },
-        "notify_on_crying": {
-            "group": "notify_on",
-            "name": "Gråt",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": true
-        },
-        "notify_on_babbling": {
-            "group": "notify_on",
-            "name": "Babling",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": false
-        },
         "ask_secure_redirect": {
             "group": "browser_notifications",
             "name": "Spør om å gå til sikker side",
@@ -146,12 +112,98 @@
             "name": "Spør om tillatelse",
             "type": "BOOLEAN NOT NULL",
             "initial_value": true
+        },
+        "notify_on_crying": {
+            "group": "notify_on",
+            "name": "Gråt",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "notify_and_or": {
+            "group": "notify_on",
+            "type": "VARCHAR(3) NOT NULL",
+            "initial_value": "or",
+            "radiovalues": {
+                "og": "and",
+                "eller": "or"
+            },
+            "children_disabled_when": {
+                "notify_on_crying": {
+                    "operator": "!=",
+                    "value": "1"
+                },
+                "notify_on_babbling": {
+                    "operator": "!=",
+                    "value": "1"
+                }
+            }
+        },
+        "notify_on_babbling": {
+            "group": "notify_on",
+            "name": "Babling",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": false
+        },
+        "interval": {
+            "group": "notifications",
+            "name": "Ventetid mellom opptak (s)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 5,
+            "range": {
+                "min": 0,
+                "max": 60,
+                "step": 1
+            }
+        },
+        "fraction_threshold": {
+            "group": "notifications",
+            "name": "Varsle når en andel på (%)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 60,
+            "range": {
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+        "consecutive_recordings": {
+            "group": "notifications",
+            "name": "av de siste (antall) opptak",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 5,
+            "range": {
+                "min": 1,
+                "max": 20,
+                "step": 1
+            }
+        },
+        "probability_threshold": {
+            "group": "notifications",
+            "name": "slår ut med sikkerhet over (%)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 85,
+            "range": {
+                "min": 0,
+                "max": 100,
+                "step": 1
+            }
+        },
+        "min_notification_interval": {
+            "group": "notifications",
+            "name": "Tillat nytt varsel etter (s)",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 180,
+            "range": {
+                "min": 0,
+                "max": 1800,
+                "step": 1
+            }
         }
     },
     "listen_groups": {
-        "detection": "Lydgjenkjenning",
+        "browser_notifications": "Nettleservarsler",
         "notify_on": "Varsle om",
-        "browser_notifications": "Nettleservarsler"
+        "notifications": "Varsling"
     },
     "audiostream_settings": {
         "encrypted": {

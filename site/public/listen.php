@@ -20,28 +20,35 @@ if (!$inotify_instance) {
 }
 stream_set_blocking($inotify_instance, true);
 
-$probabilities_filename = 'probabilities.json';
 $comm_dir = CONTROL_DIR . '/.comm';
+$probabilities_filename = 'probabilities.json';
 $probabilities_file = "$comm_dir/$probabilities_filename";
+$notification_filename = 'notification.txt';
+$notification_file = "$comm_dir/$notification_filename";
 
 if (!file_exists($probabilities_file)) {
-  $watch_descriptor = inotify_add_watch($inotify_instance, $comm_dir, IN_CREATE);
-  while (true) {
-    $events = inotify_read($inotify_instance);
-    foreach ($events as $event) {
-      if ($event['name'] == $probabilities_filename) {
-        break 2;
-      }
-    }
-  }
-  inotify_rm_watch($inotify_instance, $watch_descriptor);
+  $msg = "Probabilities file does not exist: $probabilities_file";
+  sendSSEMessage('error', $msg);
+  bm_error($msg);
+}
+if (!file_exists($notification_file)) {
+  $msg = "Notification file does not exist: $notification_file";
+  sendSSEMessage('error', $msg);
+  bm_error($msg);
 }
 
-inotify_add_watch($inotify_instance, $probabilities_file, IN_CLOSE_WRITE);
+$probabilities_descriptor = inotify_add_watch($inotify_instance, $probabilities_file, IN_CLOSE_WRITE);
+$notification_descriptor = inotify_add_watch($inotify_instance, $notification_file, IN_CLOSE_WRITE);
 
 while (!connection_aborted()) {
-  inotify_read($inotify_instance);
-  sendSSEMessage('classification_result', file_get_contents($probabilities_file));
+  $events = inotify_read($inotify_instance);
+  foreach ($events as $event) {
+    if ($event['wd'] == $probabilities_descriptor) {
+      sendSSEMessage('probabilities', file_get_contents($probabilities_file));
+    } elseif ($event['wd'] == $notification_descriptor) {
+      sendSSEMessage('notification', file_get_contents($notification_file));
+    }
+  }
 }
 
 fclose($inotify_instance);

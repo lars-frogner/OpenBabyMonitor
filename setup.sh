@@ -433,6 +433,9 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     # Create folders where the group has write permissions
     mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_MODE_COMM_DIR
 
+    # Make sure files to be watched in the comm directory exist
+    touch $BM_MODE_COMM_DIR/{probabilities.json, notification.txt}
+
     # Ensure permissions are correct in project folder
     sudo chmod -R $BM_READ_PERMISSIONS $BM_DIR
     sudo chown -R $BM_SERVER_USER:$BM_WEB_GROUP $BM_DIR

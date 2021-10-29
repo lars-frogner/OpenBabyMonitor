@@ -18,6 +18,8 @@ function generateInputs($setting_type, $grouped_setting_values, $pre_group_html,
       $setting = $settings[$setting_name];
       if (array_key_exists('values', $setting)) {
         generateSelect($setting, $setting_name, $initial_value);
+      } elseif (array_key_exists('radiovalues', $setting)) {
+        generateRadio($setting, $setting_name, $initial_value);
       } elseif (array_key_exists('range', $setting)) {
         generateRange($setting, $setting_name, $initial_value);
       } else {
@@ -104,8 +106,27 @@ function generateCheckbox($setting, $setting_name, $initial_value) {
   line('</div>');
 }
 
+function generateRadio($setting, $setting_name, $initial_value) {
+  $values = $setting['radiovalues'];
+  line("<div class=\"mb-3\" id=\"$setting_name\">");
+  foreach ($values as $name => $value) {
+    $id = $value;
+    $checked = ($value == $initial_value) ? ' checked' : '';
+    line("<div class=\"form-check form-check-inline\">");
+    line("  <input type=\"radio\" class=\"form-check-input\" name=\"$setting_name\" autocomplete=\"off\" id=\"$id\" value=\"$value\" $checked>");
+    line("  <label class=\"form-check-label\" for=\"$id\">$name</label>");
+    line('</div>');
+  }
+  line('</div>');
+}
+
 function generateBehavior($setting_type) {
-  $disabled_when = getSettingAttributes($setting_type, 'disabled_when');
+  $disabled_when = getSettingAttributes($setting_type, 'children_disabled_when');
+  $children_selector = ' *';
+  if (count($disabled_when) == 0) {
+    $children_selector = '';
+    $disabled_when = getSettingAttributes($setting_type, 'disabled_when');
+  }
   $condition_statements = array();
   foreach ($disabled_when as $setting_name => $criteria) {
     foreach ($criteria as $id => $condition) {
@@ -123,7 +144,7 @@ function generateBehavior($setting_type) {
   $change_statements = array();
   foreach ($disabled_when as $setting_name => $criteria) {
     $condition_statement = $condition_statements[$setting_name];
-    $setter_statement = "$('#$setting_name').prop('disabled', $condition_statement); ";
+    $setter_statement = "$('#$setting_name $children_selector').prop('disabled', $condition_statement); ";
     foreach ($criteria as $id => $condition) {
       if (array_key_exists($id, $change_statements)) {
         $change_statements[$id] = $change_statements[$id] . $setter_statement;
