@@ -31,6 +31,10 @@ function registerModeChangeHandler() {
     });
 }
 
+function changeModeTo(modeName) {
+    $('#mode_radio_' + modeName).click();
+}
+
 function swapRadio(radio) {
     MODE_RADIO_IDS.forEach(radioId => {
         if (radioId == radio.prop('id')) {

@@ -10,6 +10,11 @@ const MODAL_DISMISS_ID = MODAL_ID + '_dismiss';
 function setConfirmationModalProperties(properties) {
     if (properties.hasOwnProperty('header')) {
         $('#' + MODAL_HEADER_ID).html(properties['header']);
+        $('#' + MODAL_HEADER_ID).show()
+    } else if (!(properties.hasOwnProperty('noHeaderHiding') && properties['noHeaderHiding'])) {
+        $('#' + MODAL_HEADER_ID).hide()
+    } else {
+        $('#' + MODAL_HEADER_ID).show();
     }
     if (properties.hasOwnProperty('body')) {
         var body = $('#' + MODAL_BODY_ID);
@@ -21,8 +26,10 @@ function setConfirmationModalProperties(properties) {
             body.show();
             body.append(content);
         }
+    } else if (!(properties.hasOwnProperty('noBodyHiding') && properties['noBodyHiding'])) {
+        $('#' + MODAL_BODY_ID).hide();
     } else {
-        body.hide();
+        $('#' + MODAL_BODY_ID).show();
     }
     var useCheckbox = false;
     if (properties.hasOwnProperty('checkboxLabel')) {
@@ -89,15 +96,40 @@ function setConfirmationModalProperties(properties) {
     } else {
         $('#' + confirmId).hide();
     }
+    var useDismiss = false;
     if (properties.hasOwnProperty('dismiss')) {
+        useDismiss = true;
         $('#' + MODAL_DISMISS_ID).html(properties['dismiss']);
     }
     if (properties.hasOwnProperty('dismissClass')) {
+        useDismiss = true;
         $('#' + MODAL_DISMISS_ID).addClass(properties['dismissClass']);
     }
     if (properties.hasOwnProperty('dismissOnclick')) {
+        useDismiss = true;
         $('#' + MODAL_DISMISS_ID).click(properties['dismissOnclick']);
     }
+    if (useDismiss) {
+        $('#' + MODAL_DISMISS_ID).show();
+    } else {
+        $('#' + MODAL_DISMISS_ID).hide();
+    }
+}
+
+function revealModal() {
+    $('#' + MODAL_ID).modal('show');
+}
+
+function hideModal() {
+    $('#' + MODAL_ID).modal('hide');
+}
+
+function setModalHeaderHTML(html) {
+    $('#' + MODAL_HEADER_ID).html(html);
+}
+
+function setModalBodyHTML(html) {
+    $('#' + MODAL_BODY_ID).html(html);
 }
 
 function connectModalToObject(object, modalProperties, bodySetters) {
@@ -121,9 +153,11 @@ function connectModalToObject(object, modalProperties, bodySetters) {
         var bodySetters = object._bodySetters;
         var showModal = object._showModal;
         if (showModal()) {
-            modalProperties['body'] = [];
+            if (bodySetters.length > 0) {
+                modalProperties['body'] = [];
+            }
             bodySetters.forEach(setter => {
-                if (setter.showText()) {
+                if (setter.showText && setter.showText()) {
                     modalProperties['body'].push($('<p></p>').text(setter.text));
                 }
             });
@@ -131,7 +165,7 @@ function connectModalToObject(object, modalProperties, bodySetters) {
             if (event) {
                 event.preventDefault();
             }
-            $('#' + MODAL_ID).modal('show');
+            revealModal();
         }
     };
 }
