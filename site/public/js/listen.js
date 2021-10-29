@@ -13,6 +13,8 @@ const LISTEN_ANIMATION_LABEL_CLASS = "listen-animation-label";
 const NOTIFICATION_HEADERS = { bad: 'Varsel om gråt', good: 'Varsel om babling', bad_and_good: 'Varsel om gråt og babling', bad_or_good: 'Varsel om gråt eller babling' };
 const NOTIFICATION_TEXTS = { bad: 'Barnet gråter.', good: 'Barnet babler.', bad_and_good: 'Barnet gråter og babler om hverandre.', bad_or_good: 'Barnet lager lyder, men det er ikke tydelig om det er gråt eller babling.' };
 
+const NOTIFICATION_SOUND = new Audio('media/notification_sound.mp3');
+
 var _EVENT_SOURCE;
 var _REDIRECT_MODAL_TRIGGER = {};
 var _UNSUPPORTED_MODAL_TRIGGER = {};
@@ -21,7 +23,7 @@ var _NOTIFICATION_MODAL_TRIGGER = {};
 var _BROWSER_NOTIFICATION;
 
 $(function () {
-    connectModalToObject(_REDIRECT_MODAL_TRIGGER, { checkboxLabel: 'Ikke spør igjen', checkboxChecked: !SETTING_ASK_SECURE_REDIRECT, confirmOnclick: function () { redirectModalCallback(function () { window.location.replace(SECURE_URL); }); }, dismissOnclick: redirectModalCallback, header: 'Varsler støttes ikke på ukrypterte nettsider', confirm: 'Fortsett til ny side', dismiss: 'Bli på denne siden' }, { text: 'Vil du gå til den krypterte (https) versjonen av siden?', showText: () => { return true; } });
+    connectModalToObject(_REDIRECT_MODAL_TRIGGER, { checkboxLabel: 'Ikke spør igjen', checkboxChecked: !SETTING_ASK_SECURE_REDIRECT, confirmOnclick: function () { redirectModalCallback(function () { window.location.replace(SECURE_URL); }); }, dismissOnclick: redirectModalCallback, header: 'Nettleservarsler støttes ikke på ukrypterte nettsider', confirm: 'Fortsett til ny side', dismiss: 'Bli på denne siden' }, { text: 'Vil du gå til den krypterte (https) versjonen av siden?', showText: () => { return true; } });
     connectModalToObject(_UNSUPPORTED_MODAL_TRIGGER, { checkboxLabel: 'Ikke vis igjen', checkboxChecked: !SETTING_SHOW_UNSUPPORTED_MESSAGE, dismissOnclick: unsupportedModalCallback, header: 'Denne nettleseren støtter ikke varsler', dismiss: 'Ok' });
     connectModalToObject(_PERMISSION_MODAL_TRIGGER, { checkboxLabel: 'Ikke spør igjen', checkboxChecked: !SETTING_ASK_NOTIFICATION_PERMISSION, confirmOnclick: function () { askNotificationPermission(); hideModal(); }, dismissOnclick: permissionModalCallback, header: 'Tillatelse kreves for å bruke nettlerservarsler', confirm: 'Gi tillatelse', dismiss: 'Fortsett uten' });
     connectModalToObject(_NOTIFICATION_MODAL_TRIGGER, { noHeaderHiding: true, noBodyHiding: true, confirmOnclick: function () { hideModal(); changeModeTo('audiostream'); }, confirm: 'Begynn lydavspilling', dismiss: 'Lukk' });
@@ -167,8 +169,14 @@ function handleNotificationEvent(event) {
     notificationType = event.data;
     if (notificationsAllowed()) {
         createNotification(notificationType);
+    } else {
+        playNotificationSound();
     }
     displayNotificationModal(notificationType)
+}
+
+function playNotificationSound() {
+    NOTIFICATION_SOUND.play();
 }
 
 function createNotification(notificationType) {

@@ -202,8 +202,9 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/linux,macos,python,visualstudiocode
 
 library/
-media/
 detection/data/
+
+bootstrap-icons.svg
 
 *.npz
 *.bin
