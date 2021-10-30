@@ -1,6 +1,7 @@
 import math
 import pathlib
 import pickle
+import collections
 import numpy as np
 import torch
 import torch.nn as nn
@@ -609,6 +610,12 @@ def print_accuracy(epoch, *accuracies):
     )
 
 
+def export_model(model, output_path='model.onnx'):
+    model.eval()
+    dummy_feature = torch.zeros(1, *model.input_shape)
+    torch.onnx.export(model, dummy_feature, output_path)
+
+
 def test_model_variations(result_file, complexities, repeats, batch_sizes,
                           learning_rates, weight_decays, use_batch_norms):
 
@@ -712,58 +719,103 @@ def test_model_variations(result_file, complexities, repeats, batch_sizes,
                                 with open(results_path, 'wb') as f:
                                     pickle.dump(results, f)
 
+    print(find_best_model(results_path))
+
+
+def find_best_model(result_file):
+    with open(result_file, 'rb') as f:
+        results = pickle.load(f)
+
+    best_minimal_accuracy = -np.inf
+    best_model_idx = None
+    best_epoch = None
+    for model_idx, result in enumerate(results):
+        queue = collections.deque(maxlen=6)
+        for epoch_idx, matrix in enumerate(
+                result['test_results']['ConfusionMatrix']):
+            minimal_accuracy = np.diagonal(matrix).min()
+            queue.append(minimal_accuracy)
+            mean_minimal_accuracy = np.mean(queue)
+            if mean_minimal_accuracy > best_minimal_accuracy:
+                best_minimal_accuracy = mean_minimal_accuracy
+                best_model_idx = model_idx
+                best_epoch = epoch_idx + 1 - queue.maxlen // 2
+    return best_model_idx, best_epoch, best_minimal_accuracy, results[
+        best_model_idx]['params']
+
 
 if __name__ == '__main__':
     from data import create_dataset, create_dataloaders
 
-    dataset = create_dataset(device=DEVICE)
+    model_name = 'final_model'
 
-    config = dict(batch_size=32, learning_rate=3e-3, weight_decay=3e-3)
+    complexity = 0
+    repeats = [1, 1, 1, 2, 1]
+    use_batch_norm = True
+
+    config = dict(batch_size=32, learning_rate=1e-3, weight_decay=3e-3)
+
+    dataset = create_dataset(device=DEVICE)
 
     train_dataloader, test_dataloader = create_dataloaders(
         dataset, batch_size=config['batch_size'], num_workers=0)
 
     model = create_model(dataset.get_feature_shape(),
                          dataset.get_n_labels(),
-                         complexity=0,
-                         repeats=[1, 1, 1, 2, 1],
-                         use_batch_norm=True)
-
-    loss_function = create_loss_function()
-
-    optimizer = create_optimizer(model,
-                                 learning_rate=config['learning_rate'],
-                                 weight_decay=config['weight_decay'])
-
-    early_stopper = create_early_stopper(patience=np.inf)
+                         complexity=complexity,
+                         repeats=repeats,
+                         use_batch_norm=use_batch_norm)
 
     train_metric, test_metric = create_metrics()
 
-    visualizer = create_visualizer(dataset,
-                                   train_metric,
-                                   test_metric,
-                                   run_params=config)
+    evaluate = False
+    export_to_onnx = True
 
-    calculate_initial_metrics(train_dataloader,
-                              test_dataloader,
-                              model,
-                              early_stopper,
-                              test_metric,
-                              train_metric,
-                              callback=visualizer.update_metric_results)
+    if evaluate:
+        model.load_state_dict(torch.load(f'{model_name}.pickle'))
 
-    train_results, test_results = run_model_training(
-        train_dataloader,
-        test_dataloader,
-        model,
-        loss_function,
-        optimizer,
-        early_stopper,
-        test_metric,
-        train_metric=train_metric,
-        max_epochs=44,
-        callback=visualizer.update_metric_results,
-        save_path='final_model.pickle',
-        metric_save_path='final_model_metrics.pickle')
+        test_model(test_dataloader, model, test_metric)
+        print(test_metric.compute())
 
-    visualizer.close()
+        if export_to_onnx:
+            export_model(model, output_path=f'{model_name}.onnx')
+    else:
+        loss_function = create_loss_function()
+
+        optimizer = create_optimizer(model,
+                                     learning_rate=config['learning_rate'],
+                                     weight_decay=config['weight_decay'])
+
+        early_stopper = create_early_stopper(patience=np.inf)
+
+        visualizer = create_visualizer(dataset,
+                                       train_metric,
+                                       test_metric,
+                                       run_params=config)
+
+        calculate_initial_metrics(train_dataloader,
+                                  test_dataloader,
+                                  model,
+                                  early_stopper,
+                                  test_metric,
+                                  train_metric,
+                                  callback=visualizer.update_metric_results)
+
+        train_results, test_results = run_model_training(
+            train_dataloader,
+            test_dataloader,
+            model,
+            loss_function,
+            optimizer,
+            early_stopper,
+            test_metric,
+            train_metric=train_metric,
+            max_epochs=43,
+            callback=visualizer.update_metric_results,
+            save_path=f'{model_name}.pickle',
+            metric_save_path=f'{model_name}_metrics.pickle')
+
+        visualizer.close()
+
+        if export_to_onnx:
+            export_model(model, output_path=f'{model_name}.onnx')
