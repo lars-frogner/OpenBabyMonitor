@@ -13,6 +13,12 @@ from tqdm import tqdm
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
+def get_conv_same_padding(kernel_size):
+    return nn.Conv2d(
+        1, 1, kernel_size=kernel_size,
+        padding='same')._reversed_padding_repeated_twice[::-1][::2]
+
+
 def compute_conv_output_shape(input_shape, conv):
     assert len(input_shape) == 3
     kernel_size = conv.kernel_size if isinstance(
@@ -70,7 +76,8 @@ class CryNet(nn.Module):
                              out_channels,
                              kernel_size=kernel_size,
                              stride=stride,
-                             padding=padding,
+                             padding=(get_conv_same_padding(kernel_size)
+                                      if padding == 'same' else padding),
                              bias=bias,
                              dtype=self.dtype)
             out_shape = compute_conv_output_shape(in_shape, conv)
@@ -130,6 +137,8 @@ class CryNet(nn.Module):
             input_shape = (1, ) + input_shape
         else:
             assert len(input_shape) == 3
+
+        self.input_shape = input_shape
 
         self.description += f'i={input_shape[1]}x{input_shape[2]}'
 
@@ -611,6 +620,7 @@ def print_accuracy(epoch, *accuracies):
 
 
 def export_model(model, output_path='model.onnx'):
+    model.to('cpu')
     model.eval()
     dummy_feature = torch.zeros(1, *model.input_shape)
     torch.onnx.export(model, dummy_feature, output_path)
