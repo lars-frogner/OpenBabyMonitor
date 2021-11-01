@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(__DIR__) . '/config/site_config.php');
+require_once(dirname(__DIR__) . '/config/path_config.php');
+require_once(dirname(__DIR__) . '/config/error_config.php');
 
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
