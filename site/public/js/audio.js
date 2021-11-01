@@ -199,7 +199,7 @@ class AudiostreamContext {
                     return this.#analyserSamples;
                 }.bind(this);
             default:
-                alert('createSampler called when mode is not valid');
+                console.error('createSampler called when mode is not valid');
                 break;
         }
     }
@@ -248,11 +248,11 @@ class AudiostreamContext {
 
     static #createPlayer() {
         if (document.getElementById(AUDIO_PLAYER_ID) != null) {
-            alert('AudiostreamContext constructor called when player already exists');
+            console.error('AudiostreamContext constructor called when player already exists');
         }
         var playerObject = $('<audio></audio>')
             .prop({ id: AUDIO_PLAYER_ID, controls: true, autoplay: true }).css('max-width', CANVAS_MAX_WIDTH + 'px')
-            .append('Denne funksjonaliteten er ikke tilgjengelig i din nettleser.');
+            .append('This browser does not support HTML5 audio.');
         $('#' + AUDIO_PLAYER_PARENT_ID).append(playerObject);
 
         var hls = null;
@@ -272,25 +272,25 @@ class AudiostreamContext {
                 if (data.fatal) {
                     switch (data.type) {
                         case Hls.ErrorTypes.NETWORK_ERROR:
-                            $('#' + AUDIO_ERROR_ID).html('Kunne ikke laste inn lydstrømmen grunnet et nettverksproblem');
+                            $('#' + AUDIO_ERROR_ID).html('Could not load the audio stream due to a network error');
                             $('#' + AUDIO_ERROR_ID).parent().show();
                             hls.startLoad();
                             break;
                         case Hls.ErrorTypes.MEDIA_ERROR:
-                            $('#' + AUDIO_ERROR_ID).html('Kunne ikke laste inn lydstrømmen grunnet et mediaproblem');
+                            $('#' + AUDIO_ERROR_ID).html('Could not load the audio stream due to a media error');
                             $('#' + AUDIO_ERROR_ID).parent().show();
                             hls.recoverMediaError();
                             break;
                         default:
                             hls.destroy();
-                            $('#' + AUDIO_ERROR_ID).html('Kunne ikke laste inn lydstrømmen');
+                            $('#' + AUDIO_ERROR_ID).html('Could not load the audio stream');
                             $('#' + AUDIO_ERROR_ID).parent().show();
                             break;
                     }
                 }
             });
         } else {
-            $('#' + AUDIO_ERROR_ID).html('Denne funksjonaliteten (HLS-strømming) er ikke tilgjengelig i din nettleser');
+            $('#' + AUDIO_ERROR_ID).html('This browser does not support HLS streaming');
             $('#' + AUDIO_ERROR_ID).parent().show();
         }
 
@@ -433,7 +433,7 @@ class AudioVisualizer {
                 this.#clearCanvas = AudioVisualizer.#clearCanvasFrequencyDomain;
                 break;
             default:
-                alert('Mode is not valid: ' + newMode);
+                console.error('Mode is not valid: ' + newMode);
                 break;
         }
         this.#mode = newMode;
@@ -450,7 +450,7 @@ class AudioVisualizer {
 
     static #createCanvas() {
         if (document.getElementById(AUDIO_CANVAS_ID) != null) {
-            alert('AudioVisualizer constructor called when audio visualization canvas already exists');
+            console.error('AudioVisualizer constructor called when audio visualization canvas already exists');
         }
         var canvasObject = $('<canvas></canvas>').prop('id', AUDIO_CANVAS_ID).addClass('px-0');
         $('#' + AUDIO_CANVAS_PARENT_ID).append(canvasObject);
