@@ -25,3 +25,5 @@ define('SERVER_IP', trim(`hostname -I`));
 
 define('USES_SECURE_PROTOCOL', !(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on'));
 define('PROTOCOL', USES_SECURE_PROTOCOL ? 'https' : 'http');
+define('URI_WITHOUT_SEARCH', strtok(substr("$_SERVER[REQUEST_URI]", 1), '?'));
+define('URL_WITHOUT_SEARCH', PROTOCOL . "://$_SERVER[HTTP_HOST]/" . URI_WITHOUT_SEARCH);
