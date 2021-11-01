@@ -234,7 +234,7 @@ if [[ "$INSTALL_HLS_JS" = true ]]; then
     wget $DOWNLOAD_URL
     unzip $FILENAME
     mkdir -p $BM_LINKED_SITE_DIR/library/hls-js
-    mv dist/hls.min.js* $BM_LINKED_SITE_DIR/library/hls-js/
+    mv dist/* $BM_LINKED_SITE_DIR/library/hls-js/
     rm -r $FILENAME dist
     cd -
 fi
@@ -255,7 +255,7 @@ if [[ "$INSTALL_ANIME" = true ]]; then
     wget $DOWNLOAD_URL
     unzip $FILENAME
     mkdir -p $BM_LINKED_SITE_DIR/library/anime
-    mv anime-$FILENAME_ROOT/lib/anime.min.js $BM_LINKED_SITE_DIR/library/anime/
+    mv anime-$FILENAME_ROOT/lib/* $BM_LINKED_SITE_DIR/library/anime/
     rm -r $FILENAME anime-$FILENAME_ROOT
     cd -
 fi

@@ -1,1 +1,1 @@
-<script src="library/hls-js/hls.min.js"></script>
+<script src="library/hls-js/hls.light.min.js"></script>
