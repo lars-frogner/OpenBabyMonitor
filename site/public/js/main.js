@@ -59,7 +59,7 @@ function requestModeChange(radio) {
         .then(response => response.text())
         .then(responseText => { logoutIfSessionExpired(responseText); handleModeChangeResponse(radio.prop('id'), radio.prop('value'), responseText); })
         .catch(error => {
-            alert(error)
+            console.error(error)
         });
 
     indicateWaiting();
@@ -147,7 +147,7 @@ function getContentIdByRadioId(radioId) {
     if (idx >= 0) {
         return MODE_CONTENT_IDS[idx];
     } else {
-        alert('Invalid radio ID' + radioId);
+        console.error('Invalid radio ID' + radioId);
         return null;
     }
 }
