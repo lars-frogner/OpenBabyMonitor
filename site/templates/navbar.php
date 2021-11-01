@@ -5,7 +5,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbar_entries">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <ul class="navbar-nav w-100 mb-2 mb-lg-0">
         <li class="nav-item">
           <a id="modes_nav_link" class="nav-link<?php echo LOCATION == 'main' ? ' active' : ''; ?> d-flex align-items-center disabled" href="main.php">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
@@ -86,7 +86,7 @@
             <?php echo LANG['nav_reboot']; ?>
           </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item me-auto">
           <a id="shutdown_nav_link" class="nav-link d-flex align-items-center disabled" href="shutdown.php">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
               <use xlink:href="media/bootstrap-icons.svg#power" />
@@ -94,17 +94,19 @@
             <?php echo LANG['nav_shutdown']; ?>
           </a>
         </li>
-        <?php
-        if (false && !ACCESS_POINT_ACTIVE) {
-        ?><li class="nav-item">
-            <a id="ap_mode_nav_link" class="nav-link disabled" href="activate_ap_mode.php"><?php echo LANG['nav_ap_mode']; ?></a>
-          </li>
-        <?php }
-        if (false && !CONNECTED_TO_EXTERNAL_NETWORK) {
-        ?><li class="nav-item">
-            <a id="client_mode_nav_link" class="nav-link disabled" href="activate_client_mode.php"><?php echo LANG['nav_client_mode']; ?></a>
-          </li>
-        <?php } ?>
+        <li class="nav-item">
+          <div class="pe-0 nav-link d-flex align-items-center disabled">
+            <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
+              <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                <use xlink:href="media/bootstrap-icons.svg#broadcast-pin" />
+              </svg>
+              <?php echo LANG['nav_access_point']; ?>
+            </div>
+            <div class="form-check form-switch my-0 ms-2">
+              <input id="ap_mode_switch" class="form-check-input" type="checkbox" role="button" <?php echo ACCESS_POINT_ACTIVE ? 'checked' : ''; ?>>
+            </div>
+          </div>
+        </li>
       </ul>
     </div>
   </div>
