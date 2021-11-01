@@ -87,12 +87,12 @@ require_once(TEMPLATES_DIR . '/main.php');
 
           <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : ''; ?>>
             <div class="row justify-content-center align-items-center">
-              <div class="col-sm-6 mb-5 text-center" style="display: none">
+              <div class="col-sm-6 mb-5 text-center" style="display: none;">
                 <p id="mode_content_audio_error" class="alert alert-danger text-center"></p>
                 <a class="btn btn-secondary" href="main.php"><?php echo LANG['refresh_page']; ?></a>
               </div>
             </div>
-            <div class="row align-items-center justify-content-center" id="audiostream_visualization_mode_box" style="display: none">
+            <div class="row align-items-center justify-content-center" id="audiostream_visualization_mode_box" style="display: none;">
               <div class="col-auto fw-bold">
                 <?php echo LANG['visualization']; ?>
               </div>
@@ -113,7 +113,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                 </form>
               </div>
             </div>
-            <div class="row align-items-center justify-content-center" id="audiostream_fftsize_range_box" style="display: none">
+            <div class="row align-items-center justify-content-center" id="audiostream_fftsize_range_box" style="display: none;">
               <div class="col-auto">
                 <label class="form-label" for="audiostream_fftsize_range"><?php echo LANG['samples_per_frame']; ?></label>
               </div>
@@ -140,14 +140,14 @@ require_once(TEMPLATES_DIR . '/main.php');
           </div>
 
           <div id="mode_content_standby" class="col-auto text-center" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : ''; ?>>
-            <svg class="bi mb-5 text-bm" style="width: 25vh; height: 25vh" fill="currentColor">
+            <svg class="bi mb-5 text-bm" style="width: 25vh; height: 25vh;" fill="currentColor">
               <use xlink:href="media/bootstrap-icons.svg#moon-fill" />
             </svg>
             <p class="mb-5 text-bm"><?php echo LANG['device_in_standby']; ?></p>
 
             <div class="row mb-3 align-items-center justify-content-center">
-              <div id="latency_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none">
-                <svg id="latency_icon" class="bi" style="width: 2em; height: 2em" fill="currentColor">
+              <div id="latency_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none;">
+                <svg id="latency_icon" class="bi" style="width: 2em; height: 2em;" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#stopwatch" />
                 </svg>
                 <p id="latency_text" class="mb-0"></p>
@@ -155,41 +155,41 @@ require_once(TEMPLATES_DIR . '/main.php');
               <div class="col-auto text-center">
                 <p class="mb-0 text-bm"><?php echo LANG['connection']; ?></p>
                 <button id="measure_bandwidth_button" class="btn btn-bm" disabled>
-                  <svg class="bi" style="width: 2.5em; height: 2.5em" fill="currentColor">
+                  <svg class="bi" style="width: 2.5em; height: 2.5em;" fill="currentColor">
                     <use xlink:href="media/bootstrap-icons.svg#speedometer2" />
                   </svg>
                   <p class="mb-0"><?php echo LANG['test_connection']; ?></p>
                 </button>
-                <span id="measure_bandwidth_busy_spinner" class="spinner-border mt-3" style="display: none"></span>
+                <span id="measure_bandwidth_busy_spinner" class="spinner-border mt-3" style="display: none;"></span>
               </div>
-              <div id="download_speed_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none">
-                <svg id="download_speed_icon" class="bi" style="width: 2em; height: 2em" fill="currentColor">
+              <div id="download_speed_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none;">
+                <svg id="download_speed_icon" class="bi" style="width: 2em; height: 2em;" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#cloud-arrow-down" />
                 </svg>
                 <p id="download_speed_text" class="mb-0"></p>
               </div>
             </div>
 
-            <div id="connection_progress_bar_container" class="progress" style="display: none">
+            <div id="connection_progress_bar_container" class="progress" style="display: none;">
               <div id="connection_progress_bar" class="progress-bar" style="width: 0%"></div>
             </div>
 
             <div class="row mb-5 align-items-start justify-content-center">
-              <p id="connection_results_message" class="mb-3 text-bm" style="display: none"><?php echo LANG['available_features']; ?></p>
-              <div id="connection_results_listen" class="col-auto text-center text-bm" style="display: none">
-                <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
+              <p id="connection_results_message" class="mb-3 text-bm" style="display: none;"><?php echo LANG['available_features']; ?></p>
+              <div id="connection_results_listen" class="col-auto text-center text-bm" style="display: none;">
+                <svg class="bi" style="width: 2em; height: 2em;" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#bell-fill" />
                 </svg>
                 <p id="connection_results_listen_text" class="mb-0"></p>
               </div>
-              <div id="connection_results_audio" class="col-auto text-center text-bm" style="display: none">
-                <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
+              <div id="connection_results_audio" class="col-auto text-center text-bm" style="display: none;">
+                <svg class="bi" style="width: 2em; height: 2em;" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#mic-fill" />
                 </svg>
                 <p id="connection_results_audio_text" class="mb-0"></p>
               </div>
-              <div id="connection_results_video" class="col-auto text-center text-bm" style="display: none">
-                <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
+              <div id="connection_results_video" class="col-auto text-center text-bm" style="display: none;">
+                <svg class="bi" style="width: 2em; height: 2em;" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#camera-video-fill" />
                 </svg>
                 <p id="connection_results_video_text" class="mb-0"></p>
@@ -197,11 +197,11 @@ require_once(TEMPLATES_DIR . '/main.php');
             </div>
           </div>
 
-          <div id="mode_content_waiting" class="col-auto" style="display: none">
+          <div id="mode_content_waiting" class="col-auto" style="display: none;">
             <span class="spinner-grow text-bm"></span>
           </div>
 
-          <div id="mode_content_error" class="col-auto" style="display: none">
+          <div id="mode_content_error" class="col-auto" style="display: none;">
             <div class="container">
               <div class="row ">
                 <div class="col-sm-6 text-center">

@@ -21,7 +21,7 @@
             </svg>
             <?php echo LANG['nav_settings']; ?>
           </a>
-          <ul class="dropdown-menu" style="min-width: 1em">
+          <ul class="dropdown-menu" style="min-width: 1em;">
             <li><a id="listen_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'listen_settings' ? ' active' : ''; ?> d-flex align-items-center" href="listen_settings.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#megaphone" />
@@ -55,7 +55,7 @@
             </svg>
             <?php echo LANG['nav_language']; ?>
           </a>
-          <ul class="dropdown-menu" style="min-width: 1em">
+          <ul class="dropdown-menu" style="min-width: 1em;">
             <li>
               <a id="language_no_nav_link" class="dropdown-item<?php echo LANGUAGE == 'no' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=no"'; ?>">
                 <span class="me-2 flag-icon flag-icon-no" style="height: 1.1em; width: 1.1em;"></span>

@@ -9,7 +9,7 @@
       </div>
       <div class="modal-footer justify-content-between">
         <div>
-          <input class="form-check-input" type="checkbox" value="" style="display: none" id="confirmation_modal_checkbox">
+          <input class="form-check-input" type="checkbox" value="" style="display: none;" id="confirmation_modal_checkbox">
           <label class="form-check-label" for="confirmation_modal_checkbox" id="confirmation_modal_checkbox_label"></label>
         </div>
         <div>

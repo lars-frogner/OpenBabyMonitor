@@ -48,7 +48,7 @@ require_once(TEMPLATES_DIR . '/settings.php');
       <form id="listen_settings_form" action="" method="post">
         <div class="row">
           <?php
-          $permission_button_html = '<div class="border text-center my-3"><p class="my-2" id="notification_message"></p><button id="notification_button" class="btn btn-primary mb-2" style="display: none"></button></div>';
+          $permission_button_html = '<div class="border text-center my-3"><p class="my-2" id="notification_message"></p><button id="notification_button" class="btn btn-primary mb-2" style="display: none;"></button></div>';
           generateInputs($setting_type, $grouped_values, ['browser_notifications' => $permission_button_html], []);
           ?>
         </div>
