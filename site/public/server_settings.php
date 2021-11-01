@@ -39,7 +39,7 @@ $connected_network = obtainConnectedNetworkSSID();
     ?>
   </header>
 
-  <main>
+  <main id="main_container" style="display: none;">
     <div <?php echo ($connection_succeeded === true) ? '' : 'style="display: none;"'; ?>>
       <div class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column">

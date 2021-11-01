@@ -11,7 +11,7 @@ redirectIfLoggedIn('main.php');
 </head>
 
 <body>
-  <main class="vh-100">
+  <main id="main_container" class="vh-100" style="display: none;">
     <div class="container h-100">
       <div class="row h-100 justify-content-center align-items-center">
         <aside class="col-sm-5">
@@ -39,5 +39,11 @@ redirectIfLoggedIn('main.php');
     </div>
   </main>
 </body>
+
+<?php
+require_once(TEMPLATES_DIR . '/jquery_js.php');
+?>
+
+<script src="js/index.js"></script>
 
 </html>

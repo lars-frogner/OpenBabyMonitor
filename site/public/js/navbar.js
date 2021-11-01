@@ -49,6 +49,7 @@ $(function () {
             _CLIENT_MODE_MODAL_TRIGGER.triggerModal();
         }
     });
+    $('#' + NAVBAR_ID).show();
 });
 
 function setDisabledForNavbar(isDisabled) {

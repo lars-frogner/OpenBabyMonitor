@@ -37,7 +37,7 @@ require_once(TEMPLATES_DIR . '/main.php');
 
     <main id="main" class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
 
-      <div class="container-fluid h-100">
+      <div id="main_container" class="container-fluid h-100" style="display: none;">
         <div class="row h-100 align-items-center justify-content-center px-0">
 
           <div id="mode_content_listen" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : ''; ?>>
@@ -217,7 +217,7 @@ require_once(TEMPLATES_DIR . '/main.php');
     </main>
 
     <footer class="d-flex flex-grow-0 flex-shrink-1 justify-content-center">
-      <div class="btn-group" data-toggle="buttons">
+      <div id="footer_container" class="btn-group" data-toggle="buttons" style="display: none;">
         <?php
         createModeRadioButton($mode, 'listen', LANG['notify'], 'bell');
         createModeRadioButton($mode, 'audiostream', LANG['listen'], 'mic');

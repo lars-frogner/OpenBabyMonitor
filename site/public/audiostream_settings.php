@@ -42,7 +42,7 @@ require_once(TEMPLATES_DIR . '/settings.php');
     ?>
   </header>
 
-  <main>
+  <main id="main_container" style="display: none;">
     <div class="container">
       <h1 class="my-4"><?php echo LANG['audio_settings']; ?></h1>
       <form id="audiostream_settings_form" action="" method="post">

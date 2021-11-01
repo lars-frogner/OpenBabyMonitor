@@ -1,3 +1,6 @@
+const MAIN_CONTAINER_ID = 'main_container';
+const FOOTER_CONTAINER_ID = 'footer_container';
+
 const MODE_RADIO_IDS = ['mode_radio_standby', 'mode_radio_listen', 'mode_radio_audiostream', 'mode_radio_videostream'];
 const MODE_CONTENT_IDS = ['mode_content_standby', MODE_CONTENT_LISTEN_ID, MODE_CONTENT_AUDIO_ID, MODE_CONTENT_VIDEO_ID];
 
@@ -11,6 +14,8 @@ var _CURRENT_MODE = INITIAL_MODE;
 $(function () {
     registerModeChangeHandler();
     setDisabledForRelevantElements(false);
+    $('#' + MAIN_CONTAINER_ID).show();
+    $('#' + FOOTER_CONTAINER_ID).show();
 });
 
 function setCurrentMode(mode) {
