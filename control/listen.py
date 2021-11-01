@@ -129,7 +129,7 @@ def listen_with_settings(config,
     control_dir = pathlib.Path(os.environ['BM_DIR']) / 'control'
     comm_dir = control_dir / '.comm'
     standardization_file = control_dir / 'standardization.npz'
-    model_file = control_dir / 'test_model.onnx'
+    model_file = control_dir / 'crynet.onnx'
     probabilities_file = comm_dir / 'probabilities.json'
     notification_file = comm_dir / 'notification.txt'
 
@@ -157,8 +157,6 @@ def listen_with_settings(config,
         feature = feature_provider()
 
         probabilities = 10**model.forward(feature)
-        probabilities = np.array([0.1, 0.9,
-                                  0])  #np.random.rand(probabilities.size)
         probabilities /= np.sum(probabilities)
 
         notifier.add_prediction(probabilities)
