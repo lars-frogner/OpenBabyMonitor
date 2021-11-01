@@ -107,7 +107,12 @@ function setConfirmationModalProperties(properties) {
     }
     if (properties.hasOwnProperty('dismissOnclick')) {
         useDismiss = true;
-        $('#' + MODAL_DISMISS_ID).click(properties['dismissOnclick']);
+        $('#' + MODAL_ID).on('hide.bs.modal', function () {
+            properties['dismissOnclick']();
+            $('#' + MODAL_ID).off('hide.bs.modal');
+        });
+    } else {
+        $('#' + MODAL_ID).off('hide.bs.modal');
     }
     if (useDismiss) {
         $('#' + MODAL_DISMISS_ID).show();
@@ -122,6 +127,11 @@ function revealModal() {
 
 function hideModal() {
     $('#' + MODAL_ID).modal('hide');
+}
+
+function hideModalWithoutDismissCallback() {
+    $('#' + MODAL_ID).off('hide.bs.modal');
+    hideModal();
 }
 
 function setModalHeaderHTML(html) {
