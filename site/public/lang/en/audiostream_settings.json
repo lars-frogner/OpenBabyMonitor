@@ -1,0 +1,17 @@
+{
+    "audio_settings": "Audio settings",
+    "submit": "Confirm",
+    "undo": "Undo",
+    "reset": "Reset",
+    "encrypted": "Encrypted",
+    "gain": "Microphone amplification (%)",
+    "volume": "Volume adjustment",
+    "sampling_rate": "Sampling rate (Hz)",
+    "mp3_bitrate": "MP3 bit rate (kbps)",
+    "min_frequency": "Minimum frequency (Hz)",
+    "max_frequency": "Maximum frequency (Hz)",
+    "g_streaming": "Streaming",
+    "g_volume": "Volume",
+    "g_quality": "Quality",
+    "g_filtration": "Filtration"
+}

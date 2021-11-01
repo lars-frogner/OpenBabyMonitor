@@ -43,58 +43,58 @@ $connected_network = obtainConnectedNetworkSSID();
     <div <?php echo ($connection_succeeded === true) ? '' : 'style="display: none;"'; ?>>
       <div class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column">
-          <span class="alert alert-success text-center">Gratulerer, tilkoblingen var vellykket!</span>
+          <span class="alert alert-success text-center"><?php echo LANG['connection_succeeded']; ?></span>
         </div>
       </div>
     </div>
     <div <?php echo ($connection_succeeded === false) ? '' : 'style="display: none;"'; ?>>
       <div class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column">
-          <span class="alert alert-danger text-center">Tilkobling mislyktes, vennligst prøv igjen.</span>
+          <span class="alert alert-danger text-center"><?php echo LANG['connection_failed']; ?></span>
         </div>
       </div>
     </div>
     <div style="display: none;" id="switching_network_info">
       <div class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column text-center">
-          <span class="alert alert-warning">Bytter nettverk, tilkoblingen vil bli brutt.</span>
-          <a class="btn btn-secondary" href="server_settings.php">Forny siden</a>
+          <span class="alert alert-warning"><?php echo LANG['switching_network']; ?></span>
+          <a class="btn btn-secondary" href="server_settings.php"><?php echo LANG['refresh']; ?></a>
         </div>
       </div>
     </div>
     <div class="container" id="server_settings_form_container">
-      <h1 class="my-4">Nettverksinnstillinger</h1>
+      <h1 class="my-4"><?php echo LANG['server_settings']; ?></h1>
       <form id="server_settings_form" action="" method="post">
         <div class="row mb-3">
           <div class="col-auto">
             <div class="form-group">
-              <label class="form-label h3" for="available_networks">Tilgjengelige nettverk</label>
+              <label class="form-label h3" for="available_networks"><?php echo LANG['available_networks']; ?></label>
               <?php generateAvailableNetworksSelect($available_networks, $known_networks, $connected_network, 'available_networks'); ?>
             </div>
             <div class="row form-group align-items-center my-3">
               <div class="col-auto">
-                <label class="col-form-label" for="password_input">Passord</label>
+                <label class="col-form-label" for="password_input"><?php echo LANG['password']; ?></label>
               </div>
               <div class="col-auto">
-                <input type="password" name="password" class="form-control" placeholder="8-63 tegn" id="password_input" disabled>
+                <input type="password" name="password" class="form-control" placeholder="8-63 <?php echo LANG['password_characters']; ?>" id="password_input" disabled>
               </div>
               <div class="col-auto">
                 <div class="form-check">
                   <input type="checkbox" name="remember" class="form-check-input" id="remember_check" disabled>
-                  <label class="form-check-label" for="remember_check">Husk</label>
+                  <label class="form-check-label" for="remember_check"><?php echo LANG['remember']; ?></label>
                 </div>
               </div>
               <div class="col-auto mt-3">
-                <button type="submit" name="connect" style="display: none;" id="connect_submit_button"></button><button class="btn btn-secondary" id="connect_button" disabled>Koble til</button>
-                <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button"></a><button class="btn btn-secondary" id="disconnect_button" disabled>Koble fra</button>
+                <button type="submit" name="connect" style="display: none;" id="connect_submit_button"></button><button class="btn btn-secondary" id="connect_button" disabled><?php echo LANG['connect']; ?></button>
+                <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button"></a><button class="btn btn-secondary" id="disconnect_button" disabled><?php echo LANG['disconnect']; ?></button>
               </div>
             </div>
           </div>
           <div class="col-auto">
-            <label class="form-label h3" for="known_networks">Kjente nettverk</label>
+            <label class="form-label h3" for="known_networks"><?php echo LANG['known_networks']; ?></label>
             <?php generateKnownNetworksSelect($known_networks, 'known_networks'); ?>
             <div class="form-group my-3">
-              <button type="submit" name="forget" style="display: none;" id="forget_submit_button"></button><button class="btn btn-secondary" id="forget_button" disabled>Glem</button>
+              <button type="submit" name="forget" style="display: none;" id="forget_submit_button"></button><button class="btn btn-secondary" id="forget_button" disabled><?php echo LANG['forget']; ?></button>
             </div>
           </div>
         </div>
@@ -109,20 +109,8 @@ require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 
 <script>
   const SETTINGS_FORM_ID = 'server_settings_form';
-  const SETTINGS_FORM_CONTAINER_ID = 'server_settings_form_container';
-  const SWITCHING_INFO_ID = 'switching_network_info';
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
-  const AVAILABLE_NETWORKS_SELECT_ID = 'available_networks';
-  const KNOWN_NETWORKS_SELECT_ID = 'known_networks';
-  const PASSWORD_INPUT_ID = 'password_input';
-  const REMEMBER_CHECK_ID = 'remember_check';
-  const CONNECT_SUBMIT_BUTTON_ID = 'connect_submit_button';
-  const CONNECT_BUTTON_ID = 'connect_button';
-  const DISCONNECT_SUBMIT_BUTTON_ID = 'disconnect_submit_button';
-  const DISCONNECT_BUTTON_ID = 'disconnect_button';
-  const FORGET_SUBMIT_BUTTON_ID = 'forget_submit_button';
-  const FORGET_BUTTON_ID = 'forget_button';
   const DETECT_FORM_CHANGES = false;
 </script>
 <script src="js/jquery_utils.js"></script>

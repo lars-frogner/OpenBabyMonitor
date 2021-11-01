@@ -10,5 +10,8 @@
 <meta name="theme-color" content="#eeeeee" media="(prefers-color-scheme: dark)">
 
 <?php require_once(TEMPLATES_DIR . '/bootstrap_css.php'); ?>
+<?php require_once(TEMPLATES_DIR . '/flag-icons_css.php'); ?>
+
+<?php require_once(TEMPLATES_DIR . '/language.php'); ?>
 
 <script src="js/session.js"></script>

@@ -6,4 +6,5 @@ define('TEMPLATES_DIR', realpath(__DIR__ . '/../templates'));
 define('ENV_FILE_PATH', realpath(__DIR__ . '/../../env/envvars'));
 define('SERVERCONTROL_DIR', realpath(__DIR__ . '/../servercontrol'));
 define('MEDIA_DIR', realpath(__DIR__ . '/../public/media'));
+define('LANGUAGE_DIR', realpath(__DIR__ . '/../public/lang'));
 define('CONTROL_DIR', realpath(__DIR__ . '/../../control'));

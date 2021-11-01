@@ -17,19 +17,7 @@ require_once(TEMPLATES_DIR . '/main.php');
   require_once(TEMPLATES_DIR . '/video-js_css.php');
   ?>
 
-  <style>
-    .checked {
-      display: none;
-    }
-
-    .active .checked {
-      display: inline-block;
-    }
-
-    .active .unchecked {
-      display: none;
-    }
-  </style>
+  <link href="css/main.css" rel="stylesheet">
 
   <script>
     const SERVER_TIMESTAMP = <?php echo microtime(true); ?> * 1e3; // Milliseconds
@@ -52,7 +40,7 @@ require_once(TEMPLATES_DIR . '/main.php');
       <div class="container-fluid h-100">
         <div class="row h-100 align-items-center justify-content-center px-0">
 
-          <div id="mode_content_listen" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : '' ?>>
+          <div id="mode_content_listen" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : ''; ?>>
             <svg id="listen_inactive_icon" class="bi mb-3" style="width: 15vh; height: 15vh;" fill="currentColor">
               <use xlink:href="media/bootstrap-icons.svg#bell" />
             </svg>
@@ -64,17 +52,17 @@ require_once(TEMPLATES_DIR . '/main.php');
 
             <div class="row align-items-center justify-content-center" id="listen_visualization_mode_box">
               <div class="col-auto fw-bold">
-                Visualisering
+                <?php echo LANG['visualization']; ?>
               </div>
               <div class="col-auto">
                 <form>
                   <div class="form-check form-check-inline">
                     <input type="radio" class="form-check-input" name="listen_control_radio" id="listen_none_radio" autocomplete="off" onclick="deactivateLiveResultsMode();" checked disabled>
-                    <label class="form-check-label" for="listen_none_radio">Ingen</label>
+                    <label class="form-check-label" for="listen_none_radio"><?php echo LANG['none']; ?></label>
                   </div>
                   <div class="form-check form-check-inline">
                     <input type="radio" class="form-check-input" name="listen_control_radio" id="listen_live_radio" autocomplete="off" onclick="activateLiveResultsMode();" disabled>
-                    <label class="form-check-label" for="listen_live_radio">Lydtolkning</label>
+                    <label class="form-check-label" for="listen_live_radio"><?php echo LANG['audio_interpretation']; ?></label>
                   </div>
                 </form>
               </div>
@@ -97,37 +85,37 @@ require_once(TEMPLATES_DIR . '/main.php');
             </div>
           </div>
 
-          <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : '' ?>>
+          <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : ''; ?>>
             <div class="row justify-content-center align-items-center">
-              <div class="col-sm-6 mb-5 text-center" <?php echo HIDDEN_STYLE ?>>
+              <div class="col-sm-6 mb-5 text-center" style="display: none">
                 <p id="mode_content_audio_error" class="alert alert-danger text-center"></p>
-                <a class="btn btn-secondary" href="main.php">Forny siden</a>
+                <a class="btn btn-secondary" href="main.php"><?php echo LANG['refresh_page']; ?></a>
               </div>
             </div>
-            <div class="row align-items-center justify-content-center" id="audiostream_visualization_mode_box" <?php echo HIDDEN_STYLE; ?>>
+            <div class="row align-items-center justify-content-center" id="audiostream_visualization_mode_box" style="display: none">
               <div class="col-auto fw-bold">
-                Visualisering
+                <?php echo LANG['visualization']; ?>
               </div>
               <div class="col-auto">
                 <form>
                   <div class="form-check form-check-inline">
                     <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_none_radio" autocomplete="off" onclick="switchAudioVisualizationModeTo(null);" checked>
-                    <label class="form-check-label" for="audiostream_none_radio">Ingen</label>
+                    <label class="form-check-label" for="audiostream_none_radio"><?php echo LANG['none']; ?></label>
                   </div>
                   <div class="form-check form-check-inline">
                     <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_time_radio" autocomplete="off" onclick="switchAudioVisualizationModeTo('time');">
-                    <label class="form-check-label" for="audiostream_time_radio">Bølge</label>
+                    <label class="form-check-label" for="audiostream_time_radio"><?php echo LANG['wave']; ?></label>
                   </div>
                   <div class="form-check form-check-inline">
                     <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_frequency_radio" autocomplete="off" onclick="switchAudioVisualizationModeTo('frequency');">
-                    <label class="form-check-label" for="audiostream_frequency_radio">Frekvenser</label>
+                    <label class="form-check-label" for="audiostream_frequency_radio"><?php echo LANG['frequencies']; ?></label>
                   </div>
                 </form>
               </div>
             </div>
-            <div class="row align-items-center justify-content-center" id="audiostream_fftsize_range_box" <?php echo HIDDEN_STYLE; ?>>
+            <div class="row align-items-center justify-content-center" id="audiostream_fftsize_range_box" style="display: none">
               <div class="col-auto">
-                <label class="form-label" for="audiostream_fftsize_range">Målinger per bilde</label>
+                <label class="form-label" for="audiostream_fftsize_range"><?php echo LANG['samples_per_frame']; ?></label>
               </div>
               <div class="col-auto">
                 <div class="row flex-nowrap">
@@ -146,16 +134,16 @@ require_once(TEMPLATES_DIR . '/main.php');
             </div>
           </div>
 
-          <div id="mode_content_video" class="h-100 px-0" <?php echo ($mode != MODE_VALUES['videostream']) ? HIDDEN_STYLE : '' ?>>
+          <div id="mode_content_video" class="h-100 px-0" <?php echo ($mode != MODE_VALUES['videostream']) ? HIDDEN_STYLE : ''; ?>>
             <div id="mode_content_video_box" class="h-100">
             </div>
           </div>
 
-          <div id="mode_content_standby" class="col-auto text-center" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : '' ?>>
+          <div id="mode_content_standby" class="col-auto text-center" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : ''; ?>>
             <svg class="bi mb-5 text-bm" style="width: 25vh; height: 25vh" fill="currentColor">
               <use xlink:href="media/bootstrap-icons.svg#moon-fill" />
             </svg>
-            <p class="mb-5 text-bm">Enheten er i hvilemodus</p>
+            <p class="mb-5 text-bm"><?php echo LANG['device_in_standby']; ?></p>
 
             <div class="row mb-3 align-items-center justify-content-center">
               <div id="latency_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none">
@@ -165,14 +153,14 @@ require_once(TEMPLATES_DIR . '/main.php');
                 <p id="latency_text" class="mb-0"></p>
               </div>
               <div class="col-auto text-center">
-                <p class="mb-0 text-bm">Forbindelse</p>
-                <button id="measure_bandwidth_button" class="btn btn-bm" data-toggle="tooltip" data-placement="top" title="Mål ned- og opplastningshastighet" disabled>
+                <p class="mb-0 text-bm"><?php echo LANG['connection']; ?></p>
+                <button id="measure_bandwidth_button" class="btn btn-bm" disabled>
                   <svg class="bi" style="width: 2.5em; height: 2.5em" fill="currentColor">
                     <use xlink:href="media/bootstrap-icons.svg#speedometer2" />
                   </svg>
-                  <p class="mb-0">Test</p>
+                  <p class="mb-0"><?php echo LANG['test_connection']; ?></p>
                 </button>
-                <span id="measure_bandwidth_busy_spinner" class="spinner-border mt-3" <?php echo HIDDEN_STYLE; ?>></span>
+                <span id="measure_bandwidth_busy_spinner" class="spinner-border mt-3" style="display: none"></span>
               </div>
               <div id="download_speed_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none">
                 <svg id="download_speed_icon" class="bi" style="width: 2em; height: 2em" fill="currentColor">
@@ -182,25 +170,25 @@ require_once(TEMPLATES_DIR . '/main.php');
               </div>
             </div>
 
-            <div id="connection_progress_bar_container" class="progress" <?php echo HIDDEN_STYLE; ?>>
+            <div id="connection_progress_bar_container" class="progress" style="display: none">
               <div id="connection_progress_bar" class="progress-bar" style="width: 0%"></div>
             </div>
 
             <div class="row mb-5 align-items-start justify-content-center">
-              <p id="connection_results_message" class="mb-3 text-bm" <?php echo HIDDEN_STYLE; ?>>Tilgjengelige funksjoner</p>
-              <div id="connection_results_listen" class="col-auto text-center text-bm" <?php echo HIDDEN_STYLE; ?>>
+              <p id="connection_results_message" class="mb-3 text-bm" style="display: none"><?php echo LANG['available_features']; ?></p>
+              <div id="connection_results_listen" class="col-auto text-center text-bm" style="display: none">
                 <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#bell-fill" />
                 </svg>
                 <p id="connection_results_listen_text" class="mb-0"></p>
               </div>
-              <div id="connection_results_audio" class="col-auto text-center text-bm" <?php echo HIDDEN_STYLE; ?>>
+              <div id="connection_results_audio" class="col-auto text-center text-bm" style="display: none">
                 <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#mic-fill" />
                 </svg>
                 <p id="connection_results_audio_text" class="mb-0"></p>
               </div>
-              <div id="connection_results_video" class="col-auto text-center text-bm" <?php echo HIDDEN_STYLE; ?>>
+              <div id="connection_results_video" class="col-auto text-center text-bm" style="display: none">
                 <svg class="bi" style="width: 2em; height: 2em" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#camera-video-fill" />
                 </svg>
@@ -209,16 +197,16 @@ require_once(TEMPLATES_DIR . '/main.php');
             </div>
           </div>
 
-          <div id="mode_content_waiting" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
+          <div id="mode_content_waiting" class="col-auto" style="display: none">
             <span class="spinner-grow text-bm"></span>
           </div>
 
-          <div id="mode_content_error" class="col-auto" <?php echo HIDDEN_STYLE; ?>>
+          <div id="mode_content_error" class="col-auto" style="display: none">
             <div class="container">
               <div class="row ">
                 <div class="col-sm-6 text-center">
                   <p id="mode_content_error_message" class="alert alert-danger text-center"></p>
-                  <a class="btn btn-secondary" href="main.php">Forny siden</a>
+                  <a class="btn btn-secondary" href="main.php"><?php echo LANG['refresh_page']; ?></a>
                 </div>
               </div>
             </div>
@@ -231,10 +219,10 @@ require_once(TEMPLATES_DIR . '/main.php');
     <footer class="d-flex flex-grow-0 flex-shrink-1 justify-content-center">
       <div class="btn-group" data-toggle="buttons">
         <?php
-        createModeRadioButton($mode, 'listen', 'Varsle', 'bell');
-        createModeRadioButton($mode, 'audiostream', 'Lytte', 'mic');
-        createModeRadioButton($mode, 'videostream', 'Se', 'camera-video');
-        createModeRadioButton($mode, 'standby', 'Hvile', 'moon');
+        createModeRadioButton($mode, 'listen', LANG['notify'], 'bell');
+        createModeRadioButton($mode, 'audiostream', LANG['listen'], 'mic');
+        createModeRadioButton($mode, 'videostream', LANG['observe'], 'camera-video');
+        createModeRadioButton($mode, 'standby', LANG['standby'], 'moon');
         ?>
       </div>
     </footer>
@@ -254,9 +242,6 @@ require_once(TEMPLATES_DIR . '/main.php');
     const AUDIOSTREAM_MODE = <?php echo MODE_VALUES['audiostream']; ?>;
     const VIDEOSTREAM_MODE = <?php echo MODE_VALUES['videostream']; ?>;
     const INITIAL_MODE = <?php echo $mode; ?>;
-
-    const USES_SECURE_PROTOCOL = <?php echo USES_SECURE_PROTOCOL ? 'true' : 'false' ?>;
-    const SECURE_URL = 'https://<?php echo "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>';
 
     var SETTING_ASK_SECURE_REDIRECT = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'ask_secure_redirect', true); ?>;
     var SETTING_SHOW_UNSUPPORTED_MESSAGE = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'show_unsupported_message', true); ?>;

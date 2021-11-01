@@ -44,7 +44,7 @@ require_once(TEMPLATES_DIR . '/settings.php');
 
   <main>
     <div class="container">
-      <h1 class="my-4">Varselinnstillinger</h1>
+      <h1 class="my-4"><?php echo LANG['listen_settings']; ?></h1>
       <form id="listen_settings_form" action="" method="post">
         <div class="row">
           <?php
@@ -53,9 +53,9 @@ require_once(TEMPLATES_DIR . '/settings.php');
           ?>
         </div>
         <div class="my-4">
-          <button type="submit" name="submit" class="btn btn-primary">Bekreft</button>
-          <button name="undo" class="btn btn-secondary" onclick="$('#listen_settings_form').trigger('reset');">Angre</button>
-          <button type="submit" name="reset" class="btn btn-secondary">Tilbakestill</button>
+          <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['submit']; ?></button>
+          <button name="undo" class="btn btn-secondary" onclick="$('#listen_settings_form').trigger('reset');"><?php echo LANG['undo']; ?></button>
+          <button type="submit" name="reset" class="btn btn-secondary"><?php echo LANG['reset']; ?></button>
         </div>
       </form>
     </div>
@@ -68,8 +68,6 @@ require_once(TEMPLATES_DIR . '/jquery_js.php');
 ?>
 
 <script>
-  const USES_SECURE_PROTOCOL = <?php echo USES_SECURE_PROTOCOL ? 'true' : 'false' ?>;
-  const SECURE_URL = 'https://<?php echo "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>';
   const SETTINGS_FORM_ID = 'listen_settings_form';
   const SETTINGS_EDITED = <?php echo $settings_edited ? 'true' : 'false'; ?>;
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;

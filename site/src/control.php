@@ -253,3 +253,11 @@ function executeConnectionToNetwork($ssid, $password, $remember) {
 function executeRemovalOfKnownNetwork($ssid) {
   executeServerControlActionWithResult('remove_network', "'$ssid'");
 }
+
+function readCurrentLanguage($database) {
+  return readValuesFromTable($database, 'language', 'current', true);
+}
+
+function updateCurrentLanguage($database, $new_language) {
+  updateValuesInTable($database, 'language', withPrimaryKey(array('current' => $new_language)));
+}

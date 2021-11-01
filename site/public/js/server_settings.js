@@ -1,3 +1,16 @@
+const SETTINGS_FORM_CONTAINER_ID = 'server_settings_form_container';
+const SWITCHING_INFO_ID = 'switching_network_info';
+const AVAILABLE_NETWORKS_SELECT_ID = 'available_networks';
+const KNOWN_NETWORKS_SELECT_ID = 'known_networks';
+const PASSWORD_INPUT_ID = 'password_input';
+const REMEMBER_CHECK_ID = 'remember_check';
+const CONNECT_SUBMIT_BUTTON_ID = 'connect_submit_button';
+const CONNECT_BUTTON_ID = 'connect_button';
+const DISCONNECT_SUBMIT_BUTTON_ID = 'disconnect_submit_button';
+const DISCONNECT_BUTTON_ID = 'disconnect_button';
+const FORGET_SUBMIT_BUTTON_ID = 'forget_submit_button';
+const FORGET_BUTTON_ID = 'forget_button';
+
 const DISABLED_BUTTON_CLASS = 'btn btn-secondary';
 const BUTTON_CLASSES = {};
 BUTTON_CLASSES[CONNECT_BUTTON_ID] = 'btn btn-primary';
@@ -5,9 +18,9 @@ BUTTON_CLASSES[DISCONNECT_BUTTON_ID] = 'btn btn-warning';
 BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-danger';
 
 $(function () {
-    connectModalToLink(CONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble til nettverket?', confirm: 'Koble til', dismiss: 'Avbryt', confirmOnclick: () => { performPrePostActions(); $('#' + CONNECT_SUBMIT_BUTTON_ID).click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til det nye nettverket.', showText: () => { return true; } });
-    connectModalToLink(DISCONNECT_BUTTON_ID, { header: 'Er du sikker på at du vil koble fra nettverket?', confirm: 'Koble fra', dismiss: 'Avbryt', confirmClass: 'btn btn-warning', confirmOnclick: () => { $('#' + DISCONNECT_SUBMIT_BUTTON_ID)[0].click(); } }, { text: 'Den nåværende tilkoblingen vil bli avbrutt. Du vil logges ut og miste forbindelsen med enheten til du kobler deg til enhetens tilgangspunkt.', showText: () => { return true; } });
-    connectModalToLink(FORGET_BUTTON_ID, { header: 'Er du sikker på at du vil glemme nettverket?', confirm: 'Glem', dismiss: 'Avbryt', confirmClass: 'btn btn-danger', confirmOnclick: () => { performPrePostActions(); $('#' + FORGET_SUBMIT_BUTTON_ID).click(); } }, null);
+    connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmOnclick: () => { performPrePostActions(); $('#' + CONNECT_SUBMIT_BUTTON_ID).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
+    connectModalToLink(DISCONNECT_BUTTON_ID, { header: LANG['sure_want_to_disconnect'], confirm: LANG['disconnect'], dismiss: LANG['cancel'], confirmClass: 'btn btn-warning', confirmOnclick: () => { $('#' + DISCONNECT_SUBMIT_BUTTON_ID)[0].click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_access_point'], showText: () => { return true; } });
+    connectModalToLink(FORGET_BUTTON_ID, { header: LANG['sure_want_to_forget'], confirm: LANG['forget'], dismiss: LANG['cancel'], confirmClass: 'btn btn-danger', confirmOnclick: () => { performPrePostActions(); $('#' + FORGET_SUBMIT_BUTTON_ID).click(); } }, null);
 });
 
 function disableButton(button) {

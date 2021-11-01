@@ -1,4 +1,5 @@
 <?php
+require_once(dirname(__DIR__) . '/config/language_config.php');
 require_once(dirname(__DIR__) . '/config/settings_config.php');
 
 function line($string) {
@@ -34,8 +35,9 @@ function generateInputs($setting_type, $grouped_setting_values, $pre_group_html,
 }
 
 function generateGroupStart($name) {
+  $name_trans = LANG[$name];
   line('<div class="col-auto mx-2">');
-  line("<h2>$name</h2>");
+  line("<h2>$name_trans</h2>");
 }
 
 function generateGroupEnd() {
@@ -45,16 +47,18 @@ function generateGroupEnd() {
 function generateSelect($setting, $setting_name, $initial_value) {
   $id = $setting_name;
   $name = $setting['name'];
+  $name_trans = LANG[$name];
   $values = $setting['values'];
 
   line('<div class="mb-3">');
   line('  <div class="row">');
   line('    <div class="col-10">');
-  line("  <label class=\"form-label\" for=\"$id\">$name</label>");
+  line("  <label class=\"form-label\" for=\"$id\">$name_trans</label>");
   line("  <select name=\"$setting_name\" class=\"form-select\" id=\"$id\">");
   foreach ($values as $name => $value) {
+    $name_trans = array_key_exists($name, LANG) ? LANG[$name] : $name;
     $selected = ($value == $initial_value) ? ' selected' : '';
-    line("    <option value=\"$value\"$selected>$name</option>");
+    line("    <option value=\"$value\"$selected>$name_trans</option>");
   }
   line('  </select>');
   line('  </div>');
@@ -66,12 +70,13 @@ function generateRange($setting, $setting_name, $initial_value) {
   $id = $setting_name;
   $value_id = $id . '_value';
   $name = $setting['name'];
+  $name_trans = LANG[$name];
   $min = $setting['range']['min'];
   $max = $setting['range']['max'];
   $step = $setting['range']['step'];
 
   line('<div class="mb-3">');
-  line("  <label class=\"form-label\" for=\"$id\">$name</label>");
+  line("  <label class=\"form-label\" for=\"$id\">$name_trans</label>");
   line('  <div class="row flex-nowrap">');
   line('    <div class="col-10">');
   line("      <input type=\"range\" name=\"$setting_name\" class=\"form-range\" value=\"$initial_value\" min=\"$min\" max=\"$max\" step=\"$step\" id=\"$id\" oninput=\"$('#' + '$value_id').prop('value', this.value);\">");
@@ -86,6 +91,7 @@ function generateRange($setting, $setting_name, $initial_value) {
 function generateCheckbox($setting, $setting_name, $initial_value) {
   $id = $setting_name;
   $name = $setting['name'];
+  $name_trans = LANG[$name];
   $name_attribute =
     "name=\"$setting_name\"";
   if ($initial_value) {
@@ -102,7 +108,7 @@ function generateCheckbox($setting, $setting_name, $initial_value) {
   }
   line('<div class="mb-3 form-check">');
   line("  <input type=\"hidden\" $hidden_input_name value=\"0\"><input type=\"checkbox\" class=\"form-check-input\" $checkbox_name value=\"$checkbox_value\" id=\"$id\" onclick=\"if (this.checked) { this.value = 1; this.name = this.previousSibling.name; this.previousSibling.name = ''; } else { this.value = 0; this.previousSibling.name = this.name; this.name = ''; }\"$checked>");
-  line("  <label class=\"form-check-label\" for=\"$id\">$name</label>");
+  line("  <label class=\"form-check-label\" for=\"$id\">$name_trans</label>");
   line('</div>');
 }
 
@@ -112,9 +118,10 @@ function generateRadio($setting, $setting_name, $initial_value) {
   foreach ($values as $name => $value) {
     $id = $value;
     $checked = ($value == $initial_value) ? ' checked' : '';
+    $name_trans = LANG[$name];
     line("<div class=\"form-check form-check-inline\">");
     line("  <input type=\"radio\" class=\"form-check-input\" name=\"$setting_name\" autocomplete=\"off\" id=\"$id\" value=\"$value\" $checked>");
-    line("  <label class=\"form-check-label\" for=\"$id\">$name</label>");
+    line("  <label class=\"form-check-label\" for=\"$id\">$name_trans</label>");
     line('</div>');
   }
   line('</div>');

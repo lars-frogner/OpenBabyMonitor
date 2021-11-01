@@ -1,0 +1,23 @@
+{
+    "connection_succeeded": "Gratulerer, tilkoblingen var vellykket!",
+    "connection_failed": "Tilkobling mislyktes, vennligst prøv igjen.",
+    "switching_network": "Bytter nettverk, tilkoblingen vil bli brutt.",
+    "refresh": "Forny siden",
+    "server_settings": "Nettverksinnstillinger",
+    "available_networks": "Tilgjengelige nettverk",
+    "connected": "tilkoblet",
+    "password": "Passord",
+    "password_characters": "tegn",
+    "remember": "Husk",
+    "connect": "Koble til",
+    "disconnect": "Koble fra",
+    "known_networks": "Kjente nettverk",
+    "forget": "Glem",
+    "cancel": "Avbryt",
+    "sure_want_to_connect": "Er du sikker på at du vil koble til nettverket?",
+    "sure_want_to_disconnect": "Er du sikker på at du vil koble fra nettverket?",
+    "sure_want_to_forget": "Er du sikker på at du vil glemme nettverket?",
+    "will_be_disconnected": "Den nåværende tilkoblingen vil bli avbrutt.",
+    "until_new_network": "Du vil logges ut og miste forbindelsen med enheten til du kobler deg til det nye nettverket.",
+    "until_access_point": "Du vil logges ut og miste forbindelsen med enheten til du kobler deg til enhetens tilgangspunkt."
+}

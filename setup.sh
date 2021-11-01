@@ -330,6 +330,18 @@ chmod $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/stream.{hex,}key
     cd -
 fi
 
+INSTALL_FLAG_ICONS=true
+if [[ "$INSTALL_FLAG_ICONS" = true ]]; then
+    cd /tmp
+    wget https://github.com/lipis/flag-icons/archive/main.zip
+    unzip main.zip
+    mkdir -p $BM_LINKED_SITE_DIR/library/flag-icons/css
+    mv flag-icons-main/css/flag-icons.min.css $BM_LINKED_SITE_DIR/library/flag-icons/css/
+    mv flag-icons-main/flags $BM_LINKED_SITE_DIR/library/flag-icons/
+    rm -r flag-icons-main main.zip
+    cd -
+fi
+
 SETUP_SERVICES=true
 if [[ "$SETUP_SERVICES" = true ]]; then
     UNIT_DIR=/lib/systemd/system

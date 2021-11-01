@@ -10,10 +10,13 @@ const LISTEN_ANIMATION_BACKGROUND_ID = "listen_animation_background";
 const LISTEN_ANIMATION_INDICATOR_ID = "listen_animation_indicator";
 const LISTEN_ANIMATION_LABEL_CLASS = "listen-animation-label";
 
-const NOTIFICATION_HEADERS = { bad: 'Varsel om gråt', good: 'Varsel om babling', bad_and_good: 'Varsel om gråt og babling', bad_or_good: 'Varsel om gråt eller babling' };
-const NOTIFICATION_TEXTS = { bad: 'Barnet gråter.', good: 'Barnet babler.', bad_and_good: 'Barnet gråter og babler om hverandre.', bad_or_good: 'Barnet lager lyder, men det er ikke tydelig om det er gråt eller babling.' };
+const NOTIFICATION_HEADERS = { bad: LANG['crying_alert'], good: LANG['babbling_alert'], bad_and_good: LANG['crying_and_babbling_alert'], bad_or_good: LANG['crying_or_babbling_alert'] };
+const NOTIFICATION_TEXTS = { bad: LANG['child_crying'], good: LANG['child_babbling'], bad_and_good: LANG['child_crying_and_babbling'], bad_or_good: LANG['child_crying_or_babbling'] };
 
 const NOTIFICATION_SOUND = new Audio('media/notification_sound.mp3');
+
+const USES_SECURE_PROTOCOL = location.protocol === 'https:';
+const SECURE_URL = 'https://' + location.host + location.pathname;
 
 var _EVENT_SOURCE;
 var _REDIRECT_MODAL_TRIGGER = {};
@@ -23,9 +26,9 @@ var _NOTIFICATION_MODAL_TRIGGER = {};
 var _BROWSER_NOTIFICATION;
 
 $(function () {
-    connectModalToObject(_REDIRECT_MODAL_TRIGGER, { checkboxLabel: 'Ikke spør igjen', checkboxChecked: !SETTING_ASK_SECURE_REDIRECT, confirmOnclick: function () { redirectModalCallback(function () { window.location.replace(SECURE_URL); }); }, dismissOnclick: redirectModalCallback, header: 'Nettleservarsler støttes ikke på ukrypterte nettsider', confirm: 'Fortsett til ny side', dismiss: 'Bli på denne siden' }, { text: 'Vil du gå til den krypterte (https) versjonen av siden?', showText: () => { return true; } });
-    connectModalToObject(_UNSUPPORTED_MODAL_TRIGGER, { checkboxLabel: 'Ikke vis igjen', checkboxChecked: !SETTING_SHOW_UNSUPPORTED_MESSAGE, dismissOnclick: unsupportedModalCallback, header: 'Denne nettleseren støtter ikke varsler', dismiss: 'Ok' });
-    connectModalToObject(_PERMISSION_MODAL_TRIGGER, { checkboxLabel: 'Ikke spør igjen', checkboxChecked: !SETTING_ASK_NOTIFICATION_PERMISSION, confirmOnclick: function () { askNotificationPermission(); hideModal(); }, dismissOnclick: permissionModalCallback, header: 'Tillatelse kreves for å bruke nettlerservarsler', confirm: 'Gi tillatelse', dismiss: 'Fortsett uten' });
+    connectModalToObject(_REDIRECT_MODAL_TRIGGER, { checkboxLabel: LANG['dont_ask_again'], checkboxChecked: !SETTING_ASK_SECURE_REDIRECT, confirmOnclick: function () { redirectModalCallback(function () { window.location.replace(SECURE_URL); }); }, dismissOnclick: redirectModalCallback, header: LANG['not_supported_unencrypted'], confirm: LANG['switch_site'], dismiss: LANG['stay'] }, { text: LANG['want_to_switch_site'], showText: () => { return true; } });
+    connectModalToObject(_UNSUPPORTED_MODAL_TRIGGER, { checkboxLabel: LANG['dont_show_again'], checkboxChecked: !SETTING_SHOW_UNSUPPORTED_MESSAGE, dismissOnclick: unsupportedModalCallback, header: LANG['not_supported_by_browser'], dismiss: LANG['ok'] });
+    connectModalToObject(_PERMISSION_MODAL_TRIGGER, { checkboxLabel: LANG['dont_ask_again'], checkboxChecked: !SETTING_ASK_NOTIFICATION_PERMISSION, confirmOnclick: function () { askNotificationPermission(); hideModal(); }, dismissOnclick: permissionModalCallback, header: LANG['premission_required'], confirm: LANG['grant_permission'], dismiss: LANG['continue_without'] });
     connectModalToObject(_NOTIFICATION_MODAL_TRIGGER, { noHeaderHiding: true, noBodyHiding: true, confirmOnclick: function () { hideModal(); changeModeTo('audiostream'); }, confirm: 'Begynn lydavspilling', dismiss: 'Lukk' });
 
     document.addEventListener('visibilitychange', function () {
@@ -120,13 +123,13 @@ function notificationsBlocked() {
 function indicateNotificationsActivated() {
     $('#' + LISTEN_INACTIVE_ICON_ID).hide();
     $('#' + LISTEN_ACTIVE_ICON_ID).show();
-    $('#' + NOTIFICATIONS_MSG_ID).html('Lytter etter aktivitet');
+    $('#' + NOTIFICATIONS_MSG_ID).html(LANG['listening_for_activity']);
 }
 
 function indicateNotificationsDeactivated() {
     $('#' + LISTEN_INACTIVE_ICON_ID).show();
     $('#' + LISTEN_ACTIVE_ICON_ID).hide();
-    $('#' + NOTIFICATIONS_MSG_ID).html('Lytter etter aktivitet<br>(Nettleservarsler er deaktivert)');
+    $('#' + NOTIFICATIONS_MSG_ID).html(LANG['listening_for_activity'] + '<br>(' + LANG['browser_notifications_deactivated'] + ')');
 }
 
 function askNotificationPermission() {

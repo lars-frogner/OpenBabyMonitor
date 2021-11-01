@@ -1,7 +1,5 @@
-const SETTINGS_MODAL_WARNING_TEXT = 'Merk at du har endringer i innstillingene som ikke er lagret.';
 const settingsFormHasChanged = () => { return DETECT_FORM_CHANGES && elementHasChangedSinceCapture(SETTINGS_FORM_ID); };
-const MODAL_ADDITIONAL_SETTER = { text: SETTINGS_MODAL_WARNING_TEXT, showText: settingsFormHasChanged };
-const LOGOUT_MODAL_WARNING_TEXT = 'Enheten står ikke i standby. Den vil fortsette i nåværende modus selv om du logger ut.';
+const MODAL_ADDITIONAL_SETTER = { text: LANG['nav_unsaved_settings'], showText: settingsFormHasChanged };
 
 $(function () {
     if (DETECT_FORM_CHANGES) {
@@ -16,7 +14,7 @@ $(function () {
     connectModalToLink(AUDIOSTREAM_SETTINGS_NAV_LINK_ID, Object.assign({}, AUDIOSTREAM_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
     connectModalToLink(VIDEOSTREAM_SETTINGS_NAV_LINK_ID, Object.assign({}, VIDEOSTREAM_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
     connectModalToLink(SERVER_SETTINGS_NAV_LINK_ID, Object.assign({}, SERVER_SETTINGS_MODAL_BASE_PROPERTIES, { showModal: settingsFormHasChanged }), MODAL_ADDITIONAL_SETTER);
-    connectModalToLink(LOGOUT_NAV_LINK_ID, LOGOUT_MODAL_BASE_PROPERTIES, [{ text: LOGOUT_MODAL_WARNING_TEXT, showText: () => { return INITIAL_MODE != STANDBY_MODE; } }, MODAL_ADDITIONAL_SETTER]);
+    connectModalToLink(LOGOUT_NAV_LINK_ID, LOGOUT_MODAL_BASE_PROPERTIES, [{ text: LANG['nav_device_not_in_standby'], showText: () => { return INITIAL_MODE != STANDBY_MODE; } }, MODAL_ADDITIONAL_SETTER]);
     connectModalToLink(REBOOT_NAV_LINK_ID, REBOOT_MODAL_BASE_PROPERTIES, MODAL_ADDITIONAL_SETTER);
     connectModalToLink(SHUTDOWN_NAV_LINK_ID, SHUTDOWN_MODAL_BASE_PROPERTIES, MODAL_ADDITIONAL_SETTER);
     connectModalToLink(AP_NAV_LINK_ID, AP_MODAL_BASE_PROPERTIES, [AP_MODAL_BASE_BODY_SETTER, MODAL_ADDITIONAL_SETTER]);

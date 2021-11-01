@@ -17,7 +17,7 @@ redirectIfLoggedIn('main.php');
         <aside class="col-sm-5">
           <div class="card">
             <article class="card-body">
-              <h3 class="card-title text-center">Vennligst logg inn</h3>
+              <h3 class="card-title text-center"><?php echo LANG['please_sign_in']; ?></h3>
               <?php
               if (isset($_POST['submit'])) {
                 tryLogin($_DATABASE, $_POST['password'], 'main.php', '<hr><p class="text-center text-danger">Feil passord</p>');
@@ -25,11 +25,11 @@ redirectIfLoggedIn('main.php');
               ?>
               <form action="" method="post">
                 <div class="my-3 form-group">
-                  <label class="visually-hidden" for="password">Passord</label>
+                  <label class="visually-hidden" for="password"><?php echo LANG['password']; ?></label>
                   <input type="password" name="password" class="form-control" id="password" placeholder="Passord" required>
                 </div>
                 <div class="form-group text-center">
-                  <button type="submit" name="submit" class="btn btn-primary">Logg inn</button>
+                  <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['sign_in']; ?></button>
                 </div>
               </form>
             </article>

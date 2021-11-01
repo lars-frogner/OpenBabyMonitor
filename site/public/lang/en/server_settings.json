@@ -1,0 +1,23 @@
+{
+    "connection_succeeded": "Congratulations, connection succeeded!",
+    "connection_failed": "Connection failed, please try again.",
+    "switching_network": "Switching network, the connection will be lost.",
+    "refresh": "Refresh webpage",
+    "server_settings": "Network settings",
+    "available_networks": "Available networks",
+    "connected": "connected",
+    "password": "Password",
+    "password_characters": "characters",
+    "remember": "Remember",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "known_networks": "Known networks",
+    "forget": "Forget",
+    "cancel": "Cancel",
+    "sure_want_to_connect": "Are you sure you want to connect to the network?",
+    "sure_want_to_disconnect": "Are you sure you want to disconnect from the network?",
+    "sure_want_to_forget": "Are you sure you want to forget the network?",
+    "will_be_disconnected": "The current connection will be lost.",
+    "until_new_network": "You will be signed out and disonnected from the device until you connect to the new network.",
+    "until_access_point": "You will be signed out and disonnected from the device until you connect to the device access point."
+}

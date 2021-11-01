@@ -44,15 +44,15 @@ require_once(TEMPLATES_DIR . '/settings.php');
 
   <main>
     <div class="container">
-      <h1 class="my-4">Videoinnstillinger</h1>
+      <h1 class="my-4"><?php echo LANG['video_settings']; ?></h1>
       <form id="videostream_settings_form" action="" method="post">
         <div class="row">
           <?php generateInputs($setting_type, $grouped_values, [], []); ?>
         </div>
         <div class="my-4">
-          <button type="submit" name="submit" class="btn btn-primary">Bekreft</button>
-          <button name="undo" class="btn btn-secondary" onclick="$('#videostream_settings_form').trigger('reset');">Angre</button>
-          <button type="submit" name="reset" class="btn btn-secondary">Tilbakestill</button>
+          <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['submit']; ?></button>
+          <button name="undo" class="btn btn-secondary" onclick="$('#videostream_settings_form').trigger('reset');"><?php echo LANG['undo']; ?></button>
+          <button type="submit" name="reset" class="btn btn-secondary"><?php echo LANG['reset']; ?></button>
         </div>
       </form>
     </div>

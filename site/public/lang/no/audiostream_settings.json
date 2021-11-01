@@ -1,0 +1,17 @@
+{
+    "audio_settings": "Lydinnstillinger",
+    "submit": "Bekreft",
+    "undo": "Angre",
+    "reset": "Tilbakestill",
+    "encrypted": "Kryptert",
+    "gain": "Mikrofonforsterkning (%)",
+    "volume": "Volumjustering",
+    "sampling_rate": "Samplingsrate (Hz)",
+    "mp3_bitrate": "MP3 bitrate (kbps)",
+    "min_frequency": "Laveste frekvens (Hz)",
+    "max_frequency": "Høyeste frekvens (Hz)",
+    "g_streaming": "Strømming",
+    "g_volume": "Volum",
+    "g_quality": "Kvalitet",
+    "g_filtration": "Filtrering"
+}

@@ -49,7 +49,7 @@ function generateAvailableNetworksSelect($available_networks, $known_networks, $
     $requires_password = $data['authentication'] ? 'true' : 'false';
     $is_known = in_array($ssid, $known_networks) ? 'true' : 'false';
     $is_connected = $ssid == $connected_network;
-    $name = $ssid . ($is_connected ? ' (tilkoblet)' : '');
+    $name = $ssid . ($is_connected ? (' (' . LANG['connected'] . ')') : '');
     $is_connected = $is_connected ? 'true' : 'false';
     $color_class = getColorClass($data['quality']);
     line("<option class=\"$color_class\" value=\"$ssid\" id=\"$ssid\">$name</option>");
