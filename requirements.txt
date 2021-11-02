@@ -1,4 +1,3 @@
 six
 mysql-connector-python
-flask
 opencv-python

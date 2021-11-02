@@ -2,27 +2,28 @@
 set -x
 set -e
 
-# Install Raspbian Lite and flash to SD card.
+# Write a Raspbian Buster Lite image to SD card.
 # Create empty file called "ssh" and a text file called "wpa_supplicant.conf" containing
 # """
 # ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 # update_config=1
-# country=NO
+# country=<country code>
 #
 # network={
 #  ssid="<network name>"
 #  psk="<network password>"
 # }
 # """
-# in boot directory of flashed SD card.
-# ssh pi@raspberrypi.home # Password is raspberry (try .local if .home doesn't work)
+# in the boot directory of the SD card.
+# Insert the SD card into the Raspberry Pi.
+# ssh pi@raspberrypi.local # Password is raspberry (try .home if .local doesn't work)
 # echo -e "\nexport LC_ALL=en_GB.UTF-8\nexport LANGUAGE=en_GB.UTF-8\n" >> ~/.bashrc
 # sudo raspi-config
-# Change password for pi user and set hostname to "babymonitor", set time zone to Oslo and enable camera module. Say yes to reboot.
+# Change password for pi user and set hostname to "babymonitor", set time zone to the local time zone and enable camera module. Say yes to reboot.
 # ssh pi@babymonitor # Log in with new password
 # Note: mini USB microphone does not appear to useable without sudo for other users than pi.
 # Clone the babymonitor repository:
-# git clone https://github.com/lars-frogner/babymonitor.git
+# sudo apt -y install git && git clone https://github.com/lars-frogner/babymonitor.git
 # Run this setup script (as pi user).
 # Run configure_network.sh to generate network configurations for using the unit as a wireless
 # access point and for connecting to an existing wireless network as a client (the script works
@@ -89,8 +90,6 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     # Install inotify for flag monitoring
     sudo apt -y install inotify-tools
 
-    sudo apt -y install git
-
     sudo apt -y install python3 python3-pip
 
     # Install Apache, PHP and MySQL (MariaDB)
@@ -152,6 +151,9 @@ if [[ "$SETUP_AUDIO" = true ]]; then
     BM_SOUND_CARD_NUMBER=$(echo $BM_MIC_ID | sed -n 's/^hw:\([0-9]*\),[0.9]*$/\1/p')
     echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SOUND_CARD_NUMBER='$BM_SOUND_CARD_NUMBER'" >> $BM_ENV_EXPORTS_PATH
+
+    # Use max gain for microphone by default
+    amixer -c $BM_SOUND_CARD_NUMBER sset Mic 100%
 
     sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
 
