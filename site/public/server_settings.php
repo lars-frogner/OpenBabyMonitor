@@ -86,7 +86,7 @@ $connected_network = obtainConnectedNetworkSSID();
                   <label class="form-check-label" for="remember_check"><?php echo LANG['remember']; ?></label>
                 </div>
               </div>
-              <div class="col-auto mt-3">
+              <div class="col-auto">
                 <button type="submit" name="connect" style="display: none;" id="connect_submit_button"></button><button class="btn btn-secondary" id="connect_button" disabled><?php echo LANG['connect']; ?></button>
                 <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button"></a><button class="btn btn-secondary" id="disconnect_button" disabled><?php echo LANG['disconnect']; ?></button>
               </div>
