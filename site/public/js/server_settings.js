@@ -46,6 +46,7 @@ function disablePasswordInput() {
 function enablePasswordInput() {
     var input = $('#' + PASSWORD_INPUT_ID);
     input.prop('disabled', false);
+    input.focus();
 }
 
 function selectNoNetwork() {

@@ -73,10 +73,12 @@ $connected_network = obtainConnectedNetworkSSID();
             </div>
             <div class="row form-group align-items-center my-3">
               <div class="col-auto">
-                <label class="col-form-label" for="password_input"><?php echo LANG['password']; ?></label>
-              </div>
-              <div class="col-auto">
-                <input type="password" name="password" class="form-control" placeholder="8-63 <?php echo LANG['password_characters']; ?>" id="password_input" disabled>
+                <div class="form-floating">
+                  <input type="password" name="password" class="form-control" id="password_input" placeholder="" disabled>
+                  <label class="text-bm" for="password_input">
+                    <?php echo LANG['password'] . ' (8-63 ' . LANG['password_characters'] . ')'; ?>
+                  </label>
+                </div>
               </div>
               <div class="col-auto">
                 <div class="form-check">
