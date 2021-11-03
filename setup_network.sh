@@ -2,7 +2,13 @@
 set -x
 set -e
 
+# Generates network configurations for using the unit as a wireless
+# access point and for connecting to an existing wireless network as a client (works
+# for Raspbian Buster). The two modes of operation can be switched between using the
+# activate_ap_mode.sh and activate_client_mode.sh scripts.
+
 source $BM_ENV_EXPORTS_PATH
+source $BM_DIR/config/setup_config.env
 
 BM_NW_AP_DIR=~/.netconf_ap # Directory for configurations files set up for wireless access point mode
 BM_NW_CLIENT_DIR=~/.netconf_client # Directory for configurations files set up for wireless client mode
@@ -10,8 +16,8 @@ BM_NW_ORIG_DIR=~/.netconf_orig # For backup of original configuration files
 BM_NW_AP_IP_ROOT=192.168.4
 BM_NW_INTERFACE=wlan0
 BM_NW_CHANNEL=7
-BM_NW_SSID=babymonitor
-BM_NW_COUNTRY_CODE=NO
+BM_NW_SSID=$BM_HOSTNAME
+BM_NW_COUNTRY_CODE=$BM_COUNTRY_CODE
 
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
@@ -76,7 +82,7 @@ sudo mv -v {,$BM_NW_ORIG_DIR}/etc/dnsmasq.conf
 IP_START=2
 IP_END=20
 LEASE_TIME=24h
-ALIAS=babymonitor.local
+ALIAS=$BM_HOSTNAME.local
 echo "interface=$BM_NW_INTERFACE
 dhcp-range=$BM_NW_AP_IP_ROOT.$IP_START,$BM_NW_AP_IP_ROOT.$IP_END,255.255.255.0,$LEASE_TIME
 domain=wlan

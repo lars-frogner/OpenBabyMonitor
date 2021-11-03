@@ -2,33 +2,8 @@
 set -x
 set -e
 
-# Write a Raspbian Buster Lite image to SD card.
-# Create empty file called "ssh" and a text file called "wpa_supplicant.conf" containing
-# """
-# ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
-# update_config=1
-# country=<country code>
-#
-# network={
-#  ssid="<network name>"
-#  psk="<network password>"
-# }
-# """
-# in the boot directory of the SD card.
-# Insert the SD card into the Raspberry Pi.
-# ssh pi@raspberrypi.local # Password is raspberry (try .home if .local doesn't work)
-# echo -e "\nexport LC_ALL=en_GB.UTF-8\nexport LANGUAGE=en_GB.UTF-8\n" >> ~/.bashrc
-# sudo raspi-config
-# Change password for pi user and set hostname to "babymonitor", set time zone to the local time zone and enable camera module. Say yes to reboot.
-# ssh pi@babymonitor # Log in with new password
-# Note: mini USB microphone does not appear to useable without sudo for other users than pi.
-# Clone the babymonitor repository:
-# sudo apt -y install git && git clone https://github.com/lars-frogner/babymonitor.git
-# Run this setup script (as pi user).
-# Run configure_network.sh to generate network configurations for using the unit as a wireless
-# access point and for connecting to an existing wireless network as a client (the script works
-# for Raspbian Buster). The two modes of operation can be switched between using the
-# activate_ap_mode.sh and activate_client_mode.sh scripts.
+BM_DIR=$(dirname $(readlink -f $0))
+source $BM_DIR/config/setup_config.env
 
 BM_SERVER_USER=pi
 WEB_USER=www-data
@@ -38,14 +13,11 @@ BM_WRITE_PERMISSIONS=770
 
 SWAP_SIZE=1024
 
-PHP_TIMEZONE=Europe/Oslo
-
 APACHE_LOG_DIR=/var/log/apache2
 BM_APACHE_LOG_PATH=$APACHE_LOG_DIR/error.log
 SERVER_LOG_DIR=/var/log/babymonitor
 BM_SERVER_LOG_PATH=$SERVER_LOG_DIR/error.log
 
-BM_DIR=$(dirname $(readlink -f $0))
 BM_ENV_DIR=$BM_DIR/env
 BM_ENV_EXPORTS_PATH=$BM_ENV_DIR/envvar_exports
 BM_ENV_PATH=$BM_ENV_DIR/envvars
@@ -104,7 +76,7 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
 
     # Install required Python packages
     sudo apt -y install libatlas-base-dev # Requirement for numpy
-    sudo apt -y install libopenexr-dev libgtk-3-dev # Requirements for OpenCV
+    sudo apt -y install libopenexr-dev # Requirement for OpenCV
     pip3 install --no-cache-dir -r requirements.txt
 
     sudo apt -y autoremove
@@ -147,6 +119,7 @@ SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
     sudo adduser $BM_SERVER_USER audio
 
+    # Note: mini USB microphone does not appear to useable without sudo for other users than pi.
     BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
     BM_SOUND_CARD_NUMBER=$(echo $BM_MIC_ID | sed -n 's/^hw:\([0-9]*\),[0.9]*$/\1/p')
     echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_EXPORTS_PATH
@@ -434,8 +407,8 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     sudo sed -i "/;extension=xsl/aextension=inotify" $PHP_INI_APACHE_PATH
 
     # Set time zone
-    sudo sed -i "s/;date.timezone =/date.timezone = ${PHP_TIMEZONE/'/'/'\/'}/g" $PHP_INI_CLI_PATH
-    sudo sed -i "s/;date.timezone =/date.timezone = ${PHP_TIMEZONE/'/'/'\/'}/g" $PHP_INI_APACHE_PATH
+    sudo sed -i "s/;date.timezone =/date.timezone = ${BM_TIMEZONE/'/'/'\/'}/g" $PHP_INI_CLI_PATH
+    sudo sed -i "s/;date.timezone =/date.timezone = ${BM_TIMEZONE/'/'/'\/'}/g" $PHP_INI_APACHE_PATH
 
     # Use index.php as index file
     APACHE_CONF_PATH=/etc/apache2/apache2.conf
@@ -484,7 +457,7 @@ x509_extensions = v3_req
 prompt = no
 
 [req_distinguished_name]
-commonName = babymonitor.local: Self-signed certificate
+commonName = $BM_HOSTNAME.local: Self-signed certificate
 
 [req_ext]
 subjectAltName = @alt_names
@@ -493,15 +466,15 @@ subjectAltName = @alt_names
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = babymonitor.local
-DNS.2 = babymonitor.home
-DNS.3 = babymonitor.lan
-" > babymonitor.cnf
+DNS.1 = $BM_HOSTNAME.local
+DNS.2 = $BM_HOSTNAME.home
+DNS.3 = $BM_HOSTNAME.lan
+" > $BM_HOSTNAME.cnf
 
-    SSL_KEY_PATH=/etc/ssl/private/babymonitor.key
-    SSL_CERT_PATH=/etc/ssl/certs/babymonitor.crt
-    sudo openssl req -x509 -nodes -days 36524 -newkey rsa:2048 -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH -config babymonitor.cnf
-    rm babymonitor.cnf
+    SSL_KEY_PATH=/etc/ssl/private/$BM_HOSTNAME.key
+    SSL_CERT_PATH=/etc/ssl/certs/$BM_HOSTNAME.crt
+    sudo openssl req -x509 -nodes -days 36524 -newkey rsa:2048 -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH -config $BM_HOSTNAME.cnf
+    rm $BM_HOSTNAME.cnf
 
     # Setup new site
     SITE_NAME=$(basename $BM_SITE_DIR)
@@ -509,8 +482,8 @@ DNS.3 = babymonitor.lan
     DocumentRoot $BM_SITE_DIR
     ErrorLog $BM_APACHE_LOG_PATH
     CustomLog $APACHE_LOG_DIR/access.log combined
-    ServerName babymonitor.local
-    ServerAlias babymonitor.*
+    ServerName $BM_HOSTNAME.local
+    ServerAlias $BM_HOSTNAME.*
 
     <Directory \"$BM_SITE_DIR\">
         AllowOverride All
@@ -525,8 +498,8 @@ DNS.3 = babymonitor.lan
     DocumentRoot $BM_SITE_DIR
     ErrorLog $BM_APACHE_LOG_PATH
     CustomLog $APACHE_LOG_DIR/access.log combined
-    ServerName babymonitor.local
-    ServerAlias babymonitor.*
+    ServerName $BM_HOSTNAME.local
+    ServerAlias $BM_HOSTNAME.*
 
     SSLEngine On
     SSLProtocol all -SSLv2
