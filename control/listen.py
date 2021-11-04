@@ -6,11 +6,13 @@ import time
 import pathlib
 import json
 import collections
+import multiprocessing
 import numpy as np
 import cv2
 sys.path.append(os.path.join(os.environ['BM_DIR'], 'detection'))
 import features
 import control
+from audiostream import update_gain
 
 MODE = 'listen'
 
@@ -108,8 +110,35 @@ class Notifier:
         return detected_label
 
 
+class QueueWorker:
+    def __init__(self, target, *args):
+        self.task_queue = multiprocessing.Queue(1)
+        self.process = multiprocessing.Process(target=target,
+                                               args=(self.task_queue, ) + args,
+                                               daemon=True)
+
+    def __enter__(self):
+        self.process.start()
+        return self.task_queue
+
+    def __exit__(self, *args):
+        self.stop()
+        self.close_queue()
+
+    def stop(self):
+        if self.process.is_alive():
+            self.process.terminate()
+            self.process.join()
+
+    def close_queue(self):
+        if not self.task_queue.empty():
+            # Empty the queue before closing to prevent feeder thread from crashing
+            self.task_queue.get()
+        self.task_queue.close()
+        self.task_queue.join_thread()
+
+
 def listen():
-    control.register_shutdown_handler()
     control.enter_mode(
         MODE, lambda mode, config, database: listen_with_settings(
             config, **control.read_settings(mode, config, database)))
@@ -125,37 +154,53 @@ def listen_with_settings(config,
                          notify_and_or='or',
                          notify_on_babbling=False,
                          **kwargs):
-    mic_id = os.environ['BM_MIC_ID']
-    audio_device = 'plug{}'.format(mic_id)
     control_dir = pathlib.Path(os.environ['BM_DIR']) / 'control'
-    comm_dir = control_dir / '.comm'
-    standardization_file = control_dir / 'standardization.npz'
-    model_file = control_dir / 'crynet.onnx'
-    probabilities_file = comm_dir / 'probabilities.json'
-    notification_file = comm_dir / 'notification.txt'
+
+    worker = QueueWorker(
+        process_features, config, control_dir,
+        dict(fraction_threshold=fraction_threshold,
+             consecutive_recordings=consecutive_recordings,
+             probability_threshold=probability_threshold,
+             min_notification_interval=min_notification_interval,
+             notify_on_crying=notify_on_crying,
+             notify_and_or=notify_and_or,
+             notify_on_babbling=notify_on_babbling))
+
+    with worker as task_queue:
+        # Register shutdown handlers after starting worker to
+        # prevent it from inheriting the handlers
+        control.register_shutdown_handler()
+
+        update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
+                    os.environ['BM_SERVER_LOG_PATH'])
+
+        standardization_file = control_dir / 'standardization.npz'
+        feature_provider = create_feature_provider(standardization_file)
+
+        while True:
+            last_record_time = time.time()
+            feature = feature_provider()
+            task_queue.put(feature)
+            time.sleep(max(0, interval - (time.time() - last_record_time)))
+
+
+def process_features(task_queue, config, control_dir, notifier_settings):
 
     labels = config['inference']['labels']
     label_names = {idx: name for name, idx in labels.items()}
 
-    feature_provider = features.FeatureProvider(
-        audio_device,
-        features.AudioFeatureExtractor(backend='python_speech_features',
-                                       disable_io=True),
-        standardization_file=standardization_file)
+    notifier = Notifier(labels, **notifier_settings)
 
-    model = Model(model_file)
+    comm_dir = control_dir / '.comm'
+    probabilities_file = comm_dir / 'probabilities.json'
+    notification_file = comm_dir / 'notification.txt'
 
-    notifier = Notifier(labels,
-                        fraction_threshold=fraction_threshold,
-                        consecutive_recordings=consecutive_recordings,
-                        probability_threshold=probability_threshold,
-                        min_notification_interval=min_notification_interval,
-                        notify_on_crying=notify_on_crying,
-                        notify_and_or=notify_and_or,
-                        notify_on_babbling=notify_on_babbling)
+    model_file = control_dir / 'crynet_2s.onnx'
+
+    model = create_model(model_file)
 
     while True:
-        feature = feature_provider()
+        feature = task_queue.get()
 
         probabilities = 10**model.forward(feature)
         probabilities /= np.sum(probabilities)
@@ -168,7 +213,22 @@ def listen_with_settings(config,
         if notification is not None:
             write_notification(notification_file, notification)
 
-        time.sleep(interval)
+
+def create_model(model_file):
+    model = Model(model_file)
+    return model
+
+
+def create_feature_provider(standardization_file):
+    mic_id = os.environ['BM_MIC_ID']
+    audio_device = 'plug{}'.format(mic_id)
+
+    return features.FeatureProvider(audio_device,
+                                    features.AudioFeatureExtractor(
+                                        feature_window_count=128,
+                                        backend='python_speech_features',
+                                        disable_io=True),
+                                    standardization_file=standardization_file)
 
 
 def write_probabilities(label_names, probabilities_file, probabilities):
@@ -187,4 +247,3 @@ def write_notification(notification_file, notification):
 
 if __name__ == '__main__':
     listen()
-    # listen_with_settings(control.get_config())
