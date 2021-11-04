@@ -7,12 +7,26 @@ set -e
 # for Raspbian Buster). The two modes of operation can be switched between using the
 # activate_ap_mode.sh and activate_client_mode.sh scripts.
 
-source $BM_ENV_EXPORTS_PATH
+BM_DIR=$(dirname $(readlink -f $0))
 source $BM_DIR/config/setup_config.env
 
-BM_NW_AP_DIR=~/.netconf_ap # Directory for configurations files set up for wireless access point mode
-BM_NW_CLIENT_DIR=~/.netconf_client # Directory for configurations files set up for wireless client mode
-BM_NW_ORIG_DIR=~/.netconf_orig # For backup of original configuration files
+BM_ENV_EXPORTS_PATH=$BM_DIR/env/envvar_exports
+
+if [[ ! -f "$BM_ENV_EXPORTS_PATH" ]]; then
+    echo 'Error: setup.sh must be run before this script'
+    exit 1
+fi
+
+if [[ "$(whoami)" != "$BM_USER" ]]; then
+    echo "Error: this script must be run by user $BM_USER"
+    exit 1
+fi
+
+source $BM_ENV_EXPORTS_PATH
+
+BM_NW_AP_DIR=/home/$BM_USER/.netconf_ap # Directory for configurations files set up for wireless access point mode
+BM_NW_CLIENT_DIR=/home/$BM_USER/.netconf_client # Directory for configurations files set up for wireless client mode
+BM_NW_ORIG_DIR=/home/$BM_USER/.netconf_orig # For backup of original configuration files
 BM_NW_AP_IP_ROOT=192.168.4
 BM_NW_INTERFACE=wlan0
 BM_NW_CHANNEL=7

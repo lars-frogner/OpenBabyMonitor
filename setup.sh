@@ -5,7 +5,11 @@ set -e
 BM_DIR=$(dirname $(readlink -f $0))
 source $BM_DIR/config/setup_config.env
 
-BM_SERVER_USER=pi
+if [[ "$(whoami)" != "$BM_USER" ]]; then
+    echo "Error: this script must be run by user $BM_USER"
+    exit 1
+fi
+
 WEB_USER=www-data
 BM_WEB_GROUP=www-data
 BM_READ_PERMISSIONS=750
@@ -77,7 +81,7 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     # Install required Python packages
     sudo apt -y install libatlas-base-dev # Requirement for numpy
     sudo apt -y install libopenexr-dev # Requirement for OpenCV
-    pip3 install --no-cache-dir -r requirements.txt
+    pip3 install --no-cache-dir -r $BM_DIR/requirements.txt
 
     sudo apt -y autoremove
 fi
@@ -85,23 +89,25 @@ fi
 SETUP_BASH_CONFIG=true
 if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     # Enable convenient ls aliases
-    sed -i "s/#alias ll='ls -l'/alias ll='ls -lh'/g" ~/.bashrc
-    sed -i "s/#alias la='ls -A'/alias la='ls -A'/g" ~/.bashrc
-    sed -i "s/#alias l='ls -CF'/alias l='ls -Alh'/g" ~/.bashrc
+    sed -i "s/#alias ll='ls -l'/alias ll='ls -lh'/g" /home/$BM_USER/.bashrc
+    sed -i "s/#alias la='ls -A'/alias la='ls -A'/g" /home/$BM_USER/.bashrc
+    sed -i "s/#alias l='ls -CF'/alias l='ls -Alh'/g" /home/$BM_USER/.bashrc
 
     # Add alias for showing CPU temperature
-    echo -e "alias temp='sudo vcgencmd measure_temp'\n" >> ~/.bashrc
+    echo -e "alias temp='sudo vcgencmd measure_temp'\n" >> /home/$BM_USER/.bashrc
 
     # Enable arrow up/down history search
-    cp /etc/inputrc ~/.inputrc
-    sed -i 's/# "\\e\[B": history-search-forward/"\\e[B": history-search-forward/g' ~/.inputrc
-    sed -i 's/# "\\e\[A": history-search-backward/"\\e[A": history-search-backward/g' ~/.inputrc
+    cp /etc/inputrc /home/$BM_USER/.inputrc
+    sed -i 's/# "\\e\[B": history-search-forward/"\\e[B": history-search-forward/g' /home/$BM_USER/.inputrc
+    sed -i 's/# "\\e\[A": history-search-backward/"\\e[A": history-search-backward/g' /home/$BM_USER/.inputrc
 
-    echo -e "source $BM_ENV_EXPORTS_PATH\n" >> ~/.bashrc
+    echo -e "source $BM_ENV_EXPORTS_PATH\n" >> /home/$BM_USER/.bashrc
 
-    sudo sed -i 's/pi ALL=(ALL) NOPASSWD: ALL/pi ALL=(ALL) PASSWD: ALL/g' /etc/sudoers.d/010_pi-nopasswd
+    if [[ "$BM_USER" == "pi" ]]; then
+        sudo sed -i 's/pi ALL=(ALL) NOPASSWD: ALL/pi ALL=(ALL) PASSWD: ALL/g' /etc/sudoers.d/010_pi-nopasswd
+    fi
 
-    source ~/.bashrc
+    source /home/$BM_USER/.bashrc
 fi
 
 DISABLE_BLUETOOTH=true
@@ -117,9 +123,8 @@ fi
 
 SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
-    sudo adduser $BM_SERVER_USER audio
+    sudo adduser $BM_USER audio
 
-    # Note: mini USB microphone does not appear to useable without sudo for other users than pi.
     BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
     BM_SOUND_CARD_NUMBER=$(echo $BM_MIC_ID | sed -n 's/^hw:\([0-9]*\),[0.9]*$/\1/p')
     echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_EXPORTS_PATH
@@ -132,7 +137,7 @@ if [[ "$SETUP_AUDIO" = true ]]; then
 
     echo "#!/bin/bash
 rm -rf \$BM_AUDIO_STREAM_DIR
-install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_AUDIO_STREAM_DIR
+install -d -o $BM_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_AUDIO_STREAM_DIR
 openssl rand 16 > \$BM_AUDIO_STREAM_DIR/stream.key
 echo stream.key > \$BM_AUDIO_STREAM_DIR/stream.keyinfo
 echo stream.key >> \$BM_AUDIO_STREAM_DIR/stream.keyinfo
@@ -148,7 +153,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     mkdir -p $BM_ENV_DIR
 
     touch $BM_ENV_EXPORTS_PATH
-    echo "export BM_SERVER_USER=$BM_SERVER_USER" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_USER=$BM_USER" >> $BM_ENV_EXPORTS_PATH
     echo "export WEB_USER=$WEB_USER" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_WEB_GROUP=$BM_WEB_GROUP" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_READ_PERMISSIONS=$BM_READ_PERMISSIONS" >> $BM_ENV_EXPORTS_PATH
@@ -271,7 +276,7 @@ fi
 INSTALL_PICAM=true
 if [[ "$INSTALL_PICAM" = true ]]; then
     # Create directories and symbolic links
-    sudo install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS $BM_PICAM_DIR{,/archive}
+    sudo install -d -o $BM_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS $BM_PICAM_DIR{,/archive}
 
     ln -sfn {$BM_PICAM_STREAM_DIR,$BM_PICAM_DIR}/rec
     ln -sfn {$BM_PICAM_STREAM_DIR,$BM_PICAM_DIR}/hooks
@@ -281,11 +286,11 @@ if [[ "$INSTALL_PICAM" = true ]]; then
 
     echo "#!/bin/bash
 rm -rf \$BM_PICAM_STREAM_DIR
-install -d -o $BM_SERVER_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/{,rec,hooks,state}
+install -d -o $BM_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/{,rec,hooks,state}
 ENCRYPTION_KEY_HEX=\$(openssl rand -hex 16)
 echo \$ENCRYPTION_KEY_HEX > \$BM_PICAM_STREAM_DIR/stream.hexkey
 echo -ne \"\$(echo \$ENCRYPTION_KEY_HEX | sed -e 's/../\\\\x&/g')\" > \$BM_PICAM_STREAM_DIR/stream.key
-chown $BM_SERVER_USER:$BM_WEB_GROUP \$BM_PICAM_STREAM_DIR/stream.{hex,}key
+chown $BM_USER:$BM_WEB_GROUP \$BM_PICAM_STREAM_DIR/stream.{hex,}key
 chmod $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/stream.{hex,}key
 " > $BM_DIR/control/prepare_video_streaming.sh
     chmod $BM_READ_PERMISSIONS $BM_DIR/control/prepare_video_streaming.sh
@@ -352,7 +357,7 @@ After=mysqld.service
 
 [Service]
 Type=oneshot
-User=$BM_SERVER_USER
+User=$BM_USER
 Group=$BM_WEB_GROUP
 EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/startup.sh
@@ -377,7 +382,7 @@ Description=Babymonitor $SERVICE service
 
 [Service]
 Type=simple
-User=$BM_SERVER_USER
+User=$BM_USER
 Group=$BM_WEB_GROUP
 EnvironmentFile=$BM_ENV_PATH
 ExecStart=$BM_DIR/control/$SERVICE.sh
@@ -418,7 +423,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
     echo -e "\nDirectoryIndex index.php" | sudo tee -a $APACHE_CONF_PATH
 
     # Add main user to www-data group
-    sudo adduser $BM_SERVER_USER $BM_WEB_GROUP
+    sudo adduser $BM_USER $BM_WEB_GROUP
 
     # Create folders where the group has write permissions
     mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_MODE_COMM_DIR
@@ -428,7 +433,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
 
     # Ensure permissions are correct in project folder
     sudo chmod -R $BM_READ_PERMISSIONS $BM_DIR
-    sudo chown -R $BM_SERVER_USER:$BM_WEB_GROUP $BM_DIR
+    sudo chown -R $BM_USER:$BM_WEB_GROUP $BM_DIR
 
     # Set write permissions
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
@@ -437,7 +442,7 @@ if [[ "$INSTALL_SERVER" = true ]]; then
 
     sudo mkdir -p $SERVER_LOG_DIR
     sudo touch $BM_SERVER_LOG_PATH
-    sudo chown $BM_SERVER_USER:$BM_WEB_GROUP $BM_SERVER_LOG_PATH
+    sudo chown $BM_USER:$BM_WEB_GROUP $BM_SERVER_LOG_PATH
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_LOG_PATH
 
     # Link site folder to default Apache site root
