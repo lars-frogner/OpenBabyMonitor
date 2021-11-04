@@ -40,6 +40,7 @@ class Notifier:
         self.probability_threshold = probability_threshold * 1e-2
         self.min_notification_interval = min_notification_interval
         self.notify_on = {'bad': notify_on_crying, 'good': notify_on_babbling}
+        self.notify_on_any = notify_on_crying and notify_on_babbling
         self.notify_and_or = notify_and_or
 
         self.prediction_history = collections.deque(
@@ -97,7 +98,7 @@ class Notifier:
             detected_label = detected_labels[0]
         elif len(detected_labels) > 1:
             detected_label = 'bad_and_good'
-        elif self.notify_and_or == 'or' and self.compute_label_fraction_in_prediction_history(
+        elif self.notify_on_any and self.notify_and_or == 'or' and self.compute_label_fraction_in_prediction_history(
             (self.labels['bad'], self.labels['good'])):
             detected_label = 'bad_or_good'
 
