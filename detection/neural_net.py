@@ -54,12 +54,19 @@ class CryNet(nn.Module):
     def __init__(self,
                  input_shape,
                  n_labels,
+                 aspect=None,
                  complexity=0,
                  repeats=[1, 1, 1, 1, 1],
                  use_batch_norm=False,
                  use_dropout=False,
                  dtype=None):
         super().__init__()
+        self.n_labels = n_labels
+        self.aspect = aspect
+        self.complexity = complexity
+        self.repeats = repeats
+        self.use_batch_norm = use_batch_norm
+        self.use_dropout = use_dropout
         self.dtype = dtype
 
         self.n_weights = 0
@@ -144,30 +151,45 @@ class CryNet(nn.Module):
 
         modify = lambda n: int(n * 2**complexity)
 
+        if aspect is None:
+            get_stride = lambda: 1
+        else:
+            assert input_shape[2] % (aspect * input_shape[1]) == 0
+            hor_stride = input_shape[2] // (aspect * input_shape[1])
+            assert hor_stride % 2 == 0
+            assert hor_stride // 2 <= np.product(repeats[:-1])
+            initial_strides = [(1, 2)] * (hor_stride // 2)
+
+            def get_stride():
+                if len(initial_strides) > 0:
+                    return initial_strides.pop()
+                else:
+                    return 1
+
         shape = input_shape
         for i in range(repeats[0]):
-            shape = add_conv_layer(shape, modify(32))
+            shape = add_conv_layer(shape, modify(32), stride=get_stride())
             if i == repeats[0] - 1:
                 shape = add_max_pool_layer(shape)
             add_conv_batch_normalization_layer(shape)
             add_relu_activation()
 
-        for _ in range(repeats[1]):
-            shape = add_conv_layer(shape, modify(64))
+        for i in range(repeats[1]):
+            shape = add_conv_layer(shape, modify(64), stride=get_stride())
             if i == repeats[1] - 1:
                 shape = add_max_pool_layer(shape)
             add_conv_batch_normalization_layer(shape)
             add_relu_activation()
 
-        for _ in range(repeats[2]):
-            shape = add_conv_layer(shape, modify(128))
+        for i in range(repeats[2]):
+            shape = add_conv_layer(shape, modify(128), stride=get_stride())
             if i == repeats[2] - 1:
                 shape = add_max_pool_layer(shape)
             add_conv_batch_normalization_layer(shape)
             add_relu_activation()
 
-        for _ in range(repeats[3]):
-            shape = add_conv_layer(shape, modify(256))
+        for i in range(repeats[3]):
+            shape = add_conv_layer(shape, modify(256), stride=get_stride())
             if i == repeats[3] - 1:
                 shape = add_max_pool_layer(shape)
             add_conv_batch_normalization_layer(shape)
@@ -175,7 +197,7 @@ class CryNet(nn.Module):
 
         size = add_flatten_layer(shape)
 
-        for _ in range(repeats[4]):
+        for i in range(repeats[4]):
             size = add_dense_layer(size, modify(512))
             add_dense_batch_normalization_layer(size)
             add_dropout_layer()
@@ -628,8 +650,9 @@ def export_model(model, output_path='model.onnx'):
     torch.onnx.export(model, dummy_feature, output_path)
 
 
-def test_model_variations(result_file, complexities, repeats, batch_sizes,
-                          learning_rates, weight_decays, use_batch_norms):
+def test_model_variations(result_file, aspects, complexities, repeats,
+                          batch_sizes, learning_rates, weight_decays,
+                          use_batch_norms):
 
     dataset = create_dataset(device=DEVICE)
 
@@ -640,96 +663,103 @@ def test_model_variations(result_file, complexities, repeats, batch_sizes,
     else:
         results = []
 
-    for complexity in complexities:
-        for repeat in repeats:
-            for batch_size in batch_sizes:
-                for learning_rate in learning_rates:
-                    for weight_decay in weight_decays:
-                        for use_batch_norm in use_batch_norms:
+    for aspect in aspects:
+        for complexity in complexities:
+            for repeat in repeats:
+                for batch_size in batch_sizes:
+                    for learning_rate in learning_rates:
+                        for weight_decay in weight_decays:
+                            for use_batch_norm in use_batch_norms:
 
-                            params = dict(cplx=complexity,
-                                          rep=repeat,
-                                          bs=batch_size,
-                                          lr=learning_rate,
-                                          wd=weight_decay,
-                                          bn=use_batch_norm)
-                            print(params)
+                                params = dict(aspect=aspect,
+                                              cplx=complexity,
+                                              rep=repeat,
+                                              bs=batch_size,
+                                              lr=learning_rate,
+                                              wd=weight_decay,
+                                              bn=use_batch_norm)
+                                print(params)
 
-                            if len(
-                                    list(
-                                        filter(lambda r: r['params'] == params,
-                                               results))) > 0:
-                                print('Skipping')
-                                continue
+                                if len(
+                                        list(
+                                            filter(
+                                                lambda r: r['params'] ==
+                                                params, results))) > 0:
+                                    print('Skipping')
+                                    continue
 
-                            config = dict(bs=batch_size,
-                                          lr=learning_rate,
-                                          wd=weight_decay)
+                                config = dict(bs=batch_size,
+                                              lr=learning_rate,
+                                              wd=weight_decay)
 
-                            train_dataloader, test_dataloader = create_dataloaders(
-                                dataset,
-                                batch_size=config['bs'],
-                                num_workers=0)
+                                train_dataloader, test_dataloader = create_dataloaders(
+                                    dataset,
+                                    batch_size=config['bs'],
+                                    num_workers=0)
 
-                            model = create_model(dataset.get_feature_shape(),
-                                                 dataset.get_n_labels(),
-                                                 complexity=complexity,
-                                                 repeats=repeat,
-                                                 use_batch_norm=use_batch_norm)
+                                model = create_model(
+                                    dataset.get_feature_shape(),
+                                    dataset.get_n_labels(),
+                                    aspect=aspect,
+                                    complexity=complexity,
+                                    repeats=repeat,
+                                    use_batch_norm=use_batch_norm)
 
-                            loss_function = create_loss_function()
+                                loss_function = create_loss_function()
 
-                            optimizer = create_optimizer(
-                                model,
-                                learning_rate=config['lr'],
-                                weight_decay=config['wd'])
+                                optimizer = create_optimizer(
+                                    model,
+                                    learning_rate=config['lr'],
+                                    weight_decay=config['wd'])
 
-                            early_stopper = create_early_stopper()
+                                early_stopper = create_early_stopper()
 
-                            train_metric, test_metric = create_metrics()
+                                train_metric, test_metric = create_metrics()
 
-                            config['m'] = model.description
-                            visualizer = create_visualizer(dataset,
-                                                           train_metric,
-                                                           test_metric,
-                                                           run_params=config)
+                                config['m'] = model.description
+                                visualizer = create_visualizer(
+                                    dataset,
+                                    train_metric,
+                                    test_metric,
+                                    run_params=config)
 
-                            calculate_initial_metrics(
-                                train_dataloader,
-                                test_dataloader,
-                                model,
-                                early_stopper,
-                                test_metric,
-                                train_metric,
-                                callback=visualizer.update_metric_results)
+                                calculate_initial_metrics(
+                                    train_dataloader,
+                                    test_dataloader,
+                                    model,
+                                    early_stopper,
+                                    test_metric,
+                                    train_metric,
+                                    callback=visualizer.update_metric_results)
 
-                            torch.cuda.empty_cache()
+                                torch.cuda.empty_cache()
 
-                            train_results, test_results = run_model_training(
-                                train_dataloader,
-                                test_dataloader,
-                                model,
-                                loss_function,
-                                optimizer,
-                                early_stopper,
-                                test_metric,
-                                train_metric=train_metric,
-                                callback=visualizer.update_metric_results)
+                                train_results, test_results = run_model_training(
+                                    train_dataloader,
+                                    test_dataloader,
+                                    model,
+                                    loss_function,
+                                    optimizer,
+                                    early_stopper,
+                                    test_metric,
+                                    train_metric=train_metric,
+                                    callback=visualizer.update_metric_results)
 
-                            visualizer.close()
+                                visualizer.close()
 
-                            torch.cuda.empty_cache()
+                                torch.cuda.empty_cache()
 
-                            if len(
-                                    list(
-                                        filter(lambda r: r['params'] == params,
-                                               results))) == 0:
-                                results.append(
-                                    dict(params=params,
-                                         train_results=train_results,
-                                         test_results=test_results))
-                                with open(results_path, 'wb') as f:
-                                    pickle.dump(results, f)
+                                if len(
+                                        list(
+                                            filter(
+                                                lambda r: r['params'] ==
+                                                params, results))) == 0:
+                                    results.append(
+                                        dict(params=params,
+                                             train_results=train_results,
+                                             test_results=test_results))
+                                    with open(results_path, 'wb') as f:
+                                        pickle.dump(results, f)
 
     print(find_best_model(results_path))
 
@@ -790,8 +820,11 @@ def load_model(output_path):
 if __name__ == '__main__':
     from data import create_dataset, create_dataloaders
 
-    model_name = 'final_model'
+    model_name = 'crynet_2s'
+    max_epochs = 1000
+    patience = 12
 
+    aspect = None
     complexity = 0
     repeats = [1, 1, 1, 2, 1]
     use_batch_norm = True
@@ -802,12 +835,6 @@ if __name__ == '__main__':
 
     train_dataloader, test_dataloader = create_dataloaders(
         dataset, batch_size=config['batch_size'], num_workers=0)
-
-    model = create_model(dataset.get_feature_shape(),
-                         dataset.get_n_labels(),
-                         complexity=complexity,
-                         repeats=repeats,
-                         use_batch_norm=use_batch_norm)
 
     train_metric, test_metric = create_metrics()
 
@@ -836,7 +863,7 @@ if __name__ == '__main__':
                                      learning_rate=config['learning_rate'],
                                      weight_decay=config['weight_decay'])
 
-        early_stopper = create_early_stopper(patience=np.inf)
+        early_stopper = create_early_stopper(patience=patience)
 
         visualizer = create_visualizer(dataset,
                                        train_metric,
@@ -860,9 +887,11 @@ if __name__ == '__main__':
             early_stopper,
             test_metric,
             train_metric=train_metric,
-            max_epochs=43,
+            max_epochs=max_epochs,
             callback=visualizer.update_metric_results,
-            save_path=f'{model_name}.pickle',
-            metric_save_path=f'{model_name}_metrics.pickle')
+            output_path=f'{model_name}.pickle',
+            metric_output_path=f'{model_name}_metrics.pickle')
+
+        visualizer.save(f'{model_name}.png')
 
         visualizer.close()
