@@ -411,9 +411,8 @@ def create_loss_function():
 class EarlyStopper:
     def __init__(self, num_classes, patience=15):
         self.patience = patience
-        self.metric = torchmetrics.Accuracy(num_classes=num_classes,
-                                            average=None,
-                                            multiclass=True).to(DEVICE)
+        self.metric = torchmetrics.ConfusionMatrix(num_classes,
+                                                   normalize='true').to(DEVICE)
         self.accuracies = []
         self.last_epoch = None
         self.best_epoch = None
@@ -426,16 +425,23 @@ class EarlyStopper:
         self.metric(predictions, labels)
 
     def compute(self):
-        lowest_accuracy = torch.min(self.metric.compute()).cpu().item()
+        confusion_matrix = self.metric.compute().cpu()
+        lowest_accuracy = np.diagonal(confusion_matrix).min()
 
         self.last_epoch = len(self.accuracies)
         self.accuracies.append(lowest_accuracy)
 
-        if lowest_accuracy >= self.best_accuracy:
+        if lowest_accuracy > self.best_accuracy:
+            is_best_so_far = True
             self.best_accuracy = lowest_accuracy
             self.best_epoch = self.last_epoch
+        else:
+            is_best_so_far = False
 
-        return lowest_accuracy
+        print(self.last_epoch, confusion_matrix, lowest_accuracy,
+              self.best_accuracy, self.best_epoch)
+
+        return is_best_so_far
 
     def has_data(self):
         return len(self.accuracies) > 0
@@ -499,6 +505,7 @@ def calculate_initial_metrics(train_dataloader,
                                   early_stopper,
                                   test_metric,
                                   show_progress=show_test_progress)
+    early_stopper.compute()
     callback(0, train_metric.compute(), test_metric.compute())
 
 
@@ -548,6 +555,10 @@ def run_model_training(train_dataloader,
                                       early_stopper,
                                       test_metric,
                                       show_progress=show_test_progress)
+
+        is_best_so_far = early_stopper.compute()
+        if is_best_so_far and output_path is not None:
+            save_model(model, output_path)
 
         test_result = test_metric.compute()
         for name, value in test_result.items():
@@ -632,8 +643,6 @@ def test_model_with_early_stopper(dataloader,
             predictions = model(examples)
             early_stopper(predictions, labels)
             metric(predictions, labels)
-
-    early_stopper.compute()
 
 
 def print_accuracy(epoch, *accuracies):
