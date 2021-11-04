@@ -43,10 +43,12 @@ function disablePasswordInput() {
     input.prop('disabled', true);
 }
 
-function enablePasswordInput() {
+function enablePasswordInput(focus) {
     var input = $('#' + PASSWORD_INPUT_ID);
     input.prop('disabled', false);
-    input.focus();
+    if (focus) {
+        input.focus();
+    }
 }
 
 function selectNoNetwork() {
@@ -58,11 +60,10 @@ function selectNoNetwork() {
 }
 
 function selectAvailableNetwork(networkMeta) {
-    enablePasswordInput();
     disableButton($('#' + DISCONNECT_BUTTON_ID));
     disableButton($('#' + FORGET_BUTTON_ID));
     if (networkMeta.requiresPassword && !networkMeta.isKnown) {
-        enablePasswordInput();
+        enablePasswordInput(true);
         disableButton($('#' + CONNECT_BUTTON_ID));
     } else {
         disablePasswordInput();
