@@ -126,7 +126,7 @@ class AudioFeatureExtractor:
                  min_frequency=125,
                  max_frequency=3600,
                  log_offset=1e-9,
-                 feature_window_count=64,
+                 feature_window_count=128,
                  feature_overlap_fraction=0.25,
                  low_energy_threshold=0.15,
                  max_low_energy_feature_proportion=0.8,
@@ -465,12 +465,18 @@ class Recorder:
             output_format=self.output_format)
 
         self.arecord_args = [
-            'arecord', f'--device={device}', '--quiet', '--file-type', 'raw',
-            f'--format={self.output_format}', f'--rate={sampling_rate:d}'
+            'arecord',
+            f'--device={device}',
+            '--quiet',
+            '--file-type',
+            'raw',
+            f'--format={self.output_format}',
+            f'--rate={sampling_rate:d}',
+            '--channels=1',
         ]
 
     def record_waveform(self, n_samples):
-        with subprocess.Popen(self.arecord_args,
+        with subprocess.Popen(self.arecord_args + [f'--samples={n_samples:d}'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.DEVNULL) as process:
             waveform = self.interpreter(
