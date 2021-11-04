@@ -258,6 +258,10 @@ class TrainingVisualizer:
             except Exception as e:
                 print(e)
 
+    def save(self, output_path):
+        with open(output_path, 'wb') as f:
+            plt.savefig(f)
+
     def stay_awake(self):
         plt.pause(np.iinfo(np.int32).max)
 
@@ -486,8 +490,8 @@ def run_model_training(train_dataloader,
                        max_epochs=1000,
                        train_metric=None,
                        callback=None,
-                       save_path=None,
-                       metric_save_path=None,
+                       output_path=None,
+                       metric_output_path=None,
                        show_train_progress=True,
                        show_test_progress=True):
     if train_metric is not None:
@@ -540,14 +544,12 @@ def run_model_training(train_dataloader,
             early_stopper.print_result()
             break
 
-    if save_path is not None:
-        torch.save(model.state_dict(), save_path)
-
-    if metric_save_path is not None:
+    if metric_output_path is not None:
         metric_data = dict(test=test_results)
         if train_metric is not None:
             metric_data['train'] = train_results
-        torch.save(metric_data, metric_save_path)
+        with open(metric_output_path, 'wb') as f:
+            pickle.dump(metric_data, f)
 
     if train_metric is None:
         return test_results
@@ -754,6 +756,37 @@ def find_best_model(result_file):
         best_model_idx]['params']
 
 
+def save_model(model, output_path, epoch=None):
+    model.eval()
+
+    output_path = pathlib.Path(output_path)
+    torch.save(model.state_dict(), output_path)
+
+    params = dict(args=[model.input_shape, model.n_labels],
+                  kwargs=dict(aspect=model.aspect,
+                              complexity=model.complexity,
+                              repeats=model.repeats,
+                              use_batch_norm=model.use_batch_norm,
+                              use_dropout=model.use_dropout,
+                              dtype=model.dtype))
+    if epoch is not None:
+        params['epoch'] = epoch
+    with open(output_path.with_stem(f'{output_path.stem}_params'), 'wb') as f:
+        pickle.dump(params, f)
+
+
+def load_model(output_path):
+    output_path = pathlib.Path(output_path)
+    state_dict = torch.load(output_path)
+
+    with open(output_path.with_stem(f'{output_path.stem}_params'), 'rb') as f:
+        params = pickle.load(f)
+
+    model = CryNet(*params['args'], **params['kwargs'])
+    model.load_state_dict(state_dict)
+    return model.to(DEVICE)
+
+
 if __name__ == '__main__':
     from data import create_dataset, create_dataloaders
 
@@ -782,7 +815,7 @@ if __name__ == '__main__':
     export_to_onnx = True
 
     if evaluate:
-        model.load_state_dict(torch.load(f'{model_name}.pickle'))
+        model = load_model(f'{model_name}.pickle')
 
         test_model(test_dataloader, model, test_metric)
         print(test_metric.compute())
@@ -790,6 +823,13 @@ if __name__ == '__main__':
         if export_to_onnx:
             export_model(model, output_path=f'{model_name}.onnx')
     else:
+        model = create_model(dataset.get_feature_shape(),
+                             dataset.get_n_labels(),
+                             aspect=aspect,
+                             complexity=complexity,
+                             repeats=repeats,
+                             use_batch_norm=use_batch_norm)
+
         loss_function = create_loss_function()
 
         optimizer = create_optimizer(model,
@@ -826,6 +866,3 @@ if __name__ == '__main__':
             metric_save_path=f'{model_name}_metrics.pickle')
 
         visualizer.close()
-
-        if export_to_onnx:
-            export_model(model, output_path=f'{model_name}.onnx')
