@@ -20,12 +20,12 @@
         "current": {
             "type": "CHAR(2) NOT NULL",
             "initial_value": "no",
-            "value": "no"
-        },
-        "values": [
-            "no",
-            "en"
-        ]
+            "value": "no",
+            "values": [
+                "no",
+                "en"
+            ]
+        }
     },
     "modes": {
         "current": {

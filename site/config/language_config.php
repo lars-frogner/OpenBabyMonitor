@@ -7,7 +7,7 @@ require_once(SRC_DIR . '/io.php');
 require_once(SRC_DIR . '/database.php');
 require_once(SRC_DIR . '/control.php');
 
-define('VALID_LANGUAGES', $_CONFIG['language']['values']);
+define('VALID_LANGUAGES', $_CONFIG['language']['current']['values']);
 
 if (isset($_GET['lang'])) {
   $new_language = $_GET['lang'];
