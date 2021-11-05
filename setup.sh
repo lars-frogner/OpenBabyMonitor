@@ -106,8 +106,6 @@ if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     if [[ "$BM_USER" == "pi" ]]; then
         sudo sed -i 's/pi ALL=(ALL) NOPASSWD: ALL/pi ALL=(ALL) PASSWD: ALL/g' /etc/sudoers.d/010_pi-nopasswd
     fi
-
-    source /home/$BM_USER/.bashrc
 fi
 
 DISABLE_BLUETOOTH=true
@@ -120,6 +118,9 @@ dtoverlay=disable-bt" | sudo tee -a /boot/config.txt
     sudo systemctl disable hciuart
     sudo systemctl disable bluetooth
 fi
+
+mkdir -p $BM_ENV_DIR
+touch $BM_ENV_EXPORTS_PATH
 
 SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
@@ -150,9 +151,6 @@ fi
 
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
-    mkdir -p $BM_ENV_DIR
-
-    touch $BM_ENV_EXPORTS_PATH
     echo "export BM_USER=$BM_USER" >> $BM_ENV_EXPORTS_PATH
     echo "export WEB_USER=$WEB_USER" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_WEB_GROUP=$BM_WEB_GROUP" >> $BM_ENV_EXPORTS_PATH
@@ -178,6 +176,8 @@ if [[ "$SETUP_ENV" = true ]]; then
     ENV_VAR_EXPORTS=$(cat $BM_ENV_EXPORTS_PATH)
     echo "${ENV_VAR_EXPORTS//'export '/}" > $BM_ENV_PATH
 fi
+
+source /home/$BM_USER/.bashrc
 
 INSTALL_BOOTSTRAP=true
 if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
