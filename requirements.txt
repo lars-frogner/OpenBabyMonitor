@@ -1,3 +1,4 @@
 six
 mysql-connector-python
+python_speech_features
 opencv-python-headless==4.5.3.56
