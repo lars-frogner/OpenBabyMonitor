@@ -26,7 +26,7 @@ redirectIfLoggedIn('main.php');
               <form action="" method="post">
                 <div class="my-3 form-group">
                   <label class="visually-hidden" for="password"><?php echo LANG['password']; ?></label>
-                  <input type="password" name="password" class="form-control" id="password" placeholder="Passord" required>
+                  <input type="password" name="password" class="form-control" id="password" placeholder="<?php echo LANG['password']; ?>" required>
                 </div>
                 <div class="form-group text-center">
                   <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['sign_in']; ?></button>
