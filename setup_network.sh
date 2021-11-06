@@ -11,6 +11,7 @@ BM_DIR=$(dirname $(readlink -f $0))
 source $BM_DIR/config/setup_config.env
 
 BM_ENV_EXPORTS_PATH=$BM_DIR/env/envvar_exports
+BM_ENV_PATH=$BM_DIR/env/envvars
 
 if [[ ! -f "$BM_ENV_EXPORTS_PATH" ]]; then
     echo 'Error: setup.sh must be run before this script'
