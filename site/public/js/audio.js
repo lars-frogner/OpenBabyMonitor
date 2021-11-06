@@ -36,6 +36,7 @@ const VISUALIZATION_MODES = { TIME: 'time', FREQUENCY: 'frequency' };
 const CHANNELS = 1;
 
 var _AUDIOSTREAM_CONTEXT = null;
+var _CURRENT_VISUALIZATION_MODE = null;
 
 $(function () {
     if (INITIAL_MODE == AUDIOSTREAM_MODE) {
@@ -45,6 +46,7 @@ $(function () {
 
 function enableAudioStreamPlayer() {
     _AUDIOSTREAM_CONTEXT = new AudiostreamContext();
+    switchAudioVisualizationModeTo(_CURRENT_VISUALIZATION_MODE);
 }
 
 function disableAudioStreamPlayer() {
@@ -141,6 +143,7 @@ class AudiostreamContext {
     }
 
     set visualizer(newVisualizationMode) {
+        _CURRENT_VISUALIZATION_MODE = newVisualizationMode;
         if (this.#visualizer == null) {
             if (newVisualizationMode == null) {
                 return;
