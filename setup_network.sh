@@ -139,7 +139,7 @@ net.ipv6.conf.all.disable_ipv6=1
 " | sudo tee /etc/sysctl.conf
 
 # Check connection every 10 minutes
-(crontab -l; echo "*/10 * * * * $BM_SERVERCONTROL_DIR/ensure_connection.sh") | crontab -
+(crontab -l 2> /dev/null; echo "*/10 * * * * $BM_SERVERCONTROL_DIR/ensure_connection.sh") | crontab -
 
 echo "Start access point mode by running the following command:
 nohup $BM_SERVERCONTROL_DIR/activate_ap_mode.sh &
