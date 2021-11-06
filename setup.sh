@@ -101,6 +101,9 @@ if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     sed -i 's/# "\\e\[B": history-search-forward/"\\e[B": history-search-forward/g' /home/$BM_USER/.inputrc
     sed -i 's/# "\\e\[A": history-search-backward/"\\e[A": history-search-backward/g' /home/$BM_USER/.inputrc
 
+    # Set default editor
+    echo -e "EDITOR=nano\n" >> /home/$BM_USER/.bashrc
+
     echo -e "source $BM_ENV_EXPORTS_PATH\n" >> /home/$BM_USER/.bashrc
 
     if [[ "$BM_USER" == "pi" ]]; then
@@ -135,18 +138,6 @@ if [[ "$SETUP_AUDIO" = true ]]; then
     amixer -c $BM_SOUND_CARD_NUMBER sset Mic 100%
 
     sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
-
-    echo "#!/bin/bash
-rm -rf \$BM_AUDIO_STREAM_DIR
-install -d -o $BM_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_AUDIO_STREAM_DIR
-openssl rand 16 > \$BM_AUDIO_STREAM_DIR/stream.key
-echo stream.key > \$BM_AUDIO_STREAM_DIR/stream.keyinfo
-echo stream.key >> \$BM_AUDIO_STREAM_DIR/stream.keyinfo
-echo $(openssl rand -hex 16) >> \$BM_AUDIO_STREAM_DIR/stream.keyinfo
-chown $BM_USER:$BM_WEB_GROUP \$BM_AUDIO_STREAM_DIR/stream.key
-chmod $BM_READ_PERMISSIONS \$BM_AUDIO_STREAM_DIR/stream.key
-" > $BM_DIR/control/prepare_audio_streaming.sh
-    chmod $BM_READ_PERMISSIONS $BM_DIR/control/prepare_audio_streaming.sh
 fi
 
 SETUP_ENV=true
@@ -283,17 +274,6 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     ln -sfn {$BM_PICAM_STREAM_DIR,$BM_PICAM_DIR}/state
 
     sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
-
-    echo "#!/bin/bash
-rm -rf \$BM_PICAM_STREAM_DIR
-install -d -o $BM_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/{,rec,hooks,state}
-ENCRYPTION_KEY_HEX=\$(openssl rand -hex 16)
-echo \$ENCRYPTION_KEY_HEX > \$BM_PICAM_STREAM_DIR/stream.hexkey
-echo -ne \"\$(echo \$ENCRYPTION_KEY_HEX | sed -e 's/../\\\\x&/g')\" > \$BM_PICAM_STREAM_DIR/stream.key
-chown $BM_USER:$BM_WEB_GROUP \$BM_PICAM_STREAM_DIR/stream.{hex,}key
-chmod $BM_READ_PERMISSIONS \$BM_PICAM_STREAM_DIR/stream.{hex,}key
-" > $BM_DIR/control/prepare_video_streaming.sh
-    chmod $BM_READ_PERMISSIONS $BM_DIR/control/prepare_video_streaming.sh
 
     # Install picam binary
     PICAM_VERSION=1.4.9
