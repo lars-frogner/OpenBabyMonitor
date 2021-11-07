@@ -14,7 +14,9 @@ require_once(TEMPLATES_DIR . '/main.php');
 <head>
   <?php
   require_once(TEMPLATES_DIR . '/head_common.php');
-  require_once(TEMPLATES_DIR . '/video-js_css.php');
+  if (USES_CAMERA) {
+    require_once(TEMPLATES_DIR . '/video-js_css.php');
+  }
   ?>
 
   <link href="css/main.css" rel="stylesheet">
@@ -134,10 +136,12 @@ require_once(TEMPLATES_DIR . '/main.php');
             </div>
           </div>
 
-          <div id="mode_content_video" class="h-100 px-0" <?php echo ($mode != MODE_VALUES['videostream']) ? HIDDEN_STYLE : ''; ?>>
-            <div id="mode_content_video_box" class="h-100">
+          <?php if (USES_CAMERA) { ?>
+            <div id="mode_content_video" class="h-100 px-0" <?php echo ($mode != MODE_VALUES['videostream']) ? HIDDEN_STYLE : ''; ?>>
+              <div id="mode_content_video_box" class="h-100">
+              </div>
             </div>
-          </div>
+          <?php } ?>
 
           <div id="mode_content_standby" class="col-auto text-center" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : ''; ?>>
             <svg class="bi mb-5 text-bm" style="width: 25vh; height: 25vh;" fill="currentColor">
@@ -188,12 +192,14 @@ require_once(TEMPLATES_DIR . '/main.php');
                 </svg>
                 <p id="connection_results_audio_text" class="mb-0"></p>
               </div>
-              <div id="connection_results_video" class="col-auto text-center text-bm" style="display: none;">
-                <svg class="bi" style="width: 2em; height: 2em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#camera-video-fill" />
-                </svg>
-                <p id="connection_results_video_text" class="mb-0"></p>
-              </div>
+              <?php if (USES_CAMERA) { ?>
+                <div id="connection_results_video" class="col-auto text-center text-bm" style="display: none;">
+                  <svg class="bi" style="width: 2em; height: 2em;" fill="currentColor">
+                    <use xlink:href="media/bootstrap-icons.svg#camera-video-fill" />
+                  </svg>
+                  <p id="connection_results_video_text" class="mb-0"></p>
+                </div>
+              <?php } ?>
             </div>
           </div>
 
@@ -221,7 +227,9 @@ require_once(TEMPLATES_DIR . '/main.php');
         <?php
         createModeRadioButton($mode, 'listen', LANG['notify'], 'bell');
         createModeRadioButton($mode, 'audiostream', LANG['listen'], 'mic');
-        createModeRadioButton($mode, 'videostream', LANG['observe'], 'camera-video');
+        if (USES_CAMERA) {
+          createModeRadioButton($mode, 'videostream', LANG['observe'], 'camera-video');
+        }
         createModeRadioButton($mode, 'standby', LANG['standby'], 'moon');
         ?>
       </div>
@@ -230,17 +238,20 @@ require_once(TEMPLATES_DIR . '/main.php');
 
   <?php
   require_once(TEMPLATES_DIR . '/bootstrap_js.php');
-  require_once(TEMPLATES_DIR . '/video-js_js.php');
+  if (USES_CAMERA) {
+    require_once(TEMPLATES_DIR . '/video-js_js.php');
+  }
   require_once(TEMPLATES_DIR . '/hls-js_js.php');
   require_once(TEMPLATES_DIR . '/anime_js.php');
   require_once(TEMPLATES_DIR . '/jquery_js.php');
   ?>
 
   <script>
+    const USES_CAMERA = <?php echo USES_CAMERA ? 'true' : 'false'; ?>;
     const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
     const LISTEN_MODE = <?php echo MODE_VALUES['listen']; ?>;
     const AUDIOSTREAM_MODE = <?php echo MODE_VALUES['audiostream']; ?>;
-    const VIDEOSTREAM_MODE = <?php echo MODE_VALUES['videostream']; ?>;
+    const VIDEOSTREAM_MODE = <?php echo (USES_CAMERA) ? MODE_VALUES['videostream'] : null; ?>;
     const INITIAL_MODE = <?php echo $mode; ?>;
 
     var SETTING_ASK_SECURE_REDIRECT = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'ask_secure_redirect', true); ?>;
@@ -261,7 +272,9 @@ require_once(TEMPLATES_DIR . '/main.php');
   <script src="js/navbar_main.js"></script>
   <script src="js/audio_video.js"></script>
   <script src="js/audio.js"></script>
-  <script src="js/video.js"></script>
+  <?php if (USES_CAMERA) { ?>
+    <script src="js/video.js"></script>
+  <?php } ?>
   <script src="js/main.js"></script>
   <script src="js/network.js"></script>
 

@@ -34,12 +34,14 @@
                 </svg>
                 <?php echo LANG['nav_audio']; ?>
               </a></li>
-            <li><a id="videostream_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'videostream_settings' ? ' active' : ''; ?> d-flex align-items-center" href="videostream_settings.php">
-                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#film" />
-                </svg>
-                <?php echo LANG['nav_video']; ?>
-              </a></li>
+            <?php if (USES_CAMERA) { ?>
+              <li><a id="videostream_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'videostream_settings' ? ' active' : ''; ?> d-flex align-items-center" href="videostream_settings.php">
+                  <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                    <use xlink:href="media/bootstrap-icons.svg#film" />
+                  </svg>
+                  <?php echo LANG['nav_video']; ?>
+                </a></li>
+            <?php } ?>
             <li><a id="server_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'server_settings' ? ' active' : ''; ?> d-flex align-items-center" href="server_settings.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#wifi" />

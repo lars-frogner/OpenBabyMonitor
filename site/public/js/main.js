@@ -1,8 +1,14 @@
 const MAIN_CONTAINER_ID = 'main_container';
 const FOOTER_CONTAINER_ID = 'footer_container';
 
-const MODE_RADIO_IDS = ['mode_radio_standby', 'mode_radio_listen', 'mode_radio_audiostream', 'mode_radio_videostream'];
-const MODE_CONTENT_IDS = ['mode_content_standby', MODE_CONTENT_LISTEN_ID, MODE_CONTENT_AUDIO_ID, MODE_CONTENT_VIDEO_ID];
+var radioIds = ['mode_radio_standby', 'mode_radio_listen', 'mode_radio_audiostream'];
+var contentIds = ['mode_content_standby', MODE_CONTENT_LISTEN_ID, MODE_CONTENT_AUDIO_ID];
+if (USES_CAMERA) {
+    radioIds.push('mode_radio_videostream');
+    contentIds.push(MODE_CONTENT_VIDEO_ID);
+}
+const MODE_RADIO_IDS = radioIds;
+const MODE_CONTENT_IDS = contentIds;
 
 const WAITING_CONTENT_ID = 'mode_content_waiting';
 
@@ -122,7 +128,7 @@ function setVisibleContent(visibleContentId) {
     } else {
         waitingContent.hide();
     }
-    if (visibleContentId == MODE_CONTENT_VIDEO_ID) {
+    if (USES_CAMERA && visibleContentId == MODE_CONTENT_VIDEO_ID) {
         enableVideoStreamPlayer();
     } else {
         disableVideoStreamPlayer();

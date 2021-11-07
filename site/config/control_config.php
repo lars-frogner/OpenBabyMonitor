@@ -51,7 +51,13 @@ function getWaitForRequirement($mode_name) {
   });
 }
 
-define('MODE_VALUES', getModeAttributes('value'));
+define('USES_CAMERA', getenv('BM_USE_CAM') === 'true');
+
+$mode_values = getModeAttributes('value');
+if (!USES_CAMERA) {
+  unset($mode_values['videostream']);
+}
+define('MODE_VALUES', $mode_values);
 define('MODE_NAMES', array_flip(MODE_VALUES));
 
 define('ACTION_OK', 0);

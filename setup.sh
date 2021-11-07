@@ -31,9 +31,11 @@ BM_SHAREDMEM_DIR=/run/shm
 BM_LINKED_STREAM_DIR=$BM_LINKED_SITE_DIR/streaming
 BM_AUDIO_STREAM_DIR=$BM_SHAREDMEM_DIR/audiostream
 BM_AUDIO_STREAM_FILE=$BM_AUDIO_STREAM_DIR/index.m3u8
-BM_PICAM_DIR=$BM_DIR/picam
-BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/picam
-BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
+if [[ "$BM_USE_CAM" = true ]]; then
+    BM_PICAM_DIR=$BM_DIR/picam
+    BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/picam
+    BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
+fi
 BM_SERVERCONTROL_DIR=$BM_DIR/site/servercontrol
 BM_SERVER_ACTION_DIR=$BM_SERVERCONTROL_DIR/.hook
 BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
@@ -72,8 +74,10 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     sudo apt -y install apache2 mariadb-server php php-dev php-pear php-mysql libapache2-mod-php
     sudo pecl install inotify
 
-    # Install dependencies for picam
-    sudo apt -y install libharfbuzz0b libfontconfig1
+    if [[ "$BM_USE_CAM" = true ]]; then
+        # Install dependencies for picam
+        sudo apt -y install libharfbuzz0b libfontconfig1
+    fi
 
     # Install packages for audio recording and streaming
     sudo apt -y install alsa-utils ffmpeg lame
@@ -154,9 +158,12 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_AUDIO_STREAM_DIR=$BM_AUDIO_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_AUDIO_STREAM_FILE=$BM_AUDIO_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MICSTREAM_HEADERS_FILE=$BM_MICSTREAM_HEADERS_FILE" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_USE_CAM=$BM_USE_CAM" >> $BM_ENV_EXPORTS_PATH
+    if [[ "$BM_USE_CAM" = true ]]; then
+        echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
+        echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
+        echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
+    fi
     echo "export BM_SERVERCONTROL_DIR=$BM_SERVERCONTROL_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_DIR=$BM_SERVER_ACTION_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_FILE" >> $BM_ENV_EXPORTS_PATH
@@ -235,7 +242,7 @@ if [[ "$INSTALL_ANIME" = true ]]; then
 fi
 
 INSTALL_VIDEOJS=true
-if [[ "$INSTALL_VIDEOJS" = true ]]; then
+if [[ "$BM_USE_CAM" = true && "$INSTALL_VIDEOJS" = true ]]; then
     VIDEOJS_VERSION=7.13.3
     if [[ "$VIDEOJS_VERSION" = "latest" ]]; then
         DOWNLOAD_URL=$(curl https://api.github.com/repos/videojs/video.js/releases/latest | grep browser_download_url | grep .zip | cut -d '"' -f 4)
@@ -265,7 +272,7 @@ if [[ "$INSTALL_JQUERY" = true ]]; then
 fi
 
 INSTALL_PICAM=true
-if [[ "$INSTALL_PICAM" = true ]]; then
+if [[ "$BM_USE_CAM" = true && "$INSTALL_PICAM" = true ]]; then
     # Create directories and symbolic links
     sudo install -d -o $BM_USER -g $BM_WEB_GROUP -m $BM_READ_PERMISSIONS $BM_PICAM_DIR{,/archive}
 
@@ -352,7 +359,12 @@ WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
 
     CMD_ALIAS='Cmnd_Alias BM_MODES ='
 
-    for SERVICE in standby listen audiostream videostream
+    MODES='standby listen audiostream'
+    if [[ "$BM_USE_CAM" = true ]]; then
+        MODES+=' videostream'
+    fi
+
+    for SERVICE in $MODES
     do
         SERVICE_ROOT_NAME=bm_$SERVICE
         SERVICE_FILENAME=$SERVICE_ROOT_NAME.service

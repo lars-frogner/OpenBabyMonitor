@@ -67,6 +67,7 @@ require_once(TEMPLATES_DIR . '/jquery_js.php');
 <script>
   const SETTINGS_FORM_ID = 'audiostream_settings_form';
   const SETTINGS_EDITED = <?php echo $settings_edited ? 'true' : 'false'; ?>;
+  const USES_CAMERA = <?php echo USES_CAMERA ? 'true' : 'false'; ?>;
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
   const SITE_MODE = <?php echo MODE_VALUES[$setting_type]; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;

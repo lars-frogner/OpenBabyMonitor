@@ -111,6 +111,7 @@ require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 
 <script>
   const SETTINGS_FORM_ID = 'server_settings_form';
+  const USES_CAMERA = <?php echo USES_CAMERA ? 'true' : 'false'; ?>;
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
   const DETECT_FORM_CHANGES = false;
