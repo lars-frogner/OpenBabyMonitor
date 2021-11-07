@@ -802,7 +802,7 @@ def fetch_raw_data(max_video_count_per_label=4000, labels='all', **kwargs):
 
 def compute_features():
     manager = AudioSetDataManager()
-    extractor = AudioFeatureExtractor(feature_window_count=64)
+    extractor = AudioFeatureExtractor(feature_window_count=128)
     manager.extract_features(extractor,
                              allow_all_energies_for_labels=['ambient'])
 
@@ -896,6 +896,17 @@ def create_dataloaders(dataset,
                        seed=42,
                        pin_memory=False,
                        use_imbalanced_sampler=False):
+    generator = torch.Generator().manual_seed(seed)
+
+    if test_proportion == 0:
+        train_dataloader = torch_data.DataLoader(dataset,
+                                                 batch_size=batch_size,
+                                                 num_workers=num_workers,
+                                                 pin_memory=pin_memory,
+                                                 generator=generator,
+                                                 shuffle=True)
+        return train_dataloader, None
+
     dataset_size = len(dataset)
     all_indices = np.arange(dataset_size)
     train_indices, test_indices = sklearn.model_selection.train_test_split(
@@ -904,7 +915,6 @@ def create_dataloaders(dataset,
         random_state=seed,
         shuffle=True)
 
-    generator = torch.Generator().manual_seed(seed)
     if use_imbalanced_sampler:
         train_sampler = dataset.get_imbalanced_dataset_sampler(
             indices=train_indices)
@@ -938,6 +948,7 @@ def create_kfold_dataloaders(dataset,
                              num_workers=0,
                              seed=42,
                              pin_memory=False):
+    generator = torch.Generator().manual_seed(seed)
     return [
         tuple(
             map(
@@ -946,9 +957,9 @@ def create_kfold_dataloaders(dataset,
                     batch_size=batch_size,
                     num_workers=num_workers,
                     pin_memory=pin_memory,
-                    generator=torch.Generator().manual_seed(seed),
-                    sampler=dataset.get_sampler(indices=indices)),
-                train_or_test_indices))
+                    generator=generator,
+                    sampler=torch_data.SubsetRandomSampler(
+                        indices, generator=generator)), train_or_test_indices))
         for train_or_test_indices in sklearn.model_selection.KFold(
             n_splits=n_splits, shuffle=True, random_state=seed).split(dataset)
     ]

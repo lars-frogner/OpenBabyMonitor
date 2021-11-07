@@ -1,4 +1,5 @@
 import math
+import time
 import pathlib
 import pickle
 import collections
@@ -289,6 +290,8 @@ class TrainingVisualizer:
 
     def update_metric_results(self, epoch, train_metric_results,
                               test_metric_results):
+        if test_metric_results is None:
+            test_metric_results = []
         for name in self.metric_names:
             train_results = train_metric_results[name].cpu(
             ) if name in train_metric_results else None
@@ -327,11 +330,12 @@ class TrainingVisualizer:
                                        epoch,
                                        train_data.item(),
                                        draw=False)
-            self.__append_to_line_plot(self.plots[name]['test'],
-                                       epoch,
-                                       test_data.item(),
-                                       draw=False)
-            text.set_text(f'{name} = {test_data.item()*100:.1f} %')
+            if test_data is not None:
+                self.__append_to_line_plot(self.plots[name]['test'],
+                                           epoch,
+                                           test_data.item(),
+                                           draw=False)
+                text.set_text(f'{name} = {test_data.item()*100:.1f} %')
 
         return updater
 
@@ -371,10 +375,11 @@ class TrainingVisualizer:
         self.plots[name] = dict(im=im, texts=texts)
 
         def updater(epoch, train_data, test_data):
-            self.__update_confusion_matrix_plot(self.plots[name]['im'],
-                                                self.plots[name]['texts'],
-                                                test_data.numpy(),
-                                                draw=False)
+            if test_data is not None:
+                self.__update_confusion_matrix_plot(self.plots[name]['im'],
+                                                    self.plots[name]['texts'],
+                                                    test_data.numpy(),
+                                                    draw=False)
 
         return updater
 
@@ -505,8 +510,12 @@ def calculate_initial_metrics(train_dataloader,
                                   early_stopper,
                                   test_metric,
                                   show_progress=show_test_progress)
-    early_stopper.compute()
-    callback(0, train_metric.compute(), test_metric.compute())
+    if test_dataloader is not None:
+        early_stopper.compute()
+        test_metric_results = test_metric.compute()
+    else:
+        test_metric_results = None
+    callback(0, train_metric.compute(), test_metric_results)
 
 
 def run_model_training(train_dataloader,
@@ -556,16 +565,19 @@ def run_model_training(train_dataloader,
                                       test_metric,
                                       show_progress=show_test_progress)
 
-        is_best_so_far = early_stopper.compute()
-        if is_best_so_far and output_path is not None:
-            save_model(model, output_path)
+        if test_dataloader is not None:
+            is_best_so_far = early_stopper.compute()
+            if is_best_so_far and output_path is not None:
+                save_model(model, output_path)
 
-        test_result = test_metric.compute()
-        for name, value in test_result.items():
-            if name == 'ConfusionMatrix':
-                test_results[name].append(value.cpu().numpy())
-            else:
-                test_results[name].append(value.cpu().item())
+            test_result = test_metric.compute()
+            for name, value in test_result.items():
+                if name == 'ConfusionMatrix':
+                    test_results[name].append(value.cpu().numpy())
+                else:
+                    test_results[name].append(value.cpu().item())
+        else:
+            test_result = None
 
         if callback is not None:
             if train_metric is None:
@@ -576,6 +588,9 @@ def run_model_training(train_dataloader,
         if early_stopper.should_stop():
             early_stopper.print_result()
             break
+
+    if test_dataloader is None and output_path is not None:
+        save_model(model, output_path)
 
     if metric_output_path is not None:
         metric_data = dict(test=test_results)
@@ -616,6 +631,9 @@ def train_model(dataloader,
 
 
 def test_model(dataloader, model, metric, show_progress=True):
+    if dataloader is None:
+        return
+
     model.eval()
     metric.reset()
 
@@ -627,11 +645,25 @@ def test_model(dataloader, model, metric, show_progress=True):
             metric(predictions, labels)
 
 
+def test_model_inference_time(dataloader, model):
+    model.eval()
+    with torch.no_grad():
+        start_time = time.time()
+        for examples, _ in dataloader:
+            model(examples)
+        print(
+            f'Inference time: {1e3*(time.time() - start_time)/len(dataloader):.2f} ms'
+        )
+
+
 def test_model_with_early_stopper(dataloader,
                                   model,
                                   early_stopper,
                                   metric,
                                   show_progress=True):
+    if dataloader is None:
+        return
+
     model.eval()
     early_stopper.reset()
     metric.reset()
@@ -827,80 +859,104 @@ def load_model(output_path):
 
 
 if __name__ == '__main__':
-    from data import create_dataset, create_dataloaders
+    from data import create_dataset, create_dataloaders, create_kfold_dataloaders
 
-    model_name = 'crynet_2s'
-    max_epochs = 1000
-    patience = 12
+    model_name = 'crynet'
+    max_epochs = 30
+    patience = np.inf
 
     aspect = None
     complexity = 0
-    repeats = [1, 1, 1, 2, 1]
+    repeats = [1, 1, 2, 2, 1]
     use_batch_norm = True
 
-    config = dict(batch_size=32, learning_rate=1e-3, weight_decay=3e-3)
+    config = dict(batch_size=32, learning_rate=3e-4, weight_decay=1e-2)
 
     dataset = create_dataset(device=DEVICE)
 
-    train_dataloader, test_dataloader = create_dataloaders(
-        dataset, batch_size=config['batch_size'], num_workers=0)
-
-    train_metric, test_metric = create_metrics()
-
     evaluate = False
+    timing = True
     export_to_onnx = True
 
-    if evaluate:
-        model = load_model(f'{model_name}.pickle')
+    n_splits = 1
 
-        test_model(test_dataloader, model, test_metric)
-        print(test_metric.compute())
-
-        if export_to_onnx:
-            export_model(model, output_path=f'{model_name}.onnx')
+    if n_splits > 1:
+        dataloaders = create_kfold_dataloaders(dataset,
+                                               n_splits=n_splits,
+                                               batch_size=config['batch_size'],
+                                               num_workers=0)
     else:
-        model = create_model(dataset.get_feature_shape(),
-                             dataset.get_n_labels(),
-                             aspect=aspect,
-                             complexity=complexity,
-                             repeats=repeats,
-                             use_batch_norm=use_batch_norm)
+        train_dataloader, test_dataloader = create_dataloaders(
+            dataset,
+            test_proportion=0,
+            batch_size=config['batch_size'],
+            num_workers=0)
 
-        loss_function = create_loss_function()
+    for k in range(n_splits):
 
-        optimizer = create_optimizer(model,
-                                     learning_rate=config['learning_rate'],
-                                     weight_decay=config['weight_decay'])
+        if n_splits > 1:
+            train_dataloader, test_dataloader = dataloaders[k]
+            full_model_name = f'{model_name}_{k:d}'
+        else:
+            full_model_name = model_name
 
-        early_stopper = create_early_stopper(patience=patience)
+        train_metric, test_metric = create_metrics()
 
-        visualizer = create_visualizer(dataset,
-                                       train_metric,
-                                       test_metric,
-                                       run_params=config)
+        if evaluate:
+            model = load_model(f'{full_model_name}.pickle')
 
-        calculate_initial_metrics(train_dataloader,
-                                  test_dataloader,
-                                  model,
-                                  early_stopper,
-                                  test_metric,
-                                  train_metric,
-                                  callback=visualizer.update_metric_results)
+            if timing:
+                test_model_inference_time(train_dataloader, model)
+            else:
+                test_model(test_dataloader, model, test_metric)
+                print(test_metric.compute())
 
-        train_results, test_results = run_model_training(
-            train_dataloader,
-            test_dataloader,
-            model,
-            loss_function,
-            optimizer,
-            early_stopper,
-            test_metric,
-            train_metric=train_metric,
-            max_epochs=max_epochs,
-            callback=visualizer.update_metric_results,
-            output_path=f'{model_name}.pickle',
-            metric_output_path=f'{model_name}_metrics.pickle')
+            if export_to_onnx:
+                export_model(model, output_path=f'{full_model_name}.onnx')
+        else:
+            model = create_model(dataset.get_feature_shape(),
+                                 dataset.get_n_labels(),
+                                 aspect=aspect,
+                                 complexity=complexity,
+                                 repeats=repeats,
+                                 use_batch_norm=use_batch_norm)
 
-        visualizer.save(f'{model_name}.png')
+            loss_function = create_loss_function()
 
-        visualizer.close()
+            optimizer = create_optimizer(model,
+                                         learning_rate=config['learning_rate'],
+                                         weight_decay=config['weight_decay'])
+
+            early_stopper = create_early_stopper(patience=patience)
+
+            visualizer = create_visualizer(dataset,
+                                           train_metric,
+                                           test_metric,
+                                           run_params=config)
+
+            calculate_initial_metrics(
+                train_dataloader,
+                test_dataloader,
+                model,
+                early_stopper,
+                test_metric,
+                train_metric,
+                callback=visualizer.update_metric_results)
+
+            train_results, test_results = run_model_training(
+                train_dataloader,
+                test_dataloader,
+                model,
+                loss_function,
+                optimizer,
+                early_stopper,
+                test_metric,
+                train_metric=train_metric,
+                max_epochs=max_epochs,
+                callback=visualizer.update_metric_results,
+                output_path=f'{full_model_name}.pickle',
+                metric_output_path=f'{full_model_name}_metrics.pickle')
+
+            visualizer.save(f'{full_model_name}.png')
+
+            visualizer.close()
