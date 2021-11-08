@@ -390,8 +390,15 @@ fi
 INSTALL_SERVER=true
 if [[ "$INSTALL_SERVER" = true ]]; then
     # Configure MySQL
-    echo 'NOTE: Setup with root password according to root_account entry in config/config.json'
-    sudo mysql_secure_installation
+    MYSQL_ROOT_PASSWORD=$(python3 -c "import json; print(json.load('$BM_DIR/config/config.json')['database']['root_account']['password'])")
+    myql --user=root <<_EOF_
+UPDATE mysql.user SET Password=PASSWORD('$MYSQL_ROOT_PASSWORD') WHERE User='root';
+DELETE FROM mysql.user WHERE User='';
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+FLUSH PRIVILEGES;
+_EOF_
 
     # Configure PHP
     PHP_INI_CLI_PATH=$(php -i | grep /.+/php.ini -oE)
