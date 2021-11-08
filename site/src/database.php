@@ -135,6 +135,21 @@ function updateValuesInTable($database, $table_name, $column_values, $condition_
   }
 }
 
+function updateTableColumnTypes($database, $table_name, $column_types) {
+  if (count($column_types) == 0) {
+    bm_error("No columns for table $table_name specified");
+  }
+  $alter_table = "ALTER TABLE `$table_name`";
+  foreach ($column_types as $name => $type) {
+    $alter_table = $alter_table . "\nMODIFY COLUMN `$name` $type";
+  }
+  $alter_table = $alter_table . ';';
+  $result = $database->query($alter_table);
+  if (!$result) {
+    bm_error("Could not change column types in table $table_name: " . $database->error);
+  }
+}
+
 function deleteTableRows($database, $table_name, $condition) {
   $result = $database->query("DELETE FROM `$table_name` WHERE $condition;");
   if (!$result) {
@@ -152,7 +167,6 @@ function readValuesFromTable($database, $table_name, $columns, $return_with_nume
   }
   $result = $result->fetch_all(MYSQLI_ASSOC);
   if (empty($result)) {
-    bm_warning("Column(s) $column_string not present in table $table_name");
     return $result;
   }
   $columns = array_keys($result[0]);
