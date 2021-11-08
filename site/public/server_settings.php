@@ -72,7 +72,7 @@ $connected_network = obtainConnectedNetworkSSID();
               <?php generateAvailableNetworksSelect($available_networks, $known_networks, $connected_network, 'available_networks'); ?>
             </div>
             <div class="row form-group align-items-center my-3">
-              <div class="col-auto">
+              <div class="col-auto mb-3">
                 <div class="form-floating">
                   <input type="password" name="password" class="form-control" id="password_input" placeholder="" disabled>
                   <label class="text-bm" for="password_input">
@@ -80,13 +80,13 @@ $connected_network = obtainConnectedNetworkSSID();
                   </label>
                 </div>
               </div>
-              <div class="col-auto">
+              <div class="col-auto mb-3">
                 <div class="form-check">
                   <input type="checkbox" name="remember" class="form-check-input" id="remember_check" disabled>
                   <label class="form-check-label" for="remember_check"><?php echo LANG['remember']; ?></label>
                 </div>
               </div>
-              <div class="col-auto">
+              <div class="col-auto mb-3">
                 <button type="submit" name="connect" style="display: none;" id="connect_submit_button"></button><button class="btn btn-secondary" id="connect_button" disabled><?php echo LANG['connect']; ?></button>
                 <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button"></a><button class="btn btn-secondary" id="disconnect_button" disabled><?php echo LANG['disconnect']; ?></button>
               </div>
