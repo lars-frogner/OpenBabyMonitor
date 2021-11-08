@@ -5,6 +5,7 @@ redirectIfLoggedOut('index.php');
 require_once(TEMPLATES_DIR . '/server_settings.php');
 
 $connection_succeeded = null;
+$password_changed = null;
 if (isset($_POST['connect'])) {
   $ssid = $_POST['available_networks'];
   $password = isset($_POST['password']) ? $_POST['password'] : null;
@@ -13,6 +14,9 @@ if (isset($_POST['connect'])) {
 } elseif (isset($_POST['forget'])) {
   $ssid = $_POST['known_networks'];
   removeKnownNetwork($_DATABASE, $ssid);
+} elseif (isset($_POST['change_site_password'])) {
+  updatePassword($_DATABASE, $_POST['password']);
+  $password_changed = true;
 }
 
 $mode = readCurrentMode($_DATABASE);
@@ -62,6 +66,13 @@ $connected_network = obtainConnectedNetworkSSID();
         </div>
       </div>
     </div>
+    <div <?php echo ($password_changed === true) ? '' : 'style="display: none;"'; ?>>
+      <div class="d-flex flex-row justify-content-center">
+        <div class="d-flex flex-column">
+          <span class="alert alert-success text-center"><?php echo LANG['site_password_changed']; ?></span>
+        </div>
+      </div>
+    </div>
     <div class="container" id="server_settings_form_container">
       <h1 class="my-4"><?php echo LANG['server_settings']; ?></h1>
       <form id="server_settings_form" action="" method="post">
@@ -74,8 +85,8 @@ $connected_network = obtainConnectedNetworkSSID();
             <div class="row form-group align-items-center my-3">
               <div class="col-auto mb-3">
                 <div class="form-floating">
-                  <input type="password" name="password" class="form-control" id="password_input" placeholder="" disabled>
-                  <label class="text-bm" for="password_input">
+                  <input type="password" name="password" class="form-control" id="network_password_input" placeholder="" disabled>
+                  <label class="text-bm" for="network_password_input">
                     <?php echo LANG['password'] . ' (8-63 ' . LANG['password_characters'] . ')'; ?>
                   </label>
                 </div>
@@ -97,6 +108,18 @@ $connected_network = obtainConnectedNetworkSSID();
             <?php generateKnownNetworksSelect($known_networks, 'known_networks'); ?>
             <div class="form-group my-3">
               <button type="submit" name="forget" style="display: none;" id="forget_submit_button"></button><button class="btn btn-secondary" id="forget_button" disabled><?php echo LANG['forget']; ?></button>
+            </div>
+          </div>
+          <div class="col-auto">
+            <h3><?php echo LANG['change_site_password']; ?></h3>
+            <div class="form-floating">
+              <input type="password" name="password" class="form-control" id="site_password_input" placeholder="">
+              <label class="text-bm" for="site_password_input">
+                <?php echo LANG['new_password'] . ' (4+ ' . LANG['password_characters'] . ')'; ?>
+              </label>
+            </div>
+            <div class="form-group my-3">
+              <button type="submit" name="change_site_password" style="display: none;" id="change_site_password_submit_button"></button><button class="btn btn-secondary" id="change_site_password_button" disabled><?php echo LANG['change']; ?></button>
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@ const SETTINGS_FORM_CONTAINER_ID = 'server_settings_form_container';
 const SWITCHING_INFO_ID = 'switching_network_info';
 const AVAILABLE_NETWORKS_SELECT_ID = 'available_networks';
 const KNOWN_NETWORKS_SELECT_ID = 'known_networks';
-const PASSWORD_INPUT_ID = 'password_input';
+const NETWORK_PASSWORD_INPUT_ID = 'network_password_input';
 const REMEMBER_CHECK_ID = 'remember_check';
 const CONNECT_SUBMIT_BUTTON_ID = 'connect_submit_button';
 const CONNECT_BUTTON_ID = 'connect_button';
@@ -11,17 +11,22 @@ const DISCONNECT_SUBMIT_BUTTON_ID = 'disconnect_submit_button';
 const DISCONNECT_BUTTON_ID = 'disconnect_button';
 const FORGET_SUBMIT_BUTTON_ID = 'forget_submit_button';
 const FORGET_BUTTON_ID = 'forget_button';
+const SITE_PASSWORD_INPUT_ID = 'site_password_input';
+const CHANGE_SITE_PASSWORD_SUBMIT_BUTTON_ID = 'change_site_password_submit_button';
+const CHANGE_SITE_PASSWORD_BUTTON_ID = 'change_site_password_button';
 
 const DISABLED_BUTTON_CLASS = 'btn btn-secondary';
 const BUTTON_CLASSES = {};
 BUTTON_CLASSES[CONNECT_BUTTON_ID] = 'btn btn-primary';
 BUTTON_CLASSES[DISCONNECT_BUTTON_ID] = 'btn btn-warning';
 BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-danger';
+BUTTON_CLASSES[CHANGE_SITE_PASSWORD_BUTTON_ID] = 'btn btn-primary';
 
 $(function () {
     connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmOnclick: () => { performPrePostActions(); $('#' + CONNECT_SUBMIT_BUTTON_ID).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
     connectModalToLink(DISCONNECT_BUTTON_ID, { header: LANG['sure_want_to_disconnect'], confirm: LANG['disconnect'], dismiss: LANG['cancel'], confirmClass: 'btn btn-warning', confirmOnclick: () => { $('#' + DISCONNECT_SUBMIT_BUTTON_ID)[0].click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_access_point'], showText: () => { return true; } });
     connectModalToLink(FORGET_BUTTON_ID, { header: LANG['sure_want_to_forget'], confirm: LANG['forget'], dismiss: LANG['cancel'], confirmClass: 'btn btn-danger', confirmOnclick: () => { performPrePostActions(); $('#' + FORGET_SUBMIT_BUTTON_ID).click(); } }, null);
+    connectModalToLink(CHANGE_SITE_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_site_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { $('#' + CHANGE_SITE_PASSWORD_SUBMIT_BUTTON_ID).click(); } }, null);
     $('#' + MAIN_CONTAINER_ID).show();
 });
 
@@ -38,13 +43,13 @@ function enableButton(button) {
 }
 
 function disablePasswordInput() {
-    var input = $('#' + PASSWORD_INPUT_ID);
+    var input = $('#' + NETWORK_PASSWORD_INPUT_ID);
     input.prop('value', '');
     input.prop('disabled', true);
 }
 
 function enablePasswordInput(focus) {
-    var input = $('#' + PASSWORD_INPUT_ID);
+    var input = $('#' + NETWORK_PASSWORD_INPUT_ID);
     input.prop('disabled', false);
     if (focus) {
         input.focus();
@@ -114,10 +119,18 @@ $('#' + KNOWN_NETWORKS_SELECT_ID).change(function () {
     selectKnownNetwork();
 });
 
-$('#' + PASSWORD_INPUT_ID).on('input', function () {
+$('#' + NETWORK_PASSWORD_INPUT_ID).on('input', function () {
     if (this.value.length < 8 || this.value.length > 63) {
         disableButton($('#' + CONNECT_BUTTON_ID));
     } else {
         enableButton($('#' + CONNECT_BUTTON_ID));
+    }
+});
+
+$('#' + SITE_PASSWORD_INPUT_ID).on('input', function () {
+    if (this.value.length < 4) {
+        disableButton($('#' + CHANGE_SITE_PASSWORD_BUTTON_ID));
+    } else {
+        enableButton($('#' + CHANGE_SITE_PASSWORD_BUTTON_ID));
     }
 });
