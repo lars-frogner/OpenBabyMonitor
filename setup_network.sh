@@ -45,11 +45,25 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "${ENV_VAR_EXPORTS//'export '/}" > $BM_ENV_PATH
 fi
 
-stty -echo
-printf "New access point password (8-63 characters): "
-read PASSWORD
-stty echo
-printf '\n'
+while : ; do
+    stty -echo
+    printf "New access point password (8-63 characters): "
+    read PASSWORD
+    stty echo
+    printf '\n'
+
+    stty -echo
+    printf "Repeat password: "
+    read PASSWORD_REPEAT
+    stty echo
+    printf '\n'
+
+    if [[ "$PASSWORD" != "$PASSWORD_REPEAT" ]]; then
+        echo 'The passwords did not match'
+    else
+        break
+    fi
+done
 
 # Install access point software
 sudo apt -y install hostapd
