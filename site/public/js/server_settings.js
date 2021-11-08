@@ -23,12 +23,18 @@ BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-danger';
 BUTTON_CLASSES[CHANGE_SITE_PASSWORD_BUTTON_ID] = 'btn btn-primary';
 
 $(function () {
-    connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmOnclick: () => { performPrePostActions(); $('#' + CONNECT_SUBMIT_BUTTON_ID).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
-    connectModalToLink(DISCONNECT_BUTTON_ID, { header: LANG['sure_want_to_disconnect'], confirm: LANG['disconnect'], dismiss: LANG['cancel'], confirmClass: 'btn btn-warning', confirmOnclick: () => { $('#' + DISCONNECT_SUBMIT_BUTTON_ID)[0].click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_access_point'], showText: () => { return true; } });
-    connectModalToLink(FORGET_BUTTON_ID, { header: LANG['sure_want_to_forget'], confirm: LANG['forget'], dismiss: LANG['cancel'], confirmClass: 'btn btn-danger', confirmOnclick: () => { performPrePostActions(); $('#' + FORGET_SUBMIT_BUTTON_ID).click(); } }, null);
-    connectModalToLink(CHANGE_SITE_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_site_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { $('#' + CHANGE_SITE_PASSWORD_SUBMIT_BUTTON_ID).click(); } }, null);
+    connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmOnclick: () => { performPrePostActions(); enabled($('#' + CONNECT_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
+    connectModalToLink(DISCONNECT_BUTTON_ID, { header: LANG['sure_want_to_disconnect'], confirm: LANG['disconnect'], dismiss: LANG['cancel'], confirmClass: 'btn btn-warning', confirmOnclick: () => { enabled($('#' + DISCONNECT_SUBMIT_BUTTON_ID))[0].click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_access_point'], showText: () => { return true; } });
+    connectModalToLink(FORGET_BUTTON_ID, { header: LANG['sure_want_to_forget'], confirm: LANG['forget'], dismiss: LANG['cancel'], confirmClass: 'btn btn-danger', confirmOnclick: () => { performPrePostActions(); enabled($('#' + FORGET_SUBMIT_BUTTON_ID)).click(); } }, null);
+    connectModalToLink(CHANGE_SITE_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_site_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_SITE_PASSWORD_SUBMIT_BUTTON_ID)).click(); } }, null);
+    connectModalToLink(CHANGE_AP_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_ap_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_AP_PASSWORD_SUBMIT_BUTTON_ID)).click(); } }, null);
     $('#' + MAIN_CONTAINER_ID).show();
 });
+
+function enabled(button) {
+    button.prop('disabled', false);
+    return button;
+}
 
 function disableButton(button) {
     button.prop('disabled', true);

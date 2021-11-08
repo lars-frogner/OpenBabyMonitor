@@ -98,8 +98,8 @@ $connected_network = obtainConnectedNetworkSSID();
                 </div>
               </div>
               <div class="col-auto mb-3">
-                <button type="submit" name="connect" style="display: none;" id="connect_submit_button"></button><button class="btn btn-secondary" id="connect_button" disabled><?php echo LANG['connect']; ?></button>
-                <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button"></a><button class="btn btn-secondary" id="disconnect_button" disabled><?php echo LANG['disconnect']; ?></button>
+                <button type="submit" name="connect" style="display: none;" id="connect_submit_button" disabled></button><button class="btn btn-secondary" id="connect_button" disabled><?php echo LANG['connect']; ?></button>
+                <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button" disabled></a><button class="btn btn-secondary" id="disconnect_button" disabled><?php echo LANG['disconnect']; ?></button>
               </div>
             </div>
           </div>
@@ -107,7 +107,7 @@ $connected_network = obtainConnectedNetworkSSID();
             <label class="form-label h3" for="known_networks"><?php echo LANG['known_networks']; ?></label>
             <?php generateKnownNetworksSelect($known_networks, 'known_networks'); ?>
             <div class="form-group my-3">
-              <button type="submit" name="forget" style="display: none;" id="forget_submit_button"></button><button class="btn btn-secondary" id="forget_button" disabled><?php echo LANG['forget']; ?></button>
+              <button type="submit" name="forget" style="display: none;" id="forget_submit_button" disabled></button><button class="btn btn-secondary" id="forget_button" disabled><?php echo LANG['forget']; ?></button>
             </div>
           </div>
           <div class="col-auto">
