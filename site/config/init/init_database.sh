@@ -23,7 +23,7 @@ while : ; do
     fi
 done
 
-sudo php $SCRIPT_DIR/init_database.php $PASSWORD
+sudo php $SCRIPT_DIR/init_database.php "$PASSWORD"
 if [[ "$?" == '0' ]]; then
     echo 'Database initialized successfully'
 else
