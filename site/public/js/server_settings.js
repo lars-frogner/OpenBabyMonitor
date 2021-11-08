@@ -14,6 +14,9 @@ const FORGET_BUTTON_ID = 'forget_button';
 const SITE_PASSWORD_INPUT_ID = 'site_password_input';
 const CHANGE_SITE_PASSWORD_SUBMIT_BUTTON_ID = 'change_site_password_submit_button';
 const CHANGE_SITE_PASSWORD_BUTTON_ID = 'change_site_password_button';
+const AP_PASSWORD_INPUT_ID = 'ap_password_input';
+const CHANGE_AP_PASSWORD_SUBMIT_BUTTON_ID = 'change_ap_password_submit_button';
+const CHANGE_AP_PASSWORD_BUTTON_ID = 'change_ap_password_button';
 
 const DISABLED_BUTTON_CLASS = 'btn btn-secondary';
 const BUTTON_CLASSES = {};
@@ -21,6 +24,7 @@ BUTTON_CLASSES[CONNECT_BUTTON_ID] = 'btn btn-primary';
 BUTTON_CLASSES[DISCONNECT_BUTTON_ID] = 'btn btn-warning';
 BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-danger';
 BUTTON_CLASSES[CHANGE_SITE_PASSWORD_BUTTON_ID] = 'btn btn-primary';
+BUTTON_CLASSES[CHANGE_AP_PASSWORD_BUTTON_ID] = 'btn btn-primary';
 
 $(function () {
     connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmOnclick: () => { performPrePostActions(); enabled($('#' + CONNECT_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
@@ -138,5 +142,13 @@ $('#' + SITE_PASSWORD_INPUT_ID).on('input', function () {
         disableButton($('#' + CHANGE_SITE_PASSWORD_BUTTON_ID));
     } else {
         enableButton($('#' + CHANGE_SITE_PASSWORD_BUTTON_ID));
+    }
+});
+
+$('#' + AP_PASSWORD_INPUT_ID).on('input', function () {
+    if (this.value.length < 8 || this.value.length > 63) {
+        disableButton($('#' + CHANGE_AP_PASSWORD_BUTTON_ID));
+    } else {
+        enableButton($('#' + CHANGE_AP_PASSWORD_BUTTON_ID));
     }
 });

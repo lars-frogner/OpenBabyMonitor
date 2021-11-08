@@ -6,6 +6,7 @@ require_once(TEMPLATES_DIR . '/server_settings.php');
 
 $connection_succeeded = null;
 $password_changed = null;
+$which_password = null;
 if (isset($_POST['connect'])) {
   $ssid = $_POST['available_networks'];
   $password = isset($_POST['password']) ? $_POST['password'] : null;
@@ -17,6 +18,11 @@ if (isset($_POST['connect'])) {
 } elseif (isset($_POST['change_site_password'])) {
   updatePassword($_DATABASE, $_POST['password']);
   $password_changed = true;
+  $which_password = 'site';
+} elseif (isset($_POST['change_ap_password'])) {
+  executeSettingOfNewAPPassword($_POST['password']);
+  $password_changed = true;
+  $which_password = 'ap';
 }
 
 $mode = readCurrentMode($_DATABASE);
@@ -44,20 +50,20 @@ $connected_network = obtainConnectedNetworkSSID();
   </header>
 
   <main id="main_container" style="display: none;">
-    <div <?php echo ($connection_succeeded === true) ? '' : 'style="display: none;"'; ?>>
+    <?php if ($connection_succeeded === true) { ?>
       <div class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column">
           <span class="alert alert-success text-center"><?php echo LANG['connection_succeeded']; ?></span>
         </div>
       </div>
-    </div>
-    <div <?php echo ($connection_succeeded === false) ? '' : 'style="display: none;"'; ?>>
+    <?php } ?>
+    <?php if ($connection_succeeded === false) { ?>
       <div class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column">
           <span class="alert alert-danger text-center"><?php echo LANG['connection_failed']; ?></span>
         </div>
       </div>
-    </div>
+    <?php } ?>
     <div style="display: none;" id="switching_network_info">
       <div class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column text-center">
@@ -66,13 +72,13 @@ $connected_network = obtainConnectedNetworkSSID();
         </div>
       </div>
     </div>
-    <div <?php echo ($password_changed === true) ? '' : 'style="display: none;"'; ?>>
+    <?php if ($password_changed === true) { ?>
       <div class="d-flex flex-row justify-content-center">
         <div class="d-flex flex-column">
-          <span class="alert alert-success text-center"><?php echo LANG['site_password_changed']; ?></span>
+          <span class="alert alert-success text-center"><?php echo LANG[$which_password . '_password_changed']; ?></span>
         </div>
       </div>
-    </div>
+    <?php } ?>
     <div class="container" id="server_settings_form_container">
       <h1 class="my-4"><?php echo LANG['server_settings']; ?></h1>
       <form id="server_settings_form" action="" method="post">
@@ -119,7 +125,19 @@ $connected_network = obtainConnectedNetworkSSID();
               </label>
             </div>
             <div class="form-group my-3">
-              <button type="submit" name="change_site_password" style="display: none;" id="change_site_password_submit_button"></button><button class="btn btn-secondary" id="change_site_password_button" disabled><?php echo LANG['change']; ?></button>
+              <button type="submit" name="change_site_password" style="display: none;" id="change_site_password_submit_button" disabled></button><button class="btn btn-secondary" id="change_site_password_button" disabled><?php echo LANG['change']; ?></button>
+            </div>
+          </div>
+          <div class="col-auto">
+            <h3><?php echo LANG['change_ap_password']; ?></h3>
+            <div class="form-floating">
+              <input type="password" name="password" class="form-control" id="ap_password_input" placeholder="">
+              <label class="text-bm" for="ap_password_input">
+                <?php echo LANG['new_password'] . ' (8-63 ' . LANG['password_characters'] . ')'; ?>
+              </label>
+            </div>
+            <div class="form-group my-3">
+              <button type="submit" name="change_ap_password" style="display: none;" id="change_ap_password_submit_button" disabled></button><button class="btn btn-secondary" id="change_ap_password_button" disabled><?php echo LANG['change']; ?></button>
             </div>
           </div>
         </div>

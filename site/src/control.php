@@ -254,6 +254,10 @@ function executeRemovalOfKnownNetwork($ssid) {
   executeServerControlActionWithResult('remove_network', "'$ssid'");
 }
 
+function executeSettingOfNewAPPassword($password) {
+  executeServerControlAction('set_ap_password', $password);
+}
+
 function readCurrentLanguage($database) {
   return readValuesFromTable($database, 'language', 'current', true);
 }

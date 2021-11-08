@@ -38,6 +38,7 @@ SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_NW_AP_DIR=$BM_NW_AP_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_NW_CLIENT_DIR=$BM_NW_CLIENT_DIR" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_NW_SSID=$BM_NW_SSID" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_NW_INTERFACE=$BM_NW_INTERFACE" >> $BM_ENV_EXPORTS_PATH
 
     # Copy environment variables (without 'export') into environment file for services and PHP
@@ -127,7 +128,10 @@ sudo rfkill unblock wlan
 mkdir $BM_NW_AP_DIR/etc/hostapd
 
 # Configure hostapd
-set +x # Hide password
+
+# Obtain password hash
+PSK=$($BM_SERVERCONTROL_DIR/get_network_psk.sh "$BM_NW_SSID" "$PASSWORD")
+
 echo "country_code=$BM_NW_COUNTRY_CODE
 interface=$BM_NW_INTERFACE
 ssid=$BM_NW_SSID
@@ -137,12 +141,13 @@ macaddr_acl=0
 auth_algs=1
 ignore_broadcast_ssid=0
 wpa=2
-wpa_passphrase=$PASSWORD
+wpa_psk=$PSK
 wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP
 " > $BM_NW_AP_DIR/etc/hostapd/hostapd.conf
-set -x
+chown $BM_USER:$BM_WEB_GROUP $BM_NW_AP_DIR/etc/hostapd/hostapd.conf
+chmod $BM_WRITE_PERMISSIONS $BM_NW_AP_DIR/etc/hostapd/hostapd.conf
 
 # hostapd is only used in access point mode, so this symlink can remain also in client mode
 sudo ln -sv {$BM_NW_AP_DIR,}/etc/hostapd/hostapd.conf
