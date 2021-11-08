@@ -18,3 +18,10 @@ function storeHashedPassword($database, $hashed_password) {
 function readHashedPassword($database) {
   return readValuesFromTable($database, 'password', 'hash', true);
 }
+
+function updatePassword($database, $password) {
+  $hashed_password = hashPassword($password);
+  $hash_len = strlen($hashed_password);
+  updateTableColumnTypes($database, 'password', array('hash' => "CHAR($hash_len) NOT NULL"));
+  storeHashedPassword($database, $hashed_password);
+}
