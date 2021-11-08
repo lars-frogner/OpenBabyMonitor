@@ -23,8 +23,12 @@ define('GET_CONNECTED_NETWORK_SSID_SCRIPT', getenv('BM_SERVERCONTROL_DIR') . '/'
 
 define('SERVER_IP', trim(`hostname -I`));
 
-define('USES_SECURE_PROTOCOL', !(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on'));
-define('PROTOCOL', USES_SECURE_PROTOCOL ? 'https' : 'http');
-$request_uri = substr("$_SERVER[REQUEST_URI]", 1);
-define('URI_WITHOUT_SEARCH', ($request_uri == '') ? 'index.php' : strtok($request_uri, '?'));
-define('URL_WITHOUT_SEARCH', PROTOCOL . "://$_SERVER[HTTP_HOST]/" . URI_WITHOUT_SEARCH);
+define('IS_CLI', http_response_code() === false);
+
+if (!IS_CLI) {
+  define('USES_SECURE_PROTOCOL', !(!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on'));
+  define('PROTOCOL', USES_SECURE_PROTOCOL ? 'https' : 'http');
+  $request_uri = substr("$_SERVER[REQUEST_URI]", 1);
+  define('URI_WITHOUT_SEARCH', ($request_uri == '') ? 'index.php' : strtok($request_uri, '?'));
+  define('URL_WITHOUT_SEARCH', PROTOCOL . "://$_SERVER[HTTP_HOST]/" . URI_WITHOUT_SEARCH);
+}
