@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 set -e
 
 # Generates network configurations for using the unit as a wireless

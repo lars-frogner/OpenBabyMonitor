@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 set -e
 
 BM_DIR=$(dirname $(readlink -f $0))
