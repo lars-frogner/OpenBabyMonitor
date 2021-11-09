@@ -83,7 +83,7 @@ $connected_network = obtainConnectedNetworkSSID();
       <h1 class="my-4"><?php echo LANG['server_settings']; ?></h1>
       <form id="server_settings_form" action="" method="post">
         <div class="row mb-3">
-          <div class="col-auto">
+          <div class="col-auto mx-3 my-2">
             <div class="form-group">
               <label class="form-label h3" for="available_networks"><?php echo LANG['available_networks']; ?></label>
               <?php generateAvailableNetworksSelect($available_networks, $known_networks, $connected_network, 'available_networks'); ?>
@@ -109,14 +109,14 @@ $connected_network = obtainConnectedNetworkSSID();
               </div>
             </div>
           </div>
-          <div class="col-auto">
+          <div class="col-auto mx-3 my-2">
             <label class="form-label h3" for="known_networks"><?php echo LANG['known_networks']; ?></label>
             <?php generateKnownNetworksSelect($known_networks, 'known_networks'); ?>
             <div class="form-group my-3">
               <button type="submit" name="forget" style="display: none;" id="forget_submit_button" disabled></button><button class="btn btn-secondary" id="forget_button" disabled><?php echo LANG['forget']; ?></button>
             </div>
           </div>
-          <div class="col-auto">
+          <div class="col-auto mx-3 my-2">
             <h3><?php echo LANG['change_site_password']; ?></h3>
             <div class="form-floating">
               <input type="password" name="password" class="form-control" id="site_password_input" placeholder="">
@@ -128,7 +128,7 @@ $connected_network = obtainConnectedNetworkSSID();
               <button type="submit" name="change_site_password" style="display: none;" id="change_site_password_submit_button" disabled></button><button class="btn btn-secondary" id="change_site_password_button" disabled><?php echo LANG['change']; ?></button>
             </div>
           </div>
-          <div class="col-auto">
+          <div class="col-auto mx-3 my-2">
             <h3><?php echo LANG['change_ap_password']; ?></h3>
             <div class="form-floating">
               <input type="password" name="password" class="form-control" id="ap_password_input" placeholder="">
