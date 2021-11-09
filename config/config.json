@@ -113,7 +113,7 @@
             "type": "FLOAT NOT NULL",
             "initial_value": 10,
             "range": {
-                "min": 0,
+                "min": 1,
                 "max": 40,
                 "step": 0.5
             }
@@ -133,11 +133,11 @@
             "group": "recording",
             "name": "min_energy",
             "type": "FLOAT NOT NULL",
-            "initial_value": 0.8,
+            "initial_value": 0.5,
             "range": {
                 "min": 0,
                 "max": 5,
-                "step": 0.1
+                "step": 0.05
             }
         },
         "fraction_threshold": {
