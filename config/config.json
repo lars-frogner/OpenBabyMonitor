@@ -107,57 +107,19 @@
         }
     },
     "listen_settings": {
-        "ask_secure_redirect": {
-            "group": "browser_notifications",
-            "name": "ask_secure_redirect",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": true
-        },
-        "show_unsupported_message": {
-            "group": "browser_notifications",
-            "name": "show_unsupported_message",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": true
-        },
-        "ask_notification_permission": {
-            "group": "browser_notifications",
-            "name": "ask_notification_permission",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": true
-        },
-        "notify_on_crying": {
-            "group": "notify_on",
-            "name": "notify_on_crying",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": true
-        },
-        "notify_and_or": {
-            "group": "notify_on",
-            "type": "VARCHAR(3) NOT NULL",
-            "initial_value": "or",
-            "radiovalues": {
-                "and": "and",
-                "or": "or"
-            },
-            "children_disabled_when": {
-                "notify_on_crying": {
-                    "operator": "!=",
-                    "value": "1"
-                },
-                "notify_on_babbling": {
-                    "operator": "!=",
-                    "value": "1"
-                }
+        "amplification": {
+            "group": "recording",
+            "name": "amplification",
+            "type": "FLOAT NOT NULL",
+            "initial_value": 10,
+            "range": {
+                "min": 0,
+                "max": 40,
+                "step": 0.5
             }
         },
-        "notify_on_babbling": {
-            "group": "notify_on",
-            "name": "notify_on_babbling",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": false
-        },
         "interval": {
-            "group": "notifications",
+            "group": "recording",
             "name": "interval",
             "type": "INT UNSIGNED NOT NULL",
             "initial_value": 5,
@@ -165,6 +127,17 @@
                 "min": 0,
                 "max": 60,
                 "step": 1
+            }
+        },
+        "min_energy": {
+            "group": "recording",
+            "name": "min_energy",
+            "type": "FLOAT NOT NULL",
+            "initial_value": 0.8,
+            "range": {
+                "min": 0,
+                "max": 5,
+                "step": 0.1
             }
         },
         "fraction_threshold": {
@@ -216,12 +189,62 @@
             "name": "autoplay_on_notify",
             "type": "BOOLEAN NOT NULL",
             "initial_value": true
+        },
+        "notify_on_crying": {
+            "group": "notify_on",
+            "name": "notify_on_crying",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "notify_and_or": {
+            "group": "notify_on",
+            "type": "VARCHAR(3) NOT NULL",
+            "initial_value": "or",
+            "radiovalues": {
+                "and": "and",
+                "or": "or"
+            },
+            "children_disabled_when": {
+                "notify_on_crying": {
+                    "operator": "!=",
+                    "value": "1"
+                },
+                "notify_on_babbling": {
+                    "operator": "!=",
+                    "value": "1"
+                }
+            }
+        },
+        "notify_on_babbling": {
+            "group": "notify_on",
+            "name": "notify_on_babbling",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": false
+        },
+        "ask_secure_redirect": {
+            "group": "browser_notifications",
+            "name": "ask_secure_redirect",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "show_unsupported_message": {
+            "group": "browser_notifications",
+            "name": "show_unsupported_message",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "ask_notification_permission": {
+            "group": "browser_notifications",
+            "name": "ask_notification_permission",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
         }
     },
     "listen_groups": {
-        "browser_notifications": "g_browser_notifications",
+        "recording": "g_recording",
+        "notifications": "g_notifications",
         "notify_on": "g_notify_on",
-        "notifications": "g_notifications"
+        "browser_notifications": "g_browser_notifications"
     },
     "audiostream_settings": {
         "encrypted": {

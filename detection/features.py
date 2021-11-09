@@ -456,9 +456,14 @@ class AudioByteInterpreter:
 
 
 class Recorder:
-    def __init__(self, device, sampling_rate=8000, output_format='FLOAT_LE'):
+    def __init__(self,
+                 device,
+                 sampling_rate=8000,
+                 amplification=1,
+                 output_format='FLOAT_LE'):
         self.device = device
         self.sampling_rate = sampling_rate
+        self.amplification = amplification
         self.output_format = output_format
 
         self.interpreter = AudioByteInterpreter(
@@ -482,7 +487,7 @@ class Recorder:
             waveform = self.interpreter(
                 process.stdout.read(
                     self.interpreter.compute_n_bytes(n_samples)))
-        return waveform
+        return waveform * self.amplification
 
 
 class Standardizer:
@@ -500,15 +505,25 @@ class Standardizer:
 
 
 class FeatureProvider(Standardizer):
-    def __init__(self, audio_device, feature_extractor, **kwargs):
+    def __init__(self,
+                 audio_device,
+                 feature_extractor,
+                 min_energy=0,
+                 amplification=1,
+                 **kwargs):
         super().__init__(**kwargs)
         self.feature_extractor = feature_extractor
         self.recorder = Recorder(audio_device,
-                                 sampling_rate=feature_extractor.sampling_rate)
+                                 sampling_rate=feature_extractor.sampling_rate,
+                                 amplification=amplification)
+        self.min_energy = min_energy * amplification
 
     def __call__(self):
         waveform = self.recorder.record_waveform(
             self.feature_extractor.feature_length)
-        feature = self.feature_extractor.compute_feature(waveform)
+        feature, energies = self.feature_extractor.compute_feature(
+            waveform, return_energies=True)
+        if energies.max() < self.min_energy:
+            return None
         self.standardize(feature)
         return feature

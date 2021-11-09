@@ -145,7 +145,9 @@ def listen():
 
 
 def listen_with_settings(config,
+                         amplification=10,
                          interval=5.0,
+                         min_energy=0.8,
                          fraction_threshold=60,
                          consecutive_recordings=5,
                          probability_threshold=85,
@@ -175,12 +177,14 @@ def listen_with_settings(config,
                     os.environ['BM_SERVER_LOG_PATH'])
 
         standardization_file = control_dir / 'standardization.npz'
-        feature_provider = create_feature_provider(standardization_file)
+        feature_provider = create_feature_provider(min_energy, amplification,
+                                                   standardization_file)
 
         while True:
             last_record_time = time.time()
             feature = feature_provider()
-            task_queue.put(feature)
+            if feature is not None:
+                task_queue.put(feature)
             time.sleep(max(0, interval - (time.time() - last_record_time)))
 
 
@@ -195,7 +199,7 @@ def process_features(task_queue, config, control_dir, notifier_settings):
     probabilities_file = comm_dir / 'probabilities.json'
     notification_file = comm_dir / 'notification.txt'
 
-    model_file = control_dir / 'crynet_2s.onnx'
+    model_file = control_dir / 'crynet.onnx'
 
     model = create_model(model_file)
 
@@ -219,7 +223,7 @@ def create_model(model_file):
     return model
 
 
-def create_feature_provider(standardization_file):
+def create_feature_provider(min_energy, amplification, standardization_file):
     mic_id = os.environ['BM_MIC_ID']
     audio_device = 'plug{}'.format(mic_id)
 
@@ -228,6 +232,8 @@ def create_feature_provider(standardization_file):
                                         feature_window_count=128,
                                         backend='python_speech_features',
                                         disable_io=True),
+                                    min_energy=min_energy,
+                                    amplification=amplification,
                                     standardization_file=standardization_file)
 
 
