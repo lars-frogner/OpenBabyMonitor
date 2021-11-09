@@ -53,17 +53,38 @@ function generateSelect($setting, $setting_name, $initial_value) {
   line('<div class="mb-3">');
   line('  <div class="row">');
   line('    <div class="col-10">');
-  line("  <label class=\"form-label\" for=\"$id\">$name_trans</label>");
-  line("  <select name=\"$setting_name\" class=\"form-select\" id=\"$id\">");
+  line("      <label class=\"form-label\" for=\"$id\">$name_trans</label>");
+  line("      <select name=\"$setting_name\" class=\"form-select\" id=\"$id\">");
   foreach ($values as $name => $value) {
     $name_trans = array_key_exists($name, LANG) ? LANG[$name] : $name;
     $selected = ($value == $initial_value) ? ' selected' : '';
     line("    <option value=\"$value\"$selected>$name_trans</option>");
   }
-  line('  </select>');
-  line('  </div>');
+  line('      </select>');
+  line('    </div>');
   line('  </div>');
   line('</div>');
+}
+
+function getRangeOutputMaxNumberOfCharacters($min, $max, $step) {
+  $stepval = floatval($step);
+  if (floor($stepval) == $stepval) {
+    return max(strlen($min), strlen($max));
+  } else {
+    if (($pos = strpos($min, ".")) !== false) {
+      $whole_part_len_min = strlen(substr($min, 0, $pos));
+    } else {
+      $whole_part_len_min = strlen($min);
+    }
+    if (($pos = strpos($max, ".")) !== false) {
+      $whole_part_len_max = strlen(substr($max, 0, $pos));
+    } else {
+      $whole_part_len_max = strlen($max);
+    }
+    $whole_part_len = max($whole_part_len_min, $whole_part_len_max);
+    $decimal_len = strlen(substr($step, strpos($step, ".") + 1));
+    return $whole_part_len + 1 + $decimal_len;
+  }
 }
 
 function generateRange($setting, $setting_name, $initial_value) {
@@ -74,6 +95,7 @@ function generateRange($setting, $setting_name, $initial_value) {
   $min = $setting['range']['min'];
   $max = $setting['range']['max'];
   $step = $setting['range']['step'];
+  $n_output_chars = strval(getRangeOutputMaxNumberOfCharacters($min, $max, $step));
 
   line('<div class="mb-3">');
   line("  <label class=\"form-label\" for=\"$id\">$name_trans</label>");
@@ -81,7 +103,7 @@ function generateRange($setting, $setting_name, $initial_value) {
   line('    <div class="col-10">');
   line("      <input type=\"range\" name=\"$setting_name\" class=\"form-range\" value=\"$initial_value\" min=\"$min\" max=\"$max\" step=\"$step\" id=\"$id\" oninput=\"$('#' + '$value_id').prop('value', this.value);\">");
   line('    </div>');
-  line('    <div class="col-1">');
+  line('    <div class="col-1 px-0" style="min-width: ' . $n_output_chars . 'em;">');
   line("      <output id=\"$value_id\">$initial_value</output>");
   line('    </div>');
   line('  </div>');
