@@ -90,7 +90,7 @@ function handleModeChangeResponse(checkedRadioId, checkedRadioValue, responseTex
             break;
         default:
             if (!responseText) {
-                responseText = 'An error occured on the server.'
+                responseText = LANG['server_error']
             }
             $('#' + ERROR_CONTENT_MESSAGE_ID).html(responseText);
             setVisibleContent(ERROR_CONTENT_ID);

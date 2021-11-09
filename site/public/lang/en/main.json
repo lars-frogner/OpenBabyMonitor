@@ -34,5 +34,6 @@
     "grant_permission": "Grant permission",
     "continue_without": "Continue without",
     "listening_for_activity": "Listening for activity",
-    "browser_notifications_deactivated": "Browser notifications are deactivated"
+    "browser_notifications_deactivated": "Browser notifications are deactivated",
+    "server_error": "An error occured on the server"
 }

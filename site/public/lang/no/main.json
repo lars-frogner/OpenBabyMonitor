@@ -34,5 +34,6 @@
     "grant_permission": "Gi tillatelse",
     "continue_without": "Fortsett uten",
     "listening_for_activity": "Lytter etter aktivitet",
-    "browser_notifications_deactivated": "Nettleservarsler er deaktivert"
+    "browser_notifications_deactivated": "Nettleservarsler er deaktivert",
+    "server_error": "Det oppstod en feil på serveren"
 }
