@@ -1,6 +1,12 @@
 <?php
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedIn('main.php');
+
+$target_uri = getURIFromGETRequest();
+$automatically_signed_out = $target_uri != null;
+if (!$automatically_signed_out) {
+  $target_uri = 'main.php';
+}
 ?>
 
 <!DOCTYPE html>
@@ -14,13 +20,20 @@ redirectIfLoggedIn('main.php');
   <main id="main_container" class="vh-100" style="display: none;">
     <div class="container h-100">
       <div class="row h-100 justify-content-center align-items-center">
-        <aside class="col-sm-5">
+        <?php if ($automatically_signed_out) { ?>
+          <div class="d-flex flex-row justify-content-center align-self-start mt-3">
+            <div class="d-flex flex-column">
+              <span class="alert alert-warning text-center"><?php echo LANG['was_signed_out']; ?></span>
+            </div>
+          </div>
+        <?php } ?>
+        <aside class="col-sm-5<?php echo $automatically_signed_out ? ' align-self-start' : '' ?>">
           <div class="card">
             <article class="card-body">
               <h3 class="card-title text-center"><?php echo LANG['please_sign_in']; ?></h3>
               <?php
               if (isset($_POST['submit'])) {
-                tryLogin($_DATABASE, $_POST['password'], 'main.php', '<hr><p class="text-center text-danger">Feil passord</p>');
+                tryLogin($_DATABASE, $_POST['password'], $target_uri, '<hr><p class="text-center text-danger">Feil passord</p>');
               }
               ?>
               <form action="" method="post">

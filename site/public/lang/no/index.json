@@ -1,5 +1,6 @@
 {
     "please_sign_in": "Vennligst logg inn",
     "password": "Passord",
-    "sign_in": "Logg inn"
+    "sign_in": "Logg inn",
+    "was_signed_out": "Du ble logget ut automatisk."
 }

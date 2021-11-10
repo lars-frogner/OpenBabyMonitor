@@ -23,9 +23,9 @@ function redirectIfLoggedIn($destination) {
   }
 }
 
-function redirectIfLoggedOut($destination) {
+function redirectIfLoggedOut($destination, $pass_uri = true) {
   if (!isLoggedIn()) {
-    redirectTo($destination);
+    redirectTo($pass_uri ? addCurrentURIAsGETRequest($destination) : $destination);
   }
 }
 
@@ -48,4 +48,12 @@ function abortIfSessionExpired() {
     echo SESSION_EXPIRED;
     exit();
   }
+}
+
+function addCurrentURIAsGETRequest($destination) {
+  return $destination . '?target_uri=' . urlencode(substr("$_SERVER[REQUEST_URI]", 1));
+}
+
+function getURIFromGETRequest() {
+  return isset($_GET['target_uri']) ? urldecode($_GET['target_uri']) : null;
 }
