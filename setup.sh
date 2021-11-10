@@ -521,6 +521,17 @@ DNS.3 = $BM_HOSTNAME.lan
     </Directory>
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME
+
+    # Configure rotation of babymonitor log
+    echo "$BM_SERVER_LOG_PATH {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create $BM_WRITE_PERMISSIONS $BM_USER $BM_WEB_GROUP
+}" | sudo tee /etc/logrotate.d/babymonitor
 fi
 
 INITIALIZE_DATABASE=true
