@@ -148,6 +148,7 @@ def listen_with_settings(config,
                          amplification=10,
                          interval=5.0,
                          min_energy=0.8,
+                         model='large',
                          fraction_threshold=60,
                          consecutive_recordings=5,
                          probability_threshold=85,
@@ -159,7 +160,7 @@ def listen_with_settings(config,
     control_dir = pathlib.Path(os.environ['BM_DIR']) / 'control'
 
     worker = QueueWorker(
-        process_features, config, control_dir,
+        process_features, config, control_dir, model,
         dict(fraction_threshold=fraction_threshold,
              consecutive_recordings=consecutive_recordings,
              probability_threshold=probability_threshold,
@@ -177,7 +178,9 @@ def listen_with_settings(config,
                     os.environ['BM_SERVER_LOG_PATH'])
 
         standardization_file = control_dir / 'standardization.npz'
+        feature_shape = config['inference']['input_shape']
         feature_provider = create_feature_provider(min_energy, amplification,
+                                                   feature_shape,
                                                    standardization_file)
 
         while True:
@@ -188,7 +191,8 @@ def listen_with_settings(config,
             time.sleep(max(0, interval - (time.time() - last_record_time)))
 
 
-def process_features(task_queue, config, control_dir, notifier_settings):
+def process_features(task_queue, config, control_dir, model,
+                     notifier_settings):
 
     labels = config['inference']['labels']
     label_names = {idx: name for name, idx in labels.items()}
@@ -199,7 +203,7 @@ def process_features(task_queue, config, control_dir, notifier_settings):
     probabilities_file = comm_dir / 'probabilities.json'
     notification_file = comm_dir / 'notification.txt'
 
-    model_file = control_dir / 'crynet.onnx'
+    model_file = control_dir / config['inference']['models'][model]
 
     model = create_model(model_file)
 
@@ -223,13 +227,15 @@ def create_model(model_file):
     return model
 
 
-def create_feature_provider(min_energy, amplification, standardization_file):
+def create_feature_provider(min_energy, amplification, feature_shape,
+                            standardization_file):
     mic_id = os.environ['BM_MIC_ID']
     audio_device = 'plug{}'.format(mic_id)
 
     return features.FeatureProvider(audio_device,
                                     features.AudioFeatureExtractor(
-                                        feature_window_count=128,
+                                        n_mel_bands=feature_shape[0],
+                                        feature_window_count=feature_shape[1],
                                         backend='python_speech_features',
                                         disable_io=True),
                                     min_energy=min_energy,

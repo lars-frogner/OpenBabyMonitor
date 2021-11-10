@@ -6,9 +6,14 @@ function line($string) {
   echo $string . "\n";
 }
 
+function lineTo($text, $string) {
+  return $text . $string . "\n";
+}
+
 function generateInputs($setting_type, $grouped_setting_values, $pre_group_html, $post_group_html) {
   $settings = getSettings($setting_type);
   $group_names = getSettingGroups($setting_type);
+  $scripts = [];
   foreach ($grouped_setting_values as $group => $content) {
     $group_name = $group_names[$group];
     generateGroupStart($group_name);
@@ -18,7 +23,10 @@ function generateInputs($setting_type, $grouped_setting_values, $pre_group_html,
     foreach ($content as $setting_name => $initial_value) {
       $setting = $settings[$setting_name];
       if (array_key_exists('values', $setting)) {
-        generateSelect($setting, $setting_name, $initial_value);
+        $script = generateSelect($setting, $setting_name, $initial_value);
+        if ($script != null) {
+          $scripts[] = $script;
+        }
       } elseif (array_key_exists('radiovalues', $setting)) {
         generateRadio($setting, $setting_name, $initial_value);
       } elseif (array_key_exists('range', $setting)) {
@@ -32,6 +40,7 @@ function generateInputs($setting_type, $grouped_setting_values, $pre_group_html,
     }
     generateGroupEnd();
   }
+  return empty($scripts) ? null : $scripts;
 }
 
 function generateGroupStart($name) {
@@ -50,6 +59,12 @@ function generateSelect($setting, $setting_name, $initial_value) {
   $name_trans = LANG[$name];
   $values = $setting['values'];
 
+  $has_descriptions = isset($setting['descriptions']);
+  if ($has_descriptions) {
+    $descriptions = $setting['descriptions'];
+    $descript_id = $id . '_descript';
+  }
+
   line('<div class="mb-3">');
   line('  <div class="row">');
   line('    <div class="col-10">');
@@ -58,12 +73,28 @@ function generateSelect($setting, $setting_name, $initial_value) {
   foreach ($values as $name => $value) {
     $name_trans = array_key_exists($name, LANG) ? LANG[$name] : $name;
     $selected = ($value == $initial_value) ? ' selected' : '';
-    line("    <option value=\"$value\"$selected>$name_trans</option>");
+    line("        <option value=\"$value\"$selected>$name_trans</option>");
   }
   line('      </select>');
+  if ($has_descriptions) {
+    line("      <div class=\"text-bm mt-1\" id=\"$descript_id\">" . LANG[$descriptions[$initial_value]] . '</div>');
+  }
   line('    </div>');
   line('  </div>');
   line('</div>');
+
+  if ($has_descriptions) {
+    $script = '';
+    $script = lineTo($script, '$(function() {');
+    foreach ($values as $name => $value) {
+      $data_id = $descript_id . "_$value";
+      $description_text = LANG[$descriptions[$value]];
+      $script = lineTo($script, "  $('#$id').data('$data_id', '$description_text');");
+    }
+    $script = lineTo($script, "  $('#$id').change(function () { $('#$descript_id').html($('#$id').data('$descript_id' + '_' + this.value)); });");
+    $script = lineTo($script, '});');
+    return $script;
+  }
 }
 
 function getRangeOutputMaxNumberOfCharacters($min, $max, $step) {

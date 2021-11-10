@@ -49,7 +49,7 @@ require_once(TEMPLATES_DIR . '/settings.php');
         <div class="row">
           <?php
           $permission_button_html = '<div class="border text-center my-3"><p class="my-2" id="notification_message"></p><button id="notification_button" class="btn btn-primary mb-2" style="display: none;"></button></div>';
-          generateInputs($setting_type, $grouped_values, ['browser_notifications' => $permission_button_html], []);
+          $input_scripts = generateInputs($setting_type, $grouped_values, ['browser_notifications' => $permission_button_html], []);
           ?>
         </div>
         <div class="my-4">
@@ -85,6 +85,13 @@ require_once(TEMPLATES_DIR . '/jquery_js.php');
 <script>
   <?php generateBehavior($setting_type); ?>
 </script>
+<?php if ($input_scripts != null) { ?>
+  <script>
+    <?php foreach ($input_scripts as $script) {
+      echo $script . "\n";
+    } ?>
+  </script>
+<?php } ?>
 <script>
   $(function() {
     captureElementState(SETTINGS_FORM_ID);

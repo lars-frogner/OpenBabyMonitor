@@ -90,7 +90,15 @@
             "ambient": 0,
             "bad": 1,
             "good": 2
-        }
+        },
+        "models": {
+            "small": "crynet_small.onnx",
+            "large": "crynet_large.onnx"
+        },
+        "input_shape": [
+            64,
+            128
+        ]
     },
     "network": {
         "network_query_interval": 1e-1,
@@ -130,7 +138,7 @@
             }
         },
         "min_energy": {
-            "group": "recording",
+            "group": "interpretation",
             "name": "min_energy",
             "type": "FLOAT NOT NULL",
             "initial_value": 0.5,
@@ -138,6 +146,20 @@
                 "min": 0,
                 "max": 5,
                 "step": 0.05
+            }
+        },
+        "model": {
+            "group": "interpretation",
+            "name": "model",
+            "type": "VARCHAR(5) NOT NULL",
+            "initial_value": "large",
+            "values": {
+                "model_small": "small",
+                "model_large": "large"
+            },
+            "descriptions": {
+                "small": "small_descript",
+                "large": "large_descript"
             }
         },
         "fraction_threshold": {
@@ -242,6 +264,7 @@
     },
     "listen_groups": {
         "recording": "g_recording",
+        "interpretation": "g_interpretation",
         "notifications": "g_notifications",
         "notify_on": "g_notify_on",
         "browser_notifications": "g_browser_notifications"
