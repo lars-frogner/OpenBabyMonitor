@@ -148,6 +148,7 @@ $connected_network = obtainConnectedNetworkSSID();
 
 <?php
 require_once(TEMPLATES_DIR . '/bootstrap_js.php');
+require_once(TEMPLATES_DIR . '/js-cookie_js.php');
 ?>
 
 <script>
@@ -157,6 +158,7 @@ require_once(TEMPLATES_DIR . '/bootstrap_js.php');
   const INITIAL_MODE = <?php echo $mode; ?>;
   const DETECT_FORM_CHANGES = false;
 </script>
+<script src="js/style.js"></script>
 <script src="js/jquery_utils.js"></script>
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>

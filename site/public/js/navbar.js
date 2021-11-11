@@ -27,17 +27,7 @@ const CLIENT_MODAL_BASE_BODY_SETTER = { text: LANG['nav_you_are_in_ap_mode'], sh
 var _AP_MODE_MODAL_TRIGGER = {};
 var _CLIENT_MODE_MODAL_TRIGGER = {};
 
-const BACKGROUND_COLOR = $(document.body).css('background-color');
-const FOREGROUND_COLOR = $(document.body).css('color');
-
 $(function () {
-    const uses_dark_mode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (uses_dark_mode) {
-        $('<style>.text-bm, .btn-bm { color: ' + FOREGROUND_COLOR + '; filter: brightness(80%); } .btn-bm:hover { color: ' + FOREGROUND_COLOR + '; filter: brightness(100%); }</style>').appendTo('head');
-    } else {
-        $('<style>.text-bm, .btn-bm { color: ' + FOREGROUND_COLOR + '; filter: brightness(120%); } .btn-bm:hover { color: ' + FOREGROUND_COLOR + '; filter: brightness(200%); }</style>').appendTo('head');
-    }
-    $('#' + NAVBAR_ID).addClass(uses_dark_mode ? 'navbar-dark' : 'navbar-light');
     $('.nav-link').on('click', '.disabled', function (event) {
         event.preventDefault();
         return false;

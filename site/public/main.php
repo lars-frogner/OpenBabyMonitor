@@ -244,6 +244,7 @@ require_once(TEMPLATES_DIR . '/main.php');
   require_once(TEMPLATES_DIR . '/hls-js_js.php');
   require_once(TEMPLATES_DIR . '/anime_js.php');
   require_once(TEMPLATES_DIR . '/jquery_js.php');
+  require_once(TEMPLATES_DIR . '/js-cookie_js.php');
   ?>
 
   <script>
@@ -265,6 +266,7 @@ require_once(TEMPLATES_DIR . '/main.php');
     const SETTING_MIN_FREQUENCY = Math.min(min_frequency, max_frequency);
     const SETTING_MAX_FREQUENCY = Math.max(min_frequency, max_frequency);
   </script>
+  <script src="js/style.js"></script>
   <script src="js/confirmation_modal.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/update_settings.js"></script>

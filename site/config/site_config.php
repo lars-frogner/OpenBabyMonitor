@@ -27,7 +27,16 @@ switch (basename($_SERVER['SCRIPT_NAME'])) {
   case 'server_settings.php':
     define('LOCATION', 'server_settings');
     break;
+  case 'server_status.php':
+    define('LOCATION', 'server_status');
+    break;
   default:
     define('LOCATION', 'login');
     break;
+}
+
+if (isset($_COOKIE['color_scheme'])) {
+  define('COLOR_SCHEME', $_COOKIE['color_scheme']);
+} else {
+  define('COLOR_SCHEME', 'light');
 }

@@ -269,6 +269,12 @@ if [[ "$INSTALL_JQUERY" = true ]]; then
     cd -
 fi
 
+INSTALL_JS_COOKIE=true
+if [[ "$INSTALL_JS_COOKIE" = true ]]; then
+    JS_COOKIE_VERSION=3.0.1
+    wget -P $BM_LINKED_SITE_DIR/library/js-cookie/js https://github.com/js-cookie/js-cookie/releases/download/v$JS_COOKIE_VERSION/js.cookie.min.js
+fi
+
 INSTALL_PICAM=true
 if [[ "$BM_USE_CAM" = true && "$INSTALL_PICAM" = true ]]; then
     # Create directories and symbolic links

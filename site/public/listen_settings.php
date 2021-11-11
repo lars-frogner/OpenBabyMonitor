@@ -65,6 +65,7 @@ require_once(TEMPLATES_DIR . '/settings.php');
 <?php
 require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 require_once(TEMPLATES_DIR . '/jquery_js.php');
+require_once(TEMPLATES_DIR . '/js-cookie_js.php');
 ?>
 
 <script>
@@ -76,6 +77,7 @@ require_once(TEMPLATES_DIR . '/jquery_js.php');
   const INITIAL_MODE = <?php echo $mode; ?>;
   const DETECT_FORM_CHANGES = true;
 </script>
+<script src="js/style.js"></script>
 <script src="js/settings.js"></script>
 <script src="js/jquery_utils.js"></script>
 <script src="js/confirmation_modal.js"></script>
