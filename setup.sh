@@ -35,6 +35,7 @@ if [[ "$BM_USE_CAM" = true ]]; then
     BM_PICAM_STREAM_DIR=$BM_SHAREDMEM_DIR/picam
     BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_DIR/index.m3u8
 fi
+BM_PHPSYSINFO_CONFIG_FILE=$BM_LINKED_SITE_DIR/library/phpsysinfo/phpsysinfo.ini
 BM_SERVERCONTROL_DIR=$BM_DIR/site/servercontrol
 BM_SERVER_ACTION_DIR=$BM_SERVERCONTROL_DIR/.hook
 BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
@@ -162,6 +163,7 @@ if [[ "$SETUP_ENV" = true ]]; then
         echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
         echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
     fi
+    echo "export BM_PHPSYSINFO_CONFIG_FILE=$BM_PHPSYSINFO_CONFIG_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVERCONTROL_DIR=$BM_SERVERCONTROL_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_DIR=$BM_SERVER_ACTION_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_FILE" >> $BM_ENV_EXPORTS_PATH
@@ -316,6 +318,32 @@ if [[ "$INSTALL_FLAG_ICONS" = true ]]; then
     cd -
 fi
 
+INSTALL_PHPSYSINFO=true
+if [[ "$INSTALL_PHPSYSINFO" = true ]]; then
+    PHPSYSINFO_VERSION=3.3.4
+    if [[ "$PHPSYSINFO_VERSION" = "latest" ]]; then
+        FILENAME="main.zip"
+        FOLDER_NAME="phpsysinfo-main"
+        DOWNLOAD_URL="https://github.com/phpsysinfo/phpsysinfo/archive/refs/heads/$FILENAME"
+    else
+        FILENAME="v${PHPSYSINFO_VERSION}.zip"
+        FOLDER_NAME="phpsysinfo-$PHPSYSINFO_VERSION"
+        DOWNLOAD_URL="https://github.com/phpsysinfo/phpsysinfo/archive/refs/tags/$FILENAME"
+    fi
+    cd /tmp
+    wget $DOWNLOAD_URL
+    unzip $FILENAME
+    mv $FOLDER_NAME $BM_LINKED_SITE_DIR/library/phpsysinfo
+    rm $FILENAME
+    cd -
+
+    cp $BM_PHPSYSINFO_CONFIG_FILE{.new,}
+    sed -i 's/DEFAULT_DISPLAY_MODE="auto"/DEFAULT_DISPLAY_MODE="bootstrap"/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/SHOW_PICKLIST_LANG=true/SHOW_PICKLIST_LANG=false/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/SHOW_PICKLIST_TEMPLATE=true/SHOW_PICKLIST_TEMPLATE=false/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/REFRESH=60000/REFRESH=20000/g' $BM_PHPSYSINFO_CONFIG_FILE
+fi
+
 SETUP_SERVICES=true
 if [[ "$SETUP_SERVICES" = true ]]; then
     UNIT_DIR=/lib/systemd/system
@@ -442,6 +470,7 @@ _EOF_
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
     sudo chmod $BM_WRITE_PERMISSIONS $BM_MODE_LOCK_DIR
     sudo chmod $BM_WRITE_PERMISSIONS $BM_MODE_COMM_DIR
+    sudo chmod $BM_WRITE_PERMISSIONS $BM_PHPSYSINFO_CONFIG_FILE $(dirname $BM_PHPSYSINFO_CONFIG_FILE)
 
     sudo mkdir -p $SERVER_LOG_DIR
     sudo touch $BM_SERVER_LOG_PATH

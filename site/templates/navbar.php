@@ -50,7 +50,54 @@
               </a></li>
           </ul>
         </li>
-        <li class="dropdown">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
+            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+              <use xlink:href="media/bootstrap-icons.svg#server" />
+            </svg>
+            <?php echo LANG['nav_server']; ?>
+          </a>
+          <ul class="dropdown-menu" style="min-width: 1em;">
+            <li><a id="server_status_nav_link" class="dropdown-item<?php echo LOCATION == 'server_status' ? ' active' : ''; ?> d-flex align-items-center" href="server_status.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#activity" />
+                </svg>
+                <?php echo LANG['nav_server_status']; ?>
+              </a></li>
+            <li><a id="logout_nav_link" class="dropdown-item d-flex align-items-center" href="logout.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#door-open" />
+                </svg>
+                <?php echo LANG['nav_sign_out']; ?>
+              </a></li>
+            <li><a id="reboot_nav_link" class="dropdown-item d-flex align-items-center" href="reboot.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#arrow-counterclockwise" />
+                </svg>
+                <?php echo LANG['nav_reboot']; ?>
+              </a></li>
+            <li><a id="shutdown_nav_link" class="dropdown-item d-flex align-items-center" href="shutdown.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#power" />
+                </svg>
+                <?php echo LANG['nav_shutdown']; ?>
+              </a></li>
+            <li>
+              <div class="pe-0 dropdown-item d-flex align-items-center">
+                <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
+                  <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                    <use xlink:href="media/bootstrap-icons.svg#broadcast-pin" />
+                  </svg>
+                  <?php echo LANG['nav_access_point']; ?>
+                </div>
+                <div class="form-check form-switch my-0 ms-2">
+                  <input id="ap_mode_switch" class="form-check-input" type="checkbox" role="button" <?php echo ACCESS_POINT_ACTIVE ? 'checked' : ''; ?>>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </li>
+        <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
               <use xlink:href="media/bootstrap-icons.svg#chat-text" />
@@ -71,43 +118,6 @@
               </a>
             </li>
           </ul>
-        </li>
-        <li class="nav-item">
-          <a id="logout_nav_link" class="nav-link d-flex align-items-center disabled" href="logout.php">
-            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#door-open" />
-            </svg>
-            <?php echo LANG['nav_sign_out']; ?>
-          </a>
-        </li>
-        <li class="nav-item">
-          <a id="reboot_nav_link" class="nav-link d-flex align-items-center disabled" href="reboot.php">
-            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#arrow-counterclockwise" />
-            </svg>
-            <?php echo LANG['nav_reboot']; ?>
-          </a>
-        </li>
-        <li class="nav-item me-auto">
-          <a id="shutdown_nav_link" class="nav-link d-flex align-items-center disabled" href="shutdown.php">
-            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#power" />
-            </svg>
-            <?php echo LANG['nav_shutdown']; ?>
-          </a>
-        </li>
-        <li class="nav-item">
-          <div class="pe-0 nav-link d-flex align-items-center disabled">
-            <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
-              <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                <use xlink:href="media/bootstrap-icons.svg#broadcast-pin" />
-              </svg>
-              <?php echo LANG['nav_access_point']; ?>
-            </div>
-            <div class="form-check form-switch my-0 ms-2">
-              <input id="ap_mode_switch" class="form-check-input" type="checkbox" role="button" <?php echo ACCESS_POINT_ACTIVE ? 'checked' : ''; ?>>
-            </div>
-          </div>
         </li>
       </ul>
     </div>
