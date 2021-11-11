@@ -24,8 +24,9 @@ setPHPSysInfoDefaultTemplate((COLOR_SCHEME === 'dark') ? 'dark' : 'phpsysinfo');
       ?>
     </header>
 
-    <main class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
+    <main class="d-flex flex-column flex-grow-1 align-items-center justify-content-center overflow-auto text-center">
       <iframe id="phpsysinfo" src="library/phpsysinfo/index.php" title="phpsysinfo" width="100%" height="100%" style="display: none;"></iframe>
+      <span id="server_status_busy_spinner" class="spinner-border" style="display: none;"></span>
     </main>
   </div>
 </body>
