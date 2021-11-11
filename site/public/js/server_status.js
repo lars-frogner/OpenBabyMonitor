@@ -1,6 +1,8 @@
-const MAIN_CONTAINER_ID = 'main_container';
+const PHPSYSINFO_IFRAME_ID = 'phpsysinfo';
 
 $(function () {
-    $('#' + MAIN_CONTAINER_ID).show();
-    setDisabledForNavbar(false);
+    $('#' + PHPSYSINFO_IFRAME_ID).on('load', function () {
+        $('#' + PHPSYSINFO_IFRAME_ID).show();
+        setDisabledForNavbar(false);
+    });
 });
