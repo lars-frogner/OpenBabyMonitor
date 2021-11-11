@@ -7,4 +7,5 @@ define('ENV_FILE_PATH', realpath(__DIR__ . '/../../env/envvars'));
 define('SERVERCONTROL_DIR', realpath(__DIR__ . '/../servercontrol'));
 define('MEDIA_DIR', realpath(__DIR__ . '/../public/media'));
 define('LANGUAGE_DIR', realpath(__DIR__ . '/../public/lang'));
+define('LIBRARY_DIR', realpath(__DIR__ . '/../public/library'));
 define('CONTROL_DIR', realpath(__DIR__ . '/../../control'));
