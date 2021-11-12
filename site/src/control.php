@@ -272,7 +272,7 @@ function setPHPSysInfoDefaultLanguage($new_language) {
   $result_code = null;
   exec("sed -i 's/DEFAULT_LANG=.*/DEFAULT_LANG=\"$new_language\"/g' " . getenv('BM_PHPSYSINFO_CONFIG_FILE'), $output, $result_code);
   if ($result_code != 0) {
-    bm_error("Setting default language for phpSysInfo with error code $result_code:\n" . join("\n", $output));
+    bm_error("Setting default language for phpSysInfo failed with error code $result_code:\n" . join("\n", $output));
   }
 }
 
@@ -281,6 +281,6 @@ function setPHPSysInfoDefaultTemplate($new_template) {
   $result_code = null;
   exec("sed -i 's/DEFAULT_BOOTSTRAP_TEMPLATE=.*/DEFAULT_BOOTSTRAP_TEMPLATE=\"$new_template\"/g' " . getenv('BM_PHPSYSINFO_CONFIG_FILE'), $output, $result_code);
   if ($result_code != 0) {
-    bm_error("Setting default template for phpSysInfo with error code $result_code:\n" . join("\n", $output));
+    bm_error("Setting default template for phpSysInfo failed with error code $result_code:\n" . join("\n", $output));
   }
 }
