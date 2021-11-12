@@ -29,7 +29,6 @@ BM_NW_CLIENT_DIR=/home/$BM_USER/.netconf_client # Directory for configurations f
 BM_NW_ORIG_DIR=/home/$BM_USER/.netconf_orig # For backup of original configuration files
 BM_NW_AP_IP_ROOT=192.168.4
 BM_NW_INTERFACE=wlan0
-BM_NW_CHANNEL=7
 BM_NW_SSID=$BM_HOSTNAME
 BM_NW_COUNTRY_CODE=$BM_COUNTRY_CODE
 
@@ -135,7 +134,7 @@ echo "country_code=$BM_NW_COUNTRY_CODE
 interface=$BM_NW_INTERFACE
 ssid=$BM_NW_SSID
 hw_mode=g
-channel=$BM_NW_CHANNEL
+channel=$BM_AP_CHANNEL
 macaddr_acl=0
 auth_algs=1
 ignore_broadcast_ssid=0

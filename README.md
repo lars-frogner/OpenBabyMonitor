@@ -44,13 +44,18 @@
 
 7. (Optional) Edit environment variables in `babymonitor/config/setup_config.env`. The default version of the file looks like this:
     ```bash
-    # Whether to enable features requiring a camera (set to false if the device has no camera)
+    # Whether to enable features requiring a camera
+    # (set to false if the device has no camera)
     BM_USE_CAM=true
 
     # This name will be used as the domain name of the baby monitor website and the name of the wireless access point
     BM_HOSTNAME=babymonitor
 
-    # The name of the Linux user that will control the baby monitor (the user must already exist)
+    # The wifi channel to use for the wireless access point
+    # (try changing to another channel between 1 and 11 if the connection to the access point is unreasonably unstable)
+    BM_AP_CHANNEL=7
+
+    # The name of the Linux user that will control the baby monitor
     BM_USER=pi
 
     # The country code that will be used for networking
