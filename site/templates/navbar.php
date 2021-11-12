@@ -64,6 +64,12 @@
                 </svg>
                 <?php echo LANG['nav_server_status']; ?>
               </a></li>
+            <li><a id="server_debugging_nav_link" class="dropdown-item<?php echo LOCATION == 'debugging' ? ' active' : ''; ?> d-flex align-items-center" href="debugging.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#bug" />
+                </svg>
+                <?php echo LANG['nav_debugging']; ?>
+              </a></li>
             <li><a id="logout_nav_link" class="dropdown-item d-flex align-items-center" href="logout.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
                   <use xlink:href="media/bootstrap-icons.svg#door-open" />

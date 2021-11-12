@@ -30,6 +30,9 @@ switch (basename($_SERVER['SCRIPT_NAME'])) {
   case 'server_status.php':
     define('LOCATION', 'server_status');
     break;
+  case 'debugging.php':
+    define('LOCATION', 'debugging');
+    break;
   default:
     define('LOCATION', 'login');
     break;

@@ -12,6 +12,7 @@
     "nav_reboot": "Reboot",
     "nav_shutdown": "Shut down",
     "nav_server_status": "Status",
+    "nav_debugging": "Debugging",
     "nav_access_point": "Access point",
     "nav_continue": "Continue",
     "nav_cancel": "Cancel",

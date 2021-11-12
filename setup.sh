@@ -72,7 +72,8 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
 
     # Install Apache, PHP and MySQL (MariaDB)
     sudo apt -y install apache2 mariadb-server php php-dev php-pear php-mysql libapache2-mod-php
-    sudo pecl install inotify
+    sudo apt -y install libzip-dev # Requirement for zip
+    sudo pecl install inotify zip
 
     if [[ "$BM_USE_CAM" = true ]]; then
         # Install dependencies for picam
@@ -153,6 +154,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_WRITE_PERMISSIONS=$BM_WRITE_PERMISSIONS" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_DIR=$BM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_LOG_PATH=$BM_SERVER_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_APACHE_LOG_PATH=$BM_APACHE_LOG_PATH" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SHAREDMEM_DIR=$BM_SHAREDMEM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_LINKED_STREAM_DIR=$BM_LINKED_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_AUDIO_STREAM_DIR=$BM_AUDIO_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
@@ -445,6 +447,12 @@ _EOF_
     sudo sed -i "/;extension=xsl/aextension=inotify" $PHP_INI_CLI_PATH
     sudo sed -i "/;extension=xsl/aextension=inotify" $PHP_INI_APACHE_PATH
 
+    # Make sure zip PHP extension is loaded
+    echo 'extension=zip.so' | sudo tee $PHP_DIR/mods-available/zip.ini
+    sudo phpenmod zip
+    sudo sed -i "/;extension=xsl/aextension=zip" $PHP_INI_CLI_PATH
+    sudo sed -i "/;extension=xsl/aextension=zip" $PHP_INI_APACHE_PATH
+
     # Set time zone
     sudo sed -i "s/;date.timezone =/date.timezone = ${BM_TIMEZONE/'/'/'\/'}/g" $PHP_INI_CLI_PATH
     sudo sed -i "s/;date.timezone =/date.timezone = ${BM_TIMEZONE/'/'/'\/'}/g" $PHP_INI_APACHE_PATH
@@ -476,6 +484,10 @@ _EOF_
     sudo touch $BM_SERVER_LOG_PATH
     sudo chown $BM_USER:$BM_WEB_GROUP $BM_SERVER_LOG_PATH
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_LOG_PATH
+
+    sudo touch $BM_APACHE_LOG_PATH
+    sudo chown $BM_USER:$BM_WEB_GROUP $BM_APACHE_LOG_DIR $BM_APACHE_LOG_PATH
+    sudo chmod $BM_WRITE_PERMISSIONS $BM_APACHE_LOG_DIR $BM_APACHE_LOG_PATH
 
     # Link site folder to default Apache site root
     sudo ln -s $BM_LINKED_SITE_DIR $BM_SITE_DIR
@@ -557,16 +569,23 @@ DNS.3 = $BM_HOSTNAME.lan
 </VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
     sudo a2ensite $SITE_NAME
 
+    # Configure rotation of Apache log
+    sed -i "s/	create .*/	create $BM_WRITE_PERMISSIONS $BM_USER $BM_WEB_GROUP/g" /etc/logrotate.d/apache2
+
     # Configure rotation of babymonitor log
     echo "$BM_SERVER_LOG_PATH {
     daily
     missingok
-    rotate 14
+    size 10M
+    rotate 5
     compress
     delaycompress
     notifempty
     create $BM_WRITE_PERMISSIONS $BM_USER $BM_WEB_GROUP
 }" | sudo tee /etc/logrotate.d/babymonitor
+
+    # Restart Apache
+    sudo systemctl restart apache2
 fi
 
 INITIALIZE_DATABASE=true
