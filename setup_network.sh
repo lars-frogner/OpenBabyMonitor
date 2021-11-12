@@ -76,20 +76,16 @@ sudo apt -y install dnsmasq
 # Create directory for modified configuration files
 mkdir -v $BM_NW_AP_DIR $BM_NW_CLIENT_DIR $BM_NW_ORIG_DIR
 
-# Copy and backup dhcpcd.conf
+# Copy and backup dhcpcd.conf and hosts
 mkdir -v {$BM_NW_AP_DIR,$BM_NW_CLIENT_DIR,$BM_NW_ORIG_DIR}/etc
 cp -v {,$BM_NW_AP_DIR}/etc/dhcpcd.conf
 cp -v {,$BM_NW_CLIENT_DIR}/etc/dhcpcd.conf
 cp -v {,$BM_NW_ORIG_DIR}/etc/dhcpcd.conf
+cp -v {,$BM_NW_AP_DIR}/etc/hosts
+cp -v {,$BM_NW_CLIENT_DIR}/etc/hosts
+cp -v {,$BM_NW_ORIG_DIR}/etc/hosts
 
-# Set static IP for access point mode
-echo "
-interface $BM_NW_INTERFACE
-static ip_address=$BM_NW_AP_IP_ROOT.1/24
-nohook wpa_supplicant
-" >> $BM_NW_AP_DIR/etc/dhcpcd.conf
-
-# Set static IP for client mode
+# Set static IP for client mode (only relevant for accessing device over internet)
 STATIC_IP=false
 if [[ "$STATIC_IP" = true ]]; then
     CLIENT_IP=$(ip -o -4 addr list $BM_NW_INTERFACE | awk '{print $4}' | cut -d/ -f1)
@@ -103,18 +99,27 @@ if [[ "$STATIC_IP" = true ]]; then
     " >> $BM_NW_CLIENT_DIR/etc/dhcpcd.conf
 fi
 
+# Set static IP for access point mode
+echo "
+interface $BM_NW_INTERFACE
+static ip_address=$BM_NW_AP_IP_ROOT.1/24
+nohook wpa_supplicant
+" >> $BM_NW_AP_DIR/etc/dhcpcd.conf
+
+# Add entry for device hostname with the access point IP address in hosts file
+echo "
+$BM_NW_AP_IP_ROOT.1     $BM_HOSTNAME
+" >> $BM_NW_AP_DIR/etc/hosts
+
 # Backup dnsmasq.conf
 sudo mv -v {,$BM_NW_ORIG_DIR}/etc/dnsmasq.conf
 
-# Set listening interface, served IP range, lease time, domain and address for dnsmasq
+# Set listening interface, served IP range and lease time for dnsmasq
 IP_START=2
 IP_END=20
 LEASE_TIME=24h
-ALIAS=$BM_HOSTNAME.local
 echo "interface=$BM_NW_INTERFACE
 dhcp-range=$BM_NW_AP_IP_ROOT.$IP_START,$BM_NW_AP_IP_ROOT.$IP_END,255.255.255.0,$LEASE_TIME
-domain=wlan
-address=/$ALIAS/$BM_NW_AP_IP_ROOT.1
 " > $BM_NW_AP_DIR/etc/dnsmasq.conf
 
 # dnsmasq is only used in access point mode, so this symlink can remain also in client mode
