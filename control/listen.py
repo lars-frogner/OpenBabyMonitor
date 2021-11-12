@@ -186,8 +186,7 @@ def listen_with_settings(config,
         while True:
             last_record_time = time.time()
             feature = feature_provider()
-            if feature is not None:
-                task_queue.put(feature)
+            task_queue.put(feature)
             time.sleep(max(0, interval - (time.time() - last_record_time)))
 
 
@@ -207,11 +206,16 @@ def process_features(task_queue, config, control_dir, model,
 
     model = create_model(model_file)
 
+    ambient_probabilities = np.array([1, 0, 0])
+
     while True:
         feature = task_queue.get()
 
-        probabilities = 10**model.forward(feature)
-        probabilities /= np.sum(probabilities)
+        if feature is None:
+            probabilities = ambient_probabilities
+        else:
+            probabilities = 10**model.forward(feature)
+            probabilities /= np.sum(probabilities)
 
         notifier.add_prediction(probabilities)
         notification = notifier.detect_notification()
@@ -223,7 +227,9 @@ def process_features(task_queue, config, control_dir, model,
 
 
 def create_model(model_file):
+    start = time.time()
     model = Model(model_file)
+    print(f'Model loaded after {time.time() - start} s')
     return model
 
 
@@ -259,3 +265,4 @@ def write_notification(notification_file, notification):
 
 if __name__ == '__main__':
     listen()
+    # listen_with_settings(control.get_config(), interval=0, min_energy=0)
