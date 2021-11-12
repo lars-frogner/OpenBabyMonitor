@@ -147,7 +147,7 @@ def listen():
 def listen_with_settings(config,
                          amplification=10,
                          interval=5.0,
-                         min_energy=0.8,
+                         min_sound_level=-30,
                          model='large',
                          fraction_threshold=60,
                          consecutive_recordings=5,
@@ -179,7 +179,8 @@ def listen_with_settings(config,
 
         standardization_file = control_dir / 'standardization.npz'
         feature_shape = config['inference']['input_shape']
-        feature_provider = create_feature_provider(min_energy, amplification,
+        feature_provider = create_feature_provider(min_sound_level,
+                                                   amplification,
                                                    feature_shape,
                                                    standardization_file)
 
@@ -227,13 +228,11 @@ def process_features(task_queue, config, control_dir, model,
 
 
 def create_model(model_file):
-    start = time.time()
     model = Model(model_file)
-    print(f'Model loaded after {time.time() - start} s')
     return model
 
 
-def create_feature_provider(min_energy, amplification, feature_shape,
+def create_feature_provider(min_sound_level, amplification, feature_shape,
                             standardization_file):
     mic_id = os.environ['BM_MIC_ID']
     audio_device = 'plug{}'.format(mic_id)
@@ -244,7 +243,7 @@ def create_feature_provider(min_energy, amplification, feature_shape,
                                         feature_window_count=feature_shape[1],
                                         backend='python_speech_features',
                                         disable_io=True),
-                                    min_energy=min_energy,
+                                    min_sound_level=min_sound_level,
                                     amplification=amplification,
                                     standardization_file=standardization_file)
 

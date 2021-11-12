@@ -12,7 +12,7 @@
     "notify_on_babbling": "Babling",
     "interval": "Ventetid mellom opptak (s)",
     "amplification": "Signalforsterkning",
-    "min_energy": "Nødvendig lydnivå",
+    "min_sound_level": "Nødvendig lydnivå (dBFS)",
     "model": "Modell",
     "model_small": "Lite nevralt nettverk",
     "model_large": "Stort nevralt nettverk",

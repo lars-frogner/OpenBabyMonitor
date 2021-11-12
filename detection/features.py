@@ -447,9 +447,11 @@ class AudioByteInterpreter:
             else:
                 kind = 'FLOAT'
                 bits = int(type_size[5:])
+            self.max_sample_range = 2
         else:
             kind = type_size[0]
             bits = int(type_size[1:])
+            self.max_sample_range = 2**bits
 
         self.dtype = np.dtype('{}{}{:d}'.format(byteorders[byteorder],
                                                 kinds[kind], bits2bytes(bits)))
@@ -484,10 +486,16 @@ class Recorder:
         with subprocess.Popen(self.arecord_args + [f'--samples={n_samples:d}'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.DEVNULL) as process:
-            waveform = self.interpreter(
-                process.stdout.read(
-                    self.interpreter.compute_n_bytes(n_samples)))
-        return waveform * self.amplification
+            waveform_bytes = process.stdout.read(
+                self.interpreter.compute_n_bytes(n_samples))
+        waveform = self.interpreter(waveform_bytes)
+        level = self.compute_sound_pressure_level(waveform)
+        return waveform * self.amplification, level
+
+    def compute_sound_pressure_level(self, waveform):
+        # dBFS: max is 0 (strongest measurable by microphone), min is -inf (silence)
+        return 20 * np.log10((waveform.max() - waveform.min()) /
+                             self.interpreter.max_sample_range)
 
 
 class Standardizer:
@@ -508,7 +516,7 @@ class FeatureProvider(Standardizer):
     def __init__(self,
                  audio_device,
                  feature_extractor,
-                 min_energy=0,
+                 min_sound_level=-np.inf,
                  amplification=1,
                  **kwargs):
         super().__init__(**kwargs)
@@ -516,14 +524,13 @@ class FeatureProvider(Standardizer):
         self.recorder = Recorder(audio_device,
                                  sampling_rate=feature_extractor.sampling_rate,
                                  amplification=amplification)
-        self.min_energy = min_energy * amplification
+        self.min_sound_level = min_sound_level
 
     def __call__(self):
-        waveform = self.recorder.record_waveform(
+        waveform, sound_level = self.recorder.record_waveform(
             self.feature_extractor.feature_length)
-        feature, energies = self.feature_extractor.compute_feature(
-            waveform, return_energies=True)
-        if energies.max() < self.min_energy:
+        feature = self.feature_extractor.compute_feature(waveform)
+        if sound_level < self.min_sound_level:
             return None
         self.standardize(feature)
         return feature

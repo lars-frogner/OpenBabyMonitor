@@ -12,7 +12,7 @@
     "notify_on_babbling": "Babbling",
     "interval": "Time between recordings (s)",
     "amplification": "Signal amplification",
-    "min_energy": "Required sound level",
+    "min_sound_level": "Required sound level",
     "model": "Model",
     "model_small": "Small neural network",
     "model_large": "Large neural network",
