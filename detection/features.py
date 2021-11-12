@@ -529,8 +529,8 @@ class FeatureProvider(Standardizer):
     def __call__(self):
         waveform, sound_level = self.recorder.record_waveform(
             self.feature_extractor.feature_length)
-        feature = self.feature_extractor.compute_feature(waveform)
         if sound_level < self.min_sound_level:
             return None
+        feature = self.feature_extractor.compute_feature(waveform)
         self.standardize(feature)
         return feature
