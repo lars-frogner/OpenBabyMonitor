@@ -19,11 +19,11 @@
     "language": {
         "current": {
             "type": "CHAR(2) NOT NULL",
-            "initial_value": "no",
+            "initial_value": "en",
             "value": "no",
             "values": [
-                "no",
-                "en"
+                "en",
+                "no"
             ]
         }
     },
