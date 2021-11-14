@@ -5,7 +5,7 @@
     "refresh": "Refresh webpage",
     "site_password_changed": "The website password was successfully changed.",
     "ap_password_changed": "The access point password was successfully changed.",
-    "server_settings": "Network settings",
+    "network_settings": "Network settings",
     "available_networks": "Available networks",
     "connected": "connected",
     "password": "Password",

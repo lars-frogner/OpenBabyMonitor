@@ -25,8 +25,8 @@ switch (basename($_SERVER['SCRIPT_NAME'])) {
   case 'videostream_settings.php':
     define('LOCATION', 'videostream_settings');
     break;
-  case 'server_settings.php':
-    define('LOCATION', 'server_settings');
+  case 'network_settings.php':
+    define('LOCATION', 'network_settings');
     break;
   case 'system_settings.php':
     define('LOCATION', 'system_settings');

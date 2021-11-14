@@ -5,7 +5,7 @@
     "refresh": "Forny siden",
     "site_password_changed": "Nytt passord ble satt for nettstedet.",
     "ap_password_changed": "Nytt passord ble satt for tilgangspunktet.",
-    "server_settings": "Nettverksinnstillinger",
+    "network_settings": "Nettverksinnstillinger",
     "available_networks": "Tilgjengelige nettverk",
     "connected": "tilkoblet",
     "password": "Passord",

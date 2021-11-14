@@ -1,7 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
-require_once(TEMPLATES_DIR . '/server_settings.php');
+require_once(TEMPLATES_DIR . '/network_settings.php');
 
 $connection_succeeded = null;
 $password_changed = null;
@@ -67,7 +67,7 @@ $connected_network = obtainConnectedNetworkSSID();
       <div class="d-flex flex-row justify-content-center mt-3">
         <div class="d-flex flex-column text-center">
           <span class="alert alert-warning"><?php echo LANG['switching_network']; ?></span>
-          <a class="btn btn-secondary" href="server_settings.php"><?php echo LANG['refresh']; ?></a>
+          <a class="btn btn-secondary" href="network_settings.php"><?php echo LANG['refresh']; ?></a>
         </div>
       </div>
     </div>
@@ -78,9 +78,9 @@ $connected_network = obtainConnectedNetworkSSID();
         </div>
       </div>
     <?php } ?>
-    <div class="container" id="server_settings_form_container">
-      <h1 class="my-4"><?php echo LANG['server_settings']; ?></h1>
-      <form id="server_settings_form" action="" method="post">
+    <div class="container" id="network_settings_form_container">
+      <h1 class="my-4"><?php echo LANG['network_settings']; ?></h1>
+      <form id="network_settings_form" action="" method="post">
         <div class="row mb-3">
           <div class="col-auto mx-3 my-2">
             <div class="form-group">
@@ -151,7 +151,7 @@ require_once(TEMPLATES_DIR . '/js-cookie_js.php');
 ?>
 
 <script>
-  const SETTINGS_FORM_ID = 'server_settings_form';
+  const SETTINGS_FORM_ID = 'network_settings_form';
   const USES_CAMERA = <?php echo USES_CAMERA ? 'true' : 'false'; ?>;
   const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
   const INITIAL_MODE = <?php echo $mode; ?>;
@@ -162,7 +162,7 @@ require_once(TEMPLATES_DIR . '/js-cookie_js.php');
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
-<script src="js/server_settings.js"></script>
+<script src="js/network_settings.js"></script>
 <script>
   $(function() {
     captureElementState(SETTINGS_FORM_ID);

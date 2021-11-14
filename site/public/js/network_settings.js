@@ -1,5 +1,5 @@
 const MAIN_CONTAINER_ID = 'main_container';
-const SETTINGS_FORM_CONTAINER_ID = 'server_settings_form_container';
+const SETTINGS_FORM_CONTAINER_ID = 'network_settings_form_container';
 const SWITCHING_INFO_ID = 'switching_network_info';
 const AVAILABLE_NETWORKS_SELECT_ID = 'available_networks';
 const KNOWN_NETWORKS_SELECT_ID = 'known_networks';
