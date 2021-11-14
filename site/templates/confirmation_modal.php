@@ -2,6 +2,9 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
+        <svg class="bi me-3" style="height: 1.5em; width: 1.5em;" fill="currentColor">
+          <use id="confirmation_modal_icon" />
+        </svg>
         <h5 class="modal-title" id="confirmation_modal_header"></h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>

@@ -1,4 +1,5 @@
 const MODAL_ID = 'confirmation_modal';
+const MODAL_ICON_ID = MODAL_ID + '_icon';
 const MODAL_HEADER_ID = MODAL_ID + '_header';
 const MODAL_BODY_ID = MODAL_ID + '_body';
 const MODAL_CONFIRM_CHECKBOX_ID = MODAL_ID + '_checkbox';
@@ -8,6 +9,11 @@ const MODAL_CONFIRM_BUTTON_ID = MODAL_ID + '_confirm_button';
 const MODAL_DISMISS_ID = MODAL_ID + '_dismiss';
 
 function setConfirmationModalProperties(properties) {
+    if (properties.hasOwnProperty('icon')) {
+        $('#' + MODAL_ICON_ID).attr('href', 'media/bootstrap-icons.svg#' + properties['icon']);
+    } else {
+        $('#' + MODAL_ICON_ID).attr('href', 'media/bootstrap-icons.svg#question-circle');
+    }
     if (properties.hasOwnProperty('header')) {
         $('#' + MODAL_HEADER_ID).html(properties['header']);
         $('#' + MODAL_HEADER_ID).show()
