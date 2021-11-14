@@ -2,7 +2,6 @@
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 require_once(SRC_DIR . '/settings.php');
-require_once(SRC_DIR . '/control.php');
 
 $mode = readCurrentMode($_DATABASE);
 

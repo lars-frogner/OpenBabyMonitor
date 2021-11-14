@@ -1,7 +1,6 @@
 <?php
 require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
-
 require_once(TEMPLATES_DIR . '/server_settings.php');
 
 $connection_succeeded = null;
