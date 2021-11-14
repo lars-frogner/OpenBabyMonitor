@@ -149,7 +149,7 @@ wpa_key_mgmt=WPA-PSK
 wpa_pairwise=TKIP
 rsn_pairwise=CCMP
 " > $BM_NW_AP_DIR/etc/hostapd/hostapd.conf
-chown $BM_USER:$BM_WEB_GROUP $BM_NW_AP_DIR/etc/hostapd/hostapd.conf
+sudo chown $BM_USER:$BM_WEB_GROUP $BM_NW_AP_DIR/etc/hostapd/hostapd.conf
 chmod $BM_WRITE_PERMISSIONS $BM_NW_AP_DIR/etc/hostapd/hostapd.conf
 
 # hostapd is only used in access point mode, so this symlink can remain also in client mode
