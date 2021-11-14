@@ -230,6 +230,7 @@ function handleErrorEvent(error) {
 }
 
 function activateLiveResultsMode() {
+    $('#' + LISTEN_ANIMATION_CONTAINER_ID).show();
     if (usesNeuralNetworkModel()) {
         _EVENT_SOURCE.addEventListener('probabilities', handleClassificationResultEvent);
 
@@ -243,7 +244,6 @@ function activateLiveResultsMode() {
         _EVENT_SOURCE.addEventListener('sound_level', handleSoundLevelEvent);
         $('#' + LISTEN_ANIMATION_CONTEXT_ID).css({ left: soundLevelToIndicatorCoordinates(SETTING_MIN_SOUND_LEVEL).left });
     }
-    $('#' + LISTEN_ANIMATION_CONTAINER_ID).show();
 }
 
 function deactivateLiveResultsMode() {
