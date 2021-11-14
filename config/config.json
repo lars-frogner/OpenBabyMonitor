@@ -20,7 +20,6 @@
         "current": {
             "type": "CHAR(2) NOT NULL",
             "initial_value": "en",
-            "value": "no",
             "values": [
                 "en",
                 "no"
@@ -622,5 +621,27 @@
         "color": "g_color",
         "audio": "g_audio",
         "info": "g_info"
+    },
+    "system_settings": {
+        "query_interval": {
+            "group": "monitoring",
+            "name": "query_interval",
+            "type": "INT UNSIGNED NOT NULL",
+            "initial_value": 20,
+            "range": {
+                "min": 1,
+                "max": 300,
+                "step": 1
+            }
+        },
+        "measure_temperature": {
+            "group": "monitoring",
+            "name": "measure_temperature",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        }
+    },
+    "system_groups": {
+        "monitoring": "g_monitoring"
     }
 }

@@ -1,0 +1,9 @@
+{
+    "system_settings": "System settings",
+    "submit": "Confirm",
+    "undo": "Undo",
+    "reset": "Reset",
+    "measure_temperature": "Show device temperature",
+    "query_interval": "Interval between measurements (s)",
+    "g_monitoring": "Monitoring"
+}

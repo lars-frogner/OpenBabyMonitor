@@ -48,6 +48,12 @@
                 </svg>
                 <?php echo LANG['nav_network']; ?>
               </a></li>
+            <li><a id="system_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'system_settings' ? ' active' : ''; ?> d-flex align-items-center" href="system_settings.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#wifi" />
+                </svg>
+                <?php echo LANG['nav_system']; ?>
+              </a></li>
           </ul>
         </li>
         <li class="nav-item dropdown">

@@ -1,0 +1,9 @@
+{
+    "system_settings": "Systeminnstillinger",
+    "submit": "Bekreft",
+    "undo": "Angre",
+    "reset": "Tilbakestill",
+    "measure_temperature": "Vis enhetens temperatur",
+    "query_interval": "Intervall mellom målinger (s)",
+    "g_monitoring": "Overvåkning"
+}

@@ -46,7 +46,7 @@ echo "Storing password hash in database $db_name\n";
 createPasswordTableIfMissing($database, strlen($hashed_password));
 storeHashedPassword($database, $hashed_password);
 
-$table_names = array('modes', 'language', 'listen_settings', 'audiostream_settings');
+$table_names = array('modes', 'language', 'listen_settings', 'audiostream_settings', 'system_settings');
 if (USES_CAMERA) {
   $table_names[] = 'videostream_settings';
 }
