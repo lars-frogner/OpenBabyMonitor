@@ -591,3 +591,10 @@ INITIALIZE_DATABASE=true
 if [[ "$INITIALIZE_DATABASE" = true ]]; then
     $BM_DIR/site/config/init/init_database.sh
 fi
+
+GENERATE_BANDWIDTH_TEST_DATA=true
+if [[ "$GENERATE_BANDWIDTH_TEST_DATA" = true ]]; then
+    $BM_DIR/site/bandwidth_test/generate_bandwidth_test_file.py 10000
+fi
+
+sudo reboot
