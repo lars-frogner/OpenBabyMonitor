@@ -18,8 +18,8 @@ const NETWORK_SETTINGS_MODAL_BASE_PROPERTIES = { href: 'network_settings.php', h
 const LOGOUT_MODAL_BASE_PROPERTIES = { href: 'logout.php', header: LANG['nav_want_to_sign_out'], confirm: LANG['nav_sign_out'], dismiss: LANG['nav_cancel'] };
 const REBOOT_MODAL_BASE_PROPERTIES = { href: 'reboot.php', header: LANG['nav_want_to_reboot'], confirm: LANG['nav_reboot'], dismiss: LANG['nav_cancel'] };
 const SHUTDOWN_MODAL_BASE_PROPERTIES = { href: 'shutdown.php', header: LANG['nav_want_to_shutdown'], confirm: LANG['nav_shutdown'], dismiss: LANG['nav_cancel'] };
-const AP_MODAL_BASE_PROPERTIES = { href: 'activate_ap_mode.php', header: LANG['nav_want_to_create_ap'], confirm: LANG['nav_create'], dismiss: LANG['nav_cancel'], dismissOnclick: toggleApModeSwitchWithoutEvent };
-const CLIENT_MODAL_BASE_PROPERTIES = { href: 'activate_client_mode.php', header: LANG['nav_want_to_connect_to_network'], confirm: LANG['nav_connect'], dismiss: LANG['nav_cancel'], dismissOnclick: toggleApModeSwitchWithoutEvent };
+const AP_MODAL_BASE_PROPERTIES = { icon_size: '3em', href: 'activate_ap_mode.php', header: LANG['nav_want_to_create_ap'], confirm: LANG['nav_create'], dismiss: LANG['nav_cancel'], dismissOnclick: toggleApModeSwitchWithoutEvent };
+const CLIENT_MODAL_BASE_PROPERTIES = { icon_size: '3em', href: 'activate_client_mode.php', header: LANG['nav_want_to_connect_to_network'], confirm: LANG['nav_connect'], dismiss: LANG['nav_cancel'], dismissOnclick: toggleApModeSwitchWithoutEvent };
 
 const AP_MODAL_BASE_BODY_SETTER = { text: LANG['nav_you_are_in_client_mode'], showText: () => { return true; } };
 const CLIENT_MODAL_BASE_BODY_SETTER = { text: LANG['nav_you_are_in_ap_mode'], showText: () => { return true; } };
