@@ -422,6 +422,11 @@ StandardError=append:$BM_SERVER_LOG_PATH" > $LINKED_UNIT_DIR/$SERVICE_FILENAME
     echo -e "${CMD_ALIAS%,}\n%$BM_WEB_GROUP ALL = NOPASSWD: BM_MODES" | (sudo su -c "EDITOR=\"tee\" visudo -f /etc/sudoers.d/$BM_WEB_GROUP")
 fi
 
+GENERATE_BANDWIDTH_TEST_DATA=true
+if [[ "$GENERATE_BANDWIDTH_TEST_DATA" = true ]]; then
+    $BM_DIR/site/bandwidth_test/generate_bandwidth_test_file.py 10000
+fi
+
 INSTALL_SERVER=true
 if [[ "$INSTALL_SERVER" = true ]]; then
     # Configure MySQL
@@ -590,11 +595,6 @@ fi
 INITIALIZE_DATABASE=true
 if [[ "$INITIALIZE_DATABASE" = true ]]; then
     $BM_DIR/site/config/init/init_database.sh
-fi
-
-GENERATE_BANDWIDTH_TEST_DATA=true
-if [[ "$GENERATE_BANDWIDTH_TEST_DATA" = true ]]; then
-    $BM_DIR/site/bandwidth_test/generate_bandwidth_test_file.py 10000
 fi
 
 sudo reboot
