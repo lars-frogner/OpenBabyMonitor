@@ -425,11 +425,11 @@ fi
 INSTALL_SERVER=true
 if [[ "$INSTALL_SERVER" = true ]]; then
     # Configure MySQL
-    MYSQL_ROOT_PASSWORD=$(python3 -c "import json; print(json.load('$BM_DIR/config/config.json')['database']['root_account']['password'])")
-    myql --user=root <<_EOF_
-UPDATE mysql.user SET Password=PASSWORD('$MYSQL_ROOT_PASSWORD') WHERE User='root';
-DELETE FROM mysql.user WHERE User='';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+    MYSQL_ROOT_PASSWORD=$(python3 -c "import json; f = open('$BM_DIR/config/config.json', 'r'); print(json.load(f)['database']['root_account']['password']); f.close()")
+    sudo mysql --user=root <<_EOF_
+UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', PASSWORD('$MYSQL_ROOT_PASSWORD')) WHERE User='root';
+DELETE FROM mysql.global_priv WHERE User='';
+DELETE FROM mysql.global_priv WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DROP DATABASE IF EXISTS test;
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
 FLUSH PRIVILEGES;
@@ -569,7 +569,7 @@ DNS.3 = $BM_HOSTNAME.lan
     sudo a2ensite $SITE_NAME
 
     # Configure rotation of Apache log
-    sed -i "s/	create .*/	create $BM_WRITE_PERMISSIONS $BM_USER $BM_WEB_GROUP/g" /etc/logrotate.d/apache2
+    sudo sed -i "s/create .*/create $BM_WRITE_PERMISSIONS $BM_USER $BM_WEB_GROUP/g" /etc/logrotate.d/apache2
 
     # Configure rotation of babymonitor log
     echo "$BM_SERVER_LOG_PATH {
