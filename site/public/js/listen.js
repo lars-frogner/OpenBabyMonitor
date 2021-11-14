@@ -35,7 +35,7 @@ $(function () {
     connectModalToObject(_REDIRECT_MODAL_TRIGGER, { checkboxLabel: LANG['dont_ask_again'], checkboxChecked: !SETTING_ASK_SECURE_REDIRECT, confirmOnclick: function () { redirectModalCallback(function () { window.location.replace(SECURE_URL); }); }, dismissOnclick: redirectModalCallback, header: LANG['not_supported_unencrypted'], confirm: LANG['switch_site'], dismiss: LANG['stay'] }, { text: LANG['want_to_switch_site'], showText: () => { return true; } });
     connectModalToObject(_UNSUPPORTED_MODAL_TRIGGER, { checkboxLabel: LANG['dont_show_again'], checkboxChecked: !SETTING_SHOW_UNSUPPORTED_MESSAGE, dismissOnclick: unsupportedModalCallback, header: LANG['not_supported_by_browser'], dismiss: LANG['ok'] });
     connectModalToObject(_PERMISSION_MODAL_TRIGGER, { checkboxLabel: LANG['dont_ask_again'], checkboxChecked: !SETTING_ASK_NOTIFICATION_PERMISSION, confirmOnclick: function () { askNotificationPermission(); hideModalWithoutDismissCallback(); }, dismissOnclick: permissionModalCallback, header: LANG['premission_required'], confirm: LANG['grant_permission'], dismiss: LANG['continue_without'] });
-    connectModalToObject(_NOTIFICATION_MODAL_TRIGGER, { noHeaderHiding: true, noBodyHiding: true, confirmOnclick: function () { hideModalWithoutDismissCallback(); changeModeTo('audiostream'); }, confirm: 'Begynn lydavspilling', dismiss: 'Lukk' });
+    connectModalToObject(_NOTIFICATION_MODAL_TRIGGER, { icon: 'exclamation-circle', noHeaderHiding: true, noBodyHiding: true, confirmOnclick: function () { hideModalWithoutDismissCallback(); changeModeTo('audiostream'); }, confirm: 'Begynn lydavspilling', dismiss: 'Lukk' });
 
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {

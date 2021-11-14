@@ -9,7 +9,7 @@
         <li class="nav-item">
           <a id="modes_nav_link" class="nav-link<?php echo LOCATION == 'main' ? ' active' : ''; ?> d-flex align-items-center disabled" href="main.php">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#menu-button" />
+              <use href="media/bootstrap-icons.svg#menu-button" />
             </svg>
             <?php echo LANG['nav_modes']; ?>
           </a>
@@ -17,40 +17,40 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#gear" />
+              <use href="media/bootstrap-icons.svg#gear-fill" />
             </svg>
             <?php echo LANG['nav_settings']; ?>
           </a>
           <ul class="dropdown-menu" style="min-width: 1em;">
             <li><a id="listen_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'listen_settings' ? ' active' : ''; ?> d-flex align-items-center" href="listen_settings.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#megaphone" />
+                  <use href="media/bootstrap-icons.svg#megaphone-fill" />
                 </svg>
                 <?php echo LANG['nav_notification']; ?>
               </a></li>
             <li><a id="audiostream_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'audiostream_settings' ? ' active' : ''; ?> d-flex align-items-center" href="audiostream_settings.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#soundwave" />
+                  <use href="media/bootstrap-icons.svg#soundwave" />
                 </svg>
                 <?php echo LANG['nav_audio']; ?>
               </a></li>
             <?php if (USES_CAMERA) { ?>
               <li><a id="videostream_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'videostream_settings' ? ' active' : ''; ?> d-flex align-items-center" href="videostream_settings.php">
                   <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                    <use xlink:href="media/bootstrap-icons.svg#film" />
+                    <use href="media/bootstrap-icons.svg#film" />
                   </svg>
                   <?php echo LANG['nav_video']; ?>
                 </a></li>
             <?php } ?>
             <li><a id="network_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'network_settings' ? ' active' : ''; ?> d-flex align-items-center" href="network_settings.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#wifi" />
+                  <use href="media/bootstrap-icons.svg#wifi" />
                 </svg>
                 <?php echo LANG['nav_network']; ?>
               </a></li>
             <li><a id="system_settings_nav_link" class="dropdown-item<?php echo LOCATION == 'system_settings' ? ' active' : ''; ?> d-flex align-items-center" href="system_settings.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#wifi" />
+                  <use href="media/bootstrap-icons.svg#wrench" />
                 </svg>
                 <?php echo LANG['nav_system']; ?>
               </a></li>
@@ -59,38 +59,38 @@
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#server" />
+              <use href="media/bootstrap-icons.svg#server" />
             </svg>
             <?php echo LANG['nav_server']; ?>
           </a>
           <ul class="dropdown-menu" style="min-width: 1em;">
             <li><a id="server_status_nav_link" class="dropdown-item<?php echo LOCATION == 'server_status' ? ' active' : ''; ?> d-flex align-items-center" href="server_status.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#activity" />
+                  <use href="media/bootstrap-icons.svg#activity" />
                 </svg>
                 <?php echo LANG['nav_server_status']; ?>
               </a></li>
             <li><a id="server_debugging_nav_link" class="dropdown-item<?php echo LOCATION == 'debugging' ? ' active' : ''; ?> d-flex align-items-center" href="debugging.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#bug" />
+                  <use href="media/bootstrap-icons.svg#bug" />
                 </svg>
                 <?php echo LANG['nav_debugging']; ?>
               </a></li>
             <li><a id="logout_nav_link" class="dropdown-item d-flex align-items-center" href="logout.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#door-open" />
+                  <use href="media/bootstrap-icons.svg#door-open" />
                 </svg>
                 <?php echo LANG['nav_sign_out']; ?>
               </a></li>
             <li><a id="reboot_nav_link" class="dropdown-item d-flex align-items-center" href="reboot.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#arrow-counterclockwise" />
+                  <use href="media/bootstrap-icons.svg#arrow-counterclockwise" />
                 </svg>
                 <?php echo LANG['nav_reboot']; ?>
               </a></li>
             <li><a id="shutdown_nav_link" class="dropdown-item d-flex align-items-center" href="shutdown.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#power" />
+                  <use href="media/bootstrap-icons.svg#power" />
                 </svg>
                 <?php echo LANG['nav_shutdown']; ?>
               </a></li>
@@ -98,7 +98,7 @@
               <div class="pe-0 dropdown-item d-flex align-items-center">
                 <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
                   <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                    <use xlink:href="media/bootstrap-icons.svg#broadcast-pin" />
+                    <use href="media/bootstrap-icons.svg#broadcast-pin" />
                   </svg>
                   <?php echo LANG['nav_access_point']; ?>
                 </div>
@@ -112,7 +112,7 @@
         <li class="nav-item dropdown me-auto">
           <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#chat-text" />
+              <use href="media/bootstrap-icons.svg#chat-text" />
             </svg>
             <?php echo LANG['nav_language']; ?>
           </a>
@@ -135,7 +135,7 @@
           <li class="nav-item d-flex align-items-center text-bm">
             <div class="d-flex align-items-center py-2">
               <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                <use xlink:href="media/bootstrap-icons.svg#thermometer-half" />
+                <use href="media/bootstrap-icons.svg#thermometer-half" />
               </svg>
               <div id="temperature_label"></div>
             </div>

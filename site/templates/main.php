@@ -9,7 +9,7 @@ function createModeRadioButtonIcon($name, $icon, $checked) {
   $style_size = 'min(12vh, calc(25vw - 2rem - 2px))';
   echo "<div class=\"$checked_string\">\n";
   echo "  <svg class=\"bi\" style=\"height: $style_size; width: $style_size;\" fill=\"currentColor\">\n";
-  echo "    <use xlink:href=\"media/bootstrap-icons.svg#$icon\" />\n";
+  echo "    <use href=\"media/bootstrap-icons.svg#$icon\" />\n";
   echo "  </svg>\n";
   echo "  <p class=\"mb-0 mt-2\">$name</p>\n";
   echo "</div>\n";

@@ -27,7 +27,7 @@ redirectIfLoggedOut('index.php');
           <div class="col-auto">
             <a class="btn btn-secondary d-flex justify-content-center align-items-center" href="obtain_logs.php">
               <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                <use xlink:href="media/bootstrap-icons.svg#file-earmark-text" />
+                <use href="media/bootstrap-icons.svg#file-earmark-text" />
               </svg>
               <?php echo LANG['download_logs']; ?>
             </a>

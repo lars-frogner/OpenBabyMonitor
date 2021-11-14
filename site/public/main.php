@@ -48,10 +48,10 @@ require_once(TEMPLATES_DIR . '/main.php');
 
           <div id="mode_content_listen" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : ''; ?>>
             <svg id="listen_inactive_icon" class="bi mb-3" style="width: 15vh; height: 15vh;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#bell" />
+              <use href="media/bootstrap-icons.svg#bell" />
             </svg>
             <svg id="listen_active_icon" class="bi mb-3" style="width: 15vh; height: 15vh; display: none;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#bell-fill" />
+              <use href="media/bootstrap-icons.svg#bell-fill" />
             </svg>
 
             <p id="listen_notifications_msg" class="mb-5"></p>
@@ -77,39 +77,39 @@ require_once(TEMPLATES_DIR . '/main.php');
             <?php if (INFERENCE_MODEL == 'sound_level_threshold') { ?>
               <div id="listen_animation_container" class="container ratio px-0 mt-4" style="position: relative; --bs-aspect-ratio: 20%; display: none;">
                 <svg class="listen-animation-label bi" style="position: absolute; left: 0%; top: calc(50% - 2.5em / 2); width: 2.5em; height: 2.5em;">
-                  <use xlink:href="media/bootstrap-icons.svg#volume-off-fill" />
+                  <use href="media/bootstrap-icons.svg#volume-off-fill" />
                 </svg>
                 <div id="listen_animation_line" style="position: absolute; left: 2.5em; top: calc(50% - 1px); width: calc(100% - (2 * 2.5em + 0.5em)); height: 0%;">
                   <div id="listen_animation_indicator" style="position: absolute; width: 2.5em; height: calc(0.87 * 2.5em); top: calc(-0.87 * 2.5em); left: 0%;">
                     <div class="listen-animation-indicator" style="position: absolute; width: 100%; height: 100%; left: -50%; -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
                     <svg class="listen-animation-label-bg bi" style="position: absolute; width: calc(100% - 30%); height: calc(100% - 30%); left: calc(-50% + 30% / 2 + 3%); top: calc(0% + 30% / 2 - 10%);">
-                      <use xlink:href="media/bootstrap-icons.svg#ear-fill" />
+                      <use href="media/bootstrap-icons.svg#ear-fill" />
                     </svg>
                   </div>
                   <div id="listen_animation_context" style="position: absolute; width: 2em; height: calc(0.87 * 2em); top: 0%; left: 0%;">
                     <svg class="listen-animation-label bi" style="position: absolute; width: 100%; height: 100%; left: -50%; top: 0%;">
-                      <use xlink:href="media/bootstrap-icons.svg#exclamation-triangle-fill" />
+                      <use href="media/bootstrap-icons.svg#exclamation-triangle-fill" />
                     </svg>
                   </div>
                 </div>
                 <svg class="listen-animation-label bi" style="position: absolute; left: calc(100% - 2.5em); top: calc(50% - 2.5em / 2); width: 2.5em; height: 2.5em;">
-                  <use xlink:href="media/bootstrap-icons.svg#volume-up-fill" />
+                  <use href="media/bootstrap-icons.svg#volume-up-fill" />
                 </svg>
               </div>
             <?php } else { ?>
               <div id="listen_animation_container" class="container ratio px-0 mt-3" style="position: relative; --bs-aspect-ratio: 86.6%; display: none;">
                 <div id="listen_animation_context" style="position: absolute; width: 100%; height: 100%; filter: brightness(3); background: linear-gradient(to top, rgba(20,39,59,1), rgba(20,39,59,0)), linear-gradient(to left, rgba(31,57,35,1), rgba(31,57,35,0) 80%), linear-gradient(to right, rgba(80,10,10,1), rgba(80,10,10,0) 80%); -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
                 <svg class="listen-animation-label-bg bi" style="position: absolute; left: 1.0em; top: 0.2em; width: 1.8em; height: 1.8em;">
-                  <use xlink:href="media/bootstrap-icons.svg#emoji-frown-fill" />
+                  <use href="media/bootstrap-icons.svg#emoji-frown-fill" />
                 </svg>
                 <svg class="listen-animation-label-bg bi" style="position: absolute; left: calc(100% - 1.8em - 1.0em); top: 0.2em;  width: 1.8em; height: 1.8em;">
-                  <use xlink:href="media/bootstrap-icons.svg#emoji-smile-fill" />
+                  <use href="media/bootstrap-icons.svg#emoji-smile-fill" />
                 </svg>
                 <svg class="listen-animation-label-bg bi" style="position: absolute; left: calc(50% - 0.9em); top: calc(100% - 1.8em - 1.3em); width: 1.8em; height: 1.8em;">
-                  <use xlink:href="media/bootstrap-icons.svg#emoji-expressionless-fill" />
+                  <use href="media/bootstrap-icons.svg#emoji-expressionless-fill" />
                 </svg>
                 <svg id="listen_animation_indicator" class="bi" style="position: absolute; width: 1.5em; height: 1.5em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#bullseye" />
+                  <use href="media/bootstrap-icons.svg#bullseye" />
                 </svg>
               </div>
             <?php } ?>
@@ -173,14 +173,14 @@ require_once(TEMPLATES_DIR . '/main.php');
 
           <div id="mode_content_standby" class="col-auto text-center" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : ''; ?>>
             <svg class="bi mb-5 text-bm" style="width: 25vh; height: 25vh;" fill="currentColor">
-              <use xlink:href="media/bootstrap-icons.svg#moon-fill" />
+              <use href="media/bootstrap-icons.svg#moon-fill" />
             </svg>
             <p class="mb-5 text-bm"><?php echo LANG['device_in_standby']; ?></p>
 
             <div class="row mb-3 align-items-center justify-content-center">
               <div id="latency_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none;">
                 <svg id="latency_icon" class="bi" style="width: 2em; height: 2em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#stopwatch" />
+                  <use href="media/bootstrap-icons.svg#stopwatch" />
                 </svg>
                 <p id="latency_text" class="mb-0"></p>
               </div>
@@ -188,7 +188,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                 <p class="mb-0 text-bm"><?php echo LANG['connection']; ?></p>
                 <button id="measure_bandwidth_button" class="btn btn-bm" disabled>
                   <svg class="bi" style="width: 2.5em; height: 2.5em;" fill="currentColor">
-                    <use xlink:href="media/bootstrap-icons.svg#speedometer2" />
+                    <use href="media/bootstrap-icons.svg#speedometer2" />
                   </svg>
                   <p class="mb-0"><?php echo LANG['test_connection']; ?></p>
                 </button>
@@ -196,7 +196,7 @@ require_once(TEMPLATES_DIR . '/main.php');
               </div>
               <div id="download_speed_container" class="col-auto text-center text-bm" style="min-width: 6em; display: none;">
                 <svg id="download_speed_icon" class="bi" style="width: 2em; height: 2em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#cloud-arrow-down" />
+                  <use href="media/bootstrap-icons.svg#cloud-arrow-down" />
                 </svg>
                 <p id="download_speed_text" class="mb-0"></p>
               </div>
@@ -210,20 +210,20 @@ require_once(TEMPLATES_DIR . '/main.php');
               <p id="connection_results_message" class="mb-3 text-bm" style="display: none;"><?php echo LANG['available_features']; ?></p>
               <div id="connection_results_listen" class="col-auto text-center text-bm" style="display: none;">
                 <svg class="bi" style="width: 2em; height: 2em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#bell-fill" />
+                  <use href="media/bootstrap-icons.svg#bell-fill" />
                 </svg>
                 <p id="connection_results_listen_text" class="mb-0"></p>
               </div>
               <div id="connection_results_audio" class="col-auto text-center text-bm" style="display: none;">
                 <svg class="bi" style="width: 2em; height: 2em;" fill="currentColor">
-                  <use xlink:href="media/bootstrap-icons.svg#mic-fill" />
+                  <use href="media/bootstrap-icons.svg#mic-fill" />
                 </svg>
                 <p id="connection_results_audio_text" class="mb-0"></p>
               </div>
               <?php if (USES_CAMERA) { ?>
                 <div id="connection_results_video" class="col-auto text-center text-bm" style="display: none;">
                   <svg class="bi" style="width: 2em; height: 2em;" fill="currentColor">
-                    <use xlink:href="media/bootstrap-icons.svg#camera-video-fill" />
+                    <use href="media/bootstrap-icons.svg#camera-video-fill" />
                   </svg>
                   <p id="connection_results_video_text" class="mb-0"></p>
                 </div>
