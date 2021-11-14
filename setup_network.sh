@@ -107,9 +107,7 @@ nohook wpa_supplicant
 " >> $BM_NW_AP_DIR/etc/dhcpcd.conf
 
 # Add entry for device hostname with the access point IP address in hosts file
-echo "
-$BM_NW_AP_IP_ROOT.1     $BM_HOSTNAME
-" >> $BM_NW_AP_DIR/etc/hosts
+echo "$BM_NW_AP_IP_ROOT.1     $BM_HOSTNAME" >> $BM_NW_AP_DIR/etc/hosts
 
 # Backup dnsmasq.conf
 sudo mv -v {,$BM_NW_ORIG_DIR}/etc/dnsmasq.conf
@@ -163,8 +161,4 @@ net.ipv6.conf.all.disable_ipv6=1
 # Check connection every 10 minutes
 (crontab -l 2> /dev/null; echo "*/10 * * * * $BM_SERVERCONTROL_DIR/ensure_connection.sh") | crontab -
 
-echo "Start access point mode by running the following command:
-nohup $BM_SERVERCONTROL_DIR/activate_ap_mode.sh &
-
-Start client mode by running the following command:
-nohup $BM_SERVERCONTROL_DIR/activate_client_mode.sh &"
+sudo reboot
