@@ -1,5 +1,6 @@
 const MODAL_ID = 'confirmation_modal';
 const MODAL_ICON_ID = MODAL_ID + '_icon';
+const MODAL_ICON_SRC_ID = MODAL_ICON_ID + '_src';
 const MODAL_HEADER_ID = MODAL_ID + '_header';
 const MODAL_BODY_ID = MODAL_ID + '_body';
 const MODAL_CONFIRM_CHECKBOX_ID = MODAL_ID + '_checkbox';
@@ -10,9 +11,14 @@ const MODAL_DISMISS_ID = MODAL_ID + '_dismiss';
 
 function setConfirmationModalProperties(properties) {
     if (properties.hasOwnProperty('icon')) {
-        $('#' + MODAL_ICON_ID).attr('href', 'media/bootstrap-icons.svg#' + properties['icon']);
+        $('#' + MODAL_ICON_SRC_ID).attr('href', 'media/bootstrap-icons.svg#' + properties['icon']);
     } else {
-        $('#' + MODAL_ICON_ID).attr('href', 'media/bootstrap-icons.svg#question-circle');
+        $('#' + MODAL_ICON_SRC_ID).attr('href', 'media/bootstrap-icons.svg#question-circle');
+    }
+    if (properties.hasOwnProperty('icon_size')) {
+        $('#' + MODAL_ICON_ID).css({ width: properties['icon_size'], height: properties['icon_size'] });
+    } else {
+        $('#' + MODAL_ICON_ID).css({ width: '1.5em', height: '1.5em' });
     }
     if (properties.hasOwnProperty('header')) {
         $('#' + MODAL_HEADER_ID).html(properties['header']);
