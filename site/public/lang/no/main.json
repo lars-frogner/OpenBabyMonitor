@@ -14,6 +14,8 @@
     "listen": "Lytte",
     "observe": "Se",
     "standby": "Hvile",
+    "sound_alert": "Varsel om lydnivå",
+    "significant_sound": "Lydnivået er betydelig.",
     "crying_alert": "Varsel om gråt",
     "child_crying": "Barnet gråter.",
     "babbling_alert": "Varsel om babling",

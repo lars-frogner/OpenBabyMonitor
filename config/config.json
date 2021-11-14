@@ -92,8 +92,8 @@
             "good": 2
         },
         "models": {
-            "small": "crynet_small.onnx",
-            "large": "crynet_large.onnx"
+            "small_network": "crynet_small.onnx",
+            "large_network": "crynet_large.onnx"
         },
         "input_shape": [
             64,
@@ -115,17 +115,6 @@
         }
     },
     "listen_settings": {
-        "amplification": {
-            "group": "recording",
-            "name": "amplification",
-            "type": "FLOAT NOT NULL",
-            "initial_value": 10,
-            "range": {
-                "min": 1,
-                "max": 40,
-                "step": 0.5
-            }
-        },
         "interval": {
             "group": "recording",
             "name": "interval",
@@ -135,6 +124,23 @@
                 "min": 0,
                 "max": 60,
                 "step": 1
+            }
+        },
+        "amplification": {
+            "group": "recording",
+            "name": "amplification",
+            "type": "FLOAT NOT NULL",
+            "initial_value": 10,
+            "range": {
+                "min": 1,
+                "max": 40,
+                "step": 0.5
+            },
+            "disabled_when": {
+                "model": {
+                    "operator": "==",
+                    "value": "sound_level_threshold"
+                }
             }
         },
         "min_sound_level": {
@@ -151,15 +157,17 @@
         "model": {
             "group": "interpretation",
             "name": "model",
-            "type": "VARCHAR(5) NOT NULL",
-            "initial_value": "large",
+            "type": "VARCHAR(21) NOT NULL",
+            "initial_value": "large_network",
             "values": {
-                "model_small": "small",
-                "model_large": "large"
+                "model_sound_level_threshold": "sound_level_threshold",
+                "model_small_network": "small_network",
+                "model_large_network": "large_network"
             },
             "descriptions": {
-                "small": "small_descript",
-                "large": "large_descript"
+                "sound_level_threshold": "sound_level_threshold_descript",
+                "small_network": "small_network_descript",
+                "large_network": "large_network_descript"
             }
         },
         "fraction_threshold": {
@@ -193,6 +201,12 @@
                 "min": 0,
                 "max": 100,
                 "step": 1
+            },
+            "disabled_when": {
+                "model": {
+                    "operator": "==",
+                    "value": "sound_level_threshold"
+                }
             }
         },
         "min_notification_interval": {
@@ -216,7 +230,13 @@
             "group": "notify_on",
             "name": "notify_on_crying",
             "type": "BOOLEAN NOT NULL",
-            "initial_value": true
+            "initial_value": true,
+            "disabled_when": {
+                "model": {
+                    "operator": "==",
+                    "value": "sound_level_threshold"
+                }
+            }
         },
         "notify_and_or": {
             "group": "notify_on",
@@ -234,6 +254,10 @@
                 "notify_on_babbling": {
                     "operator": "!=",
                     "value": "1"
+                },
+                "model": {
+                    "operator": "==",
+                    "value": "sound_level_threshold"
                 }
             }
         },
@@ -241,7 +265,13 @@
             "group": "notify_on",
             "name": "notify_on_babbling",
             "type": "BOOLEAN NOT NULL",
-            "initial_value": false
+            "initial_value": false,
+            "disabled_when": {
+                "model": {
+                    "operator": "==",
+                    "value": "sound_level_threshold"
+                }
+            }
         },
         "ask_secure_redirect": {
             "group": "browser_notifications",

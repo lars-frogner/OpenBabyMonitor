@@ -468,7 +468,7 @@ _EOF_
     mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_MODE_COMM_DIR
 
     # Make sure files to be watched in the comm directory exist
-    touch $BM_MODE_COMM_DIR/{probabilities.json, notification.txt}
+    touch $BM_MODE_COMM_DIR/{sound_level.dat, probabilities.json, notification.txt}
 
     # Ensure permissions are correct in project folder
     sudo chmod -R $BM_READ_PERMISSIONS $BM_DIR

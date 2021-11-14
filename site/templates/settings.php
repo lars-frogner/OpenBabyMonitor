@@ -77,7 +77,7 @@ function generateSelect($setting, $setting_name, $initial_value) {
   }
   line('      </select>');
   if ($has_descriptions) {
-    line("      <div class=\"text-bm mt-1\" id=\"$descript_id\">" . LANG[$descriptions[$initial_value]] . '</div>');
+    line("      <p class=\"mt-1\" id=\"$descript_id\">" . LANG[$descriptions[$initial_value]] . '</p>');
   }
   line('    </div>');
   line('  </div>');
@@ -181,14 +181,12 @@ function generateRadio($setting, $setting_name, $initial_value) {
 }
 
 function generateBehavior($setting_type) {
-  $disabled_when = getSettingAttributes($setting_type, 'children_disabled_when');
-  $children_selector = ' *';
-  if (count($disabled_when) == 0) {
-    $children_selector = '';
-    $disabled_when = getSettingAttributes($setting_type, 'disabled_when');
-  }
+  $disabled_when = getSettingAttributes($setting_type, 'disabled_when');
+  $children_disabled_when = getSettingAttributes($setting_type, 'children_disabled_when');
+  $all_disabled_when = array_merge($disabled_when, $children_disabled_when);
+
   $condition_statements = array();
-  foreach ($disabled_when as $setting_name => $criteria) {
+  foreach ($all_disabled_when as $setting_name => $criteria) {
     foreach ($criteria as $id => $condition) {
       $operator = $condition['operator'];
       $value = $condition['value'];
@@ -202,8 +200,9 @@ function generateBehavior($setting_type) {
     }
   }
   $change_statements = array();
-  foreach ($disabled_when as $setting_name => $criteria) {
+  foreach ($all_disabled_when as $setting_name => $criteria) {
     $condition_statement = $condition_statements[$setting_name];
+    $children_selector = array_key_exists($setting_name, $children_disabled_when) ? ' *' : '';
     $setter_statement = "$('#$setting_name $children_selector').prop('disabled', $condition_statement); ";
     foreach ($criteria as $id => $condition) {
       if (array_key_exists($id, $change_statements)) {

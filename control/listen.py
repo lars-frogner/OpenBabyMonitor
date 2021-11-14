@@ -26,7 +26,44 @@ class Model:
         return self.model.forward().squeeze()
 
 
-class Notifier:
+class SoundLevelNotifier:
+    def __init__(self,
+                 min_sound_level=-30,
+                 fraction_threshold=60,
+                 consecutive_recordings=5,
+                 min_notification_interval=180):
+        self.min_sound_level = min_sound_level
+        self.fraction_threshold = fraction_threshold * 1e-2
+        self.consecutive_recordings = consecutive_recordings
+        self.min_notification_interval = min_notification_interval
+
+        self.prediction_history = collections.deque(
+            maxlen=self.consecutive_recordings)
+
+        self.last_notification_time = -np.inf
+
+    def add_sound_level_measurement(self, sound_level):
+        self.prediction_history.append(sound_level >= self.min_sound_level)
+
+    def compute_fraction_in_prediction_history(self):
+        return self.prediction_history.count(True) / len(
+            self.prediction_history)
+
+    def notification_allowed(self):
+        return time.time(
+        ) - self.last_notification_time > self.min_notification_interval
+
+    def detect_notification(self):
+        if not self.notification_allowed() or len(
+                self.prediction_history
+        ) < self.consecutive_recordings or self.compute_fraction_in_prediction_history(
+        ) < self.fraction_threshold:
+            return None
+        else:
+            return 'sound'
+
+
+class InferenceNotifier:
     def __init__(self,
                  labels,
                  fraction_threshold=60,
@@ -37,6 +74,7 @@ class Notifier:
                  notify_and_or='or',
                  notify_on_babbling=False):
         self.labels = labels
+        self.label_names = {idx: name for name, idx in labels.items()}
         self.fraction_threshold = fraction_threshold * 1e-2
         self.consecutive_recordings = consecutive_recordings
         self.probability_threshold = probability_threshold * 1e-2
@@ -144,19 +182,69 @@ def listen():
             config, **control.read_settings(mode, config, database)))
 
 
-def listen_with_settings(config,
-                         amplification=10,
-                         interval=5.0,
-                         min_sound_level=-30,
-                         model='large',
-                         fraction_threshold=60,
-                         consecutive_recordings=5,
-                         probability_threshold=85,
-                         min_notification_interval=180,
-                         notify_on_crying=True,
-                         notify_and_or='or',
-                         notify_on_babbling=False,
-                         **kwargs):
+def listen_with_settings(*args, model='large_network', **kwargs):
+    if model == 'sound_level_threshold':
+        listen_with_settings_sound_level_threshold(*args, **kwargs)
+    else:
+        listen_with_settings_network(*args, model=model, **kwargs)
+
+
+def listen_with_settings_sound_level_threshold(config,
+                                               interval=5.0,
+                                               min_sound_level=-30,
+                                               fraction_threshold=60,
+                                               consecutive_recordings=5,
+                                               min_notification_interval=180,
+                                               **kwargs):
+    control.register_shutdown_handler()
+
+    control_dir = pathlib.Path(os.environ['BM_DIR']) / 'control'
+    comm_dir = control_dir / '.comm'
+    sound_level_file = comm_dir / 'sound_level.dat'
+    notification_file = comm_dir / 'notification.txt'
+
+    update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
+                os.environ['BM_SERVER_LOG_PATH'])
+
+    recorder = features.Recorder(get_audio_device())
+
+    feature_extractor = create_feature_extractor(config)
+
+    notifier = SoundLevelNotifier(
+        min_sound_level=min_sound_level,
+        fraction_threshold=fraction_threshold,
+        consecutive_recordings=consecutive_recordings,
+        min_notification_interval=min_notification_interval)
+
+    while True:
+        last_record_time = time.time()
+        _, sound_level = recorder.record_waveform(
+            feature_extractor.feature_length)
+
+        notifier.add_sound_level_measurement(sound_level)
+        notification = notifier.detect_notification()
+
+        write_sound_level(sound_level_file, sound_level)
+
+        if notification is not None:
+            write_notification(notification_file, notification)
+
+        time.sleep(max(0, interval - (time.time() - last_record_time)))
+
+
+def listen_with_settings_network(config,
+                                 amplification=10,
+                                 interval=5.0,
+                                 min_sound_level=-30,
+                                 model='large_network',
+                                 fraction_threshold=60,
+                                 consecutive_recordings=5,
+                                 probability_threshold=85,
+                                 min_notification_interval=180,
+                                 notify_on_crying=True,
+                                 notify_and_or='or',
+                                 notify_on_babbling=False,
+                                 **kwargs):
     control_dir = pathlib.Path(os.environ['BM_DIR']) / 'control'
 
     worker = QueueWorker(
@@ -177,12 +265,9 @@ def listen_with_settings(config,
         update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
                     os.environ['BM_SERVER_LOG_PATH'])
 
-        standardization_file = control_dir / 'standardization.npz'
-        feature_shape = config['inference']['input_shape']
-        feature_provider = create_feature_provider(min_sound_level,
-                                                   amplification,
-                                                   feature_shape,
-                                                   standardization_file)
+        feature_provider = create_feature_provider(config, control_dir,
+                                                   min_sound_level,
+                                                   amplification)
 
         while True:
             last_record_time = time.time()
@@ -194,10 +279,7 @@ def listen_with_settings(config,
 def process_features(task_queue, config, control_dir, model,
                      notifier_settings):
 
-    labels = config['inference']['labels']
-    label_names = {idx: name for name, idx in labels.items()}
-
-    notifier = Notifier(labels, **notifier_settings)
+    notifier = create_inference_notifier(config, **notifier_settings)
 
     comm_dir = control_dir / '.comm'
     probabilities_file = comm_dir / 'probabilities.json'
@@ -221,10 +303,16 @@ def process_features(task_queue, config, control_dir, model,
         notifier.add_prediction(probabilities)
         notification = notifier.detect_notification()
 
-        write_probabilities(label_names, probabilities_file, probabilities)
+        write_probabilities(notifier.label_names, probabilities_file,
+                            probabilities)
 
         if notification is not None:
             write_notification(notification_file, notification)
+
+
+def set_mic_gain_to_max():
+    update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
+                os.environ['BM_SERVER_LOG_PATH'])
 
 
 def create_model(model_file):
@@ -232,20 +320,40 @@ def create_model(model_file):
     return model
 
 
-def create_feature_provider(min_sound_level, amplification, feature_shape,
-                            standardization_file):
+def get_audio_device():
     mic_id = os.environ['BM_MIC_ID']
     audio_device = 'plug{}'.format(mic_id)
+    return audio_device
 
-    return features.FeatureProvider(audio_device,
-                                    features.AudioFeatureExtractor(
-                                        n_mel_bands=feature_shape[0],
-                                        feature_window_count=feature_shape[1],
-                                        backend='python_speech_features',
-                                        disable_io=True),
+
+def create_feature_extractor(config):
+    feature_shape = config['inference']['input_shape']
+    return features.AudioFeatureExtractor(
+        n_mel_bands=feature_shape[0],
+        feature_window_count=feature_shape[1],
+        backend='python_speech_features',
+        disable_io=True)
+
+
+def create_inference_notifier(config, **notifier_settings):
+    labels = config['inference']['labels']
+    notifier = InferenceNotifier(labels, **notifier_settings)
+    return notifier
+
+
+def create_feature_provider(config, control_dir, min_sound_level,
+                            amplification):
+    standardization_file = control_dir / 'standardization.npz'
+    return features.FeatureProvider(get_audio_device(),
+                                    create_feature_extractor(config),
                                     min_sound_level=min_sound_level,
                                     amplification=amplification,
                                     standardization_file=standardization_file)
+
+
+def write_sound_level(sound_level_file, sound_level):
+    with open(sound_level_file, 'w') as f:
+        f.write(f'{sound_level:.2f}')
 
 
 def write_probabilities(label_names, probabilities_file, probabilities):

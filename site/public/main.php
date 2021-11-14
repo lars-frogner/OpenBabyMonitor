@@ -4,7 +4,11 @@ redirectIfLoggedOut('index.php');
 
 waitForModeLock();
 $mode = readCurrentMode($_DATABASE);
+
+define('INFERENCE_MODEL', readValuesFromTable($_DATABASE, 'listen_settings', 'model', true));
+
 define('HIDDEN_STYLE', 'style="display: none;"');
+
 require_once(TEMPLATES_DIR . '/main.php');
 ?>
 
@@ -70,21 +74,45 @@ require_once(TEMPLATES_DIR . '/main.php');
               </div>
             </div>
 
-            <div id="listen_animation_container" class="container ratio px-0 mt-3" style="position: relative; --bs-aspect-ratio: 86.6%; display: none;">
-              <div id="listen_animation_background" style="position: absolute; width: 100%; height: 100%; filter: brightness(3); background: linear-gradient(to top, rgba(20,39,59,1), rgba(20,39,59,0)), linear-gradient(to left, rgba(31,57,35,1), rgba(31,57,35,0) 80%), linear-gradient(to right, rgba(80,10,10,1), rgba(80,10,10,0) 80%); -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
-              <svg class="listen-animation-label bi" style="position: absolute; left: 1.0em; top: 0.2em; width: 1.8em; height: 1.8em;">
-                <use xlink:href="media/bootstrap-icons.svg#emoji-frown-fill" />
-              </svg>
-              <svg class="listen-animation-label bi" style="position: absolute; left: calc(100% - 1.8em - 1.0em); top: 0.2em;  width: 1.8em; height: 1.8em;">
-                <use xlink:href="media/bootstrap-icons.svg#emoji-smile-fill" />
-              </svg>
-              <svg class="listen-animation-label bi" style="position: absolute; left: calc(50% - 0.9em); top: calc(100% - 1.8em - 1.3em); width: 1.8em; height: 1.8em;">
-                <use xlink:href="media/bootstrap-icons.svg#emoji-expressionless-fill" />
-              </svg>
-              <svg id="listen_animation_indicator" class="bi" style="position: absolute; width: 1.5em; height: 1.5em;" fill="currentColor">
-                <use xlink:href="media/bootstrap-icons.svg#bullseye" />
-              </svg>
-            </div>
+            <?php if (INFERENCE_MODEL == 'sound_level_threshold') { ?>
+              <div id="listen_animation_container" class="container ratio px-0 mt-4" style="position: relative; --bs-aspect-ratio: 20%; display: none;">
+                <svg class="listen-animation-label bi" style="position: absolute; left: 0%; top: calc(50% - 2.5em / 2); width: 2.5em; height: 2.5em;">
+                  <use xlink:href="media/bootstrap-icons.svg#volume-off-fill" />
+                </svg>
+                <div id="listen_animation_line" style="position: absolute; left: 2.5em; top: calc(50% - 1px); width: calc(100% - (2 * 2.5em + 0.5em)); height: 0%;">
+                  <div id="listen_animation_indicator" style="position: absolute; width: 2.5em; height: calc(0.87 * 2.5em); top: calc(-0.87 * 2.5em); left: 0%;">
+                    <div class="listen-animation-indicator" style="position: absolute; width: 100%; height: 100%; left: -50%; -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
+                    <svg class="listen-animation-label-bg bi" style="position: absolute; width: calc(100% - 30%); height: calc(100% - 30%); left: calc(-50% + 30% / 2 + 3%); top: calc(0% + 30% / 2 - 10%);">
+                      <use xlink:href="media/bootstrap-icons.svg#ear-fill" />
+                    </svg>
+                  </div>
+                  <div id="listen_animation_context" style="position: absolute; width: 2em; height: calc(0.87 * 2em); top: 0%; left: 0%;">
+                    <svg class="listen-animation-label bi" style="position: absolute; width: 100%; height: 100%; left: -50%; top: 0%;">
+                      <use xlink:href="media/bootstrap-icons.svg#exclamation-triangle-fill" />
+                    </svg>
+                  </div>
+                </div>
+                <svg class="listen-animation-label bi" style="position: absolute; left: calc(100% - 2.5em); top: calc(50% - 2.5em / 2); width: 2.5em; height: 2.5em;">
+                  <use xlink:href="media/bootstrap-icons.svg#volume-up-fill" />
+                </svg>
+              </div>
+            <?php } else { ?>
+              <div id="listen_animation_container" class="container ratio px-0 mt-3" style="position: relative; --bs-aspect-ratio: 86.6%; display: none;">
+                <div id="listen_animation_context" style="position: absolute; width: 100%; height: 100%; filter: brightness(3); background: linear-gradient(to top, rgba(20,39,59,1), rgba(20,39,59,0)), linear-gradient(to left, rgba(31,57,35,1), rgba(31,57,35,0) 80%), linear-gradient(to right, rgba(80,10,10,1), rgba(80,10,10,0) 80%); -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
+                <svg class="listen-animation-label-bg bi" style="position: absolute; left: 1.0em; top: 0.2em; width: 1.8em; height: 1.8em;">
+                  <use xlink:href="media/bootstrap-icons.svg#emoji-frown-fill" />
+                </svg>
+                <svg class="listen-animation-label-bg bi" style="position: absolute; left: calc(100% - 1.8em - 1.0em); top: 0.2em;  width: 1.8em; height: 1.8em;">
+                  <use xlink:href="media/bootstrap-icons.svg#emoji-smile-fill" />
+                </svg>
+                <svg class="listen-animation-label-bg bi" style="position: absolute; left: calc(50% - 0.9em); top: calc(100% - 1.8em - 1.3em); width: 1.8em; height: 1.8em;">
+                  <use xlink:href="media/bootstrap-icons.svg#emoji-expressionless-fill" />
+                </svg>
+                <svg id="listen_animation_indicator" class="bi" style="position: absolute; width: 1.5em; height: 1.5em;" fill="currentColor">
+                  <use xlink:href="media/bootstrap-icons.svg#bullseye" />
+                </svg>
+              </div>
+            <?php } ?>
           </div>
 
           <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : ''; ?>>
@@ -258,6 +286,8 @@ require_once(TEMPLATES_DIR . '/main.php');
     var SETTING_ASK_SECURE_REDIRECT = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'ask_secure_redirect', true); ?>;
     var SETTING_SHOW_UNSUPPORTED_MESSAGE = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'show_unsupported_message', true); ?>;
     var SETTING_ASK_NOTIFICATION_PERMISSION = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'ask_notification_permission', true); ?>;
+    const SETTING_MODEL = '<?php echo INFERENCE_MODEL; ?>';
+    const SETTING_MIN_SOUND_LEVEL = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'min_sound_level', true); ?>;
     const SETTING_AUTOPLAY_ON_NOTIFY = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'autoplay_on_notify', true); ?>;
     const SETTING_SAMPLING_RATE = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'sampling_rate', true); ?>;
     const SETTING_VOLUME = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'volume', true); ?>;

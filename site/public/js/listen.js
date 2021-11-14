@@ -6,12 +6,18 @@ const LISTEN_INACTIVE_ICON_ID = "listen_inactive_icon";
 const LISTEN_ACTIVE_ICON_ID = "listen_active_icon";
 const LISTEN_CONTROL_VISUALIZATION_MODE_BOX_ID = 'listen_visualization_mode_box';
 const LISTEN_ANIMATION_CONTAINER_ID = "listen_animation_container";
-const LISTEN_ANIMATION_BACKGROUND_ID = "listen_animation_background";
+const LISTEN_ANIMATION_CONTEXT_ID = "listen_animation_context";
 const LISTEN_ANIMATION_INDICATOR_ID = "listen_animation_indicator";
+const LISTEN_ANIMATION_LINE_ID = "listen_animation_line";
 const LISTEN_ANIMATION_LABEL_CLASS = "listen-animation-label";
+const LISTEN_ANIMATION_LABEL_BG_CLASS = "listen-animation-label-bg";
+const LISTEN_ANIMATION_INDICATOR_CLASS = "listen-animation-indicator";
 
-const NOTIFICATION_HEADERS = { bad: LANG['crying_alert'], good: LANG['babbling_alert'], bad_and_good: LANG['crying_and_babbling_alert'], bad_or_good: LANG['crying_or_babbling_alert'] };
-const NOTIFICATION_TEXTS = { bad: LANG['child_crying'], good: LANG['child_babbling'], bad_and_good: LANG['child_crying_and_babbling'], bad_or_good: LANG['child_crying_or_babbling'] };
+const MIN_DBFS = -50;
+const MAX_DBFS = 0;
+
+const NOTIFICATION_HEADERS = { sound: LANG['sound_alert'], bad: LANG['crying_alert'], good: LANG['babbling_alert'], bad_and_good: LANG['crying_and_babbling_alert'], bad_or_good: LANG['crying_or_babbling_alert'] };
+const NOTIFICATION_TEXTS = { sound: LANG['significant_sound'], bad: LANG['child_crying'], good: LANG['child_babbling'], bad_and_good: LANG['child_crying_and_babbling'], bad_or_good: LANG['child_crying_or_babbling'] };
 
 const NOTIFICATION_SOUND = new Audio('media/notification_sound.mp3');
 
@@ -41,6 +47,10 @@ $(function () {
         initializeListenMode();
     }
 });
+
+function usesNeuralNetworkModel() {
+    return SETTING_MODEL != 'sound_level_threshold';
+}
 
 function redirectModalCallback(onCompletion) {
     const askAgain = !$('#' + MODAL_CONFIRM_CHECKBOX_ID).prop('checked');
@@ -209,26 +219,40 @@ function handleClassificationResultEvent(event) {
     moveIndicatorTo(probabilitiesToIndicatorCoordinates(probabilities));
 }
 
+function handleSoundLevelEvent(event) {
+    const soundLevel = parseFloat(event.data);
+    moveIndicatorTo(soundLevelToIndicatorCoordinates(soundLevel));
+}
+
 function handleErrorEvent(error) {
     console.error("SSE stream failed:", error);
     _EVENT_SOURCE.close();
 }
 
 function activateLiveResultsMode() {
-    _EVENT_SOURCE.addEventListener('probabilities', handleClassificationResultEvent);
+    if (usesNeuralNetworkModel()) {
+        _EVENT_SOURCE.addEventListener('probabilities', handleClassificationResultEvent);
 
-    const container = $('#' + LISTEN_ANIMATION_CONTAINER_ID);
-    const indicator = $('#' + LISTEN_ANIMATION_INDICATOR_ID);
+        const container = $('#' + LISTEN_ANIMATION_CONTAINER_ID);
+        const indicator = $('#' + LISTEN_ANIMATION_INDICATOR_ID);
+        indicator.css({
+            left: (container.width() / 2 - indicator.width() / 2).toFixed() + 'px',
+            top: (container.height() - indicator.height() / 2).toFixed() + 'px'
+        })
+    } else {
+        _EVENT_SOURCE.addEventListener('sound_level', handleSoundLevelEvent);
+        $('#' + LISTEN_ANIMATION_CONTEXT_ID).css({ left: soundLevelToIndicatorCoordinates(SETTING_MIN_SOUND_LEVEL).left });
+    }
     $('#' + LISTEN_ANIMATION_CONTAINER_ID).show();
-    indicator.css({
-        left: (container.width() / 2 - indicator.width() / 2).toFixed() + 'px',
-        top: (container.height() - indicator.height() / 2).toFixed() + 'px'
-    })
 }
 
 function deactivateLiveResultsMode() {
     $('#' + LISTEN_ANIMATION_CONTAINER_ID).hide();
-    _EVENT_SOURCE.removeEventListener('probabilities', handleClassificationResultEvent);
+    if (usesNeuralNetworkModel()) {
+        _EVENT_SOURCE.removeEventListener('probabilities', handleClassificationResultEvent);
+    } else {
+        _EVENT_SOURCE.removeEventListener('sound_level', handleSoundLevelEvent)
+    }
 }
 
 function unsubscribeFromListenMessages() {
@@ -238,9 +262,21 @@ function unsubscribeFromListenMessages() {
 }
 
 function styleClassificationAnimation() {
+    $('#' + LISTEN_ANIMATION_LINE_ID).css('border-bottom', '1px solid ' + FOREGROUND_COLOR);
     $('.' + LISTEN_ANIMATION_LABEL_CLASS).get().forEach(label => {
+        label.setAttribute('fill', FOREGROUND_COLOR);
+    });
+    $('.' + LISTEN_ANIMATION_LABEL_BG_CLASS).get().forEach(label => {
         label.setAttribute('fill', BACKGROUND_COLOR);
     });
+    $('.' + LISTEN_ANIMATION_INDICATOR_CLASS).get().forEach(label => {
+        label.style.backgroundColor = FOREGROUND_COLOR;
+    });
+}
+
+function soundLevelToIndicatorCoordinates(soundLevel) {
+    const relative_location = 100 * (soundLevel - MIN_DBFS) / (MAX_DBFS - MIN_DBFS);
+    return { left: relative_location.toFixed() + '%' };
 }
 
 function probabilitiesToIndicatorCoordinates(probabilities) {
@@ -260,10 +296,9 @@ function probabilitiesToIndicatorCoordinates(probabilities) {
 }
 
 function moveIndicatorTo(coordinates) {
-    anime({
+    var params = {
         targets: '#' + LISTEN_ANIMATION_INDICATOR_ID,
-        left: coordinates.left,
-        top: coordinates.top,
         easing: 'easeInOutQuart'
-    });
+    };
+    anime(Object.assign(params, coordinates));
 }

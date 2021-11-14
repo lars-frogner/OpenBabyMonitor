@@ -14,6 +14,8 @@
     "listen": "Listen",
     "observe": "Observe",
     "standby": "Standby",
+    "sound_alert": "Notification about sound level",
+    "significant_sound": "The sound level is significant.",
     "crying_alert": "Notification about crying",
     "child_crying": "The child is crying.",
     "babbling_alert": "Notification about babbling",
