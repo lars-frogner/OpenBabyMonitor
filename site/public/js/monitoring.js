@@ -1,3 +1,4 @@
+const TEMPERATURE_LABEL_ID = 'temperature_label';
 var _EVENT_SOURCE;
 
 $(function () {
@@ -6,7 +7,9 @@ $(function () {
 
 function subscribeToMonitoringMessages() {
     _EVENT_SOURCE = new EventSource('monitoring.php');
-    _EVENT_SOURCE.addEventListener('temperature', handleTemperatureEvent);
+    if (MEASURE_TEMPERATURE) {
+        _EVENT_SOURCE.addEventListener('temperature', handleTemperatureEvent);
+    }
     _EVENT_SOURCE.addEventListener('under_voltage', handleUnderVoltageEvent);
     _EVENT_SOURCE.addEventListener('frequency_capped', handleFrequencyCappedEvent);
     _EVENT_SOURCE.addEventListener('throttled', handleThrottledEvent);
@@ -22,7 +25,7 @@ function unsubscribeFromMonitoringMessages() {
 
 function handleTemperatureEvent(event) {
     const temperature = event.data;
-    console.log(temperature);
+    $('#' + TEMPERATURE_LABEL_ID).html(temperature + '\xB0C');
 }
 
 function handleUnderVoltageEvent(event) {

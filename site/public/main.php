@@ -297,6 +297,7 @@ require_once(TEMPLATES_DIR . '/main.php');
     const SETTING_MAX_FREQUENCY = Math.max(min_frequency, max_frequency);
   </script>
   <script src="js/style.js"></script>
+  <script src="js/monitoring.js"></script>
   <script src="js/confirmation_modal.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/update_settings.js"></script>
@@ -309,7 +310,6 @@ require_once(TEMPLATES_DIR . '/main.php');
   <?php } ?>
   <script src="js/main.js"></script>
   <script src="js/network.js"></script>
-  <script src="js/monitoring.js"></script>
 
 </body>
 

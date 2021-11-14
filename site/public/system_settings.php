@@ -76,8 +76,9 @@ require_once(TEMPLATES_DIR . '/js-cookie_js.php');
   const DETECT_FORM_CHANGES = true;
 </script>
 <script src="js/style.js"></script>
-<script src="js/settings.js"></script>
 <script src="js/jquery_utils.js"></script>
+<script src="js/monitoring.js"></script>
+<script src="js/settings.js"></script>
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
