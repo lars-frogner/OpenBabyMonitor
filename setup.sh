@@ -98,9 +98,6 @@ if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     sed -i "s/#alias la='ls -A'/alias la='ls -A'/g" /home/$BM_USER/.bashrc
     sed -i "s/#alias l='ls -CF'/alias l='ls -Alh'/g" /home/$BM_USER/.bashrc
 
-    # Add alias for showing CPU temperature
-    echo -e "alias temp='sudo vcgencmd measure_temp'\n" >> /home/$BM_USER/.bashrc
-
     # Enable arrow up/down history search
     cp /etc/inputrc /home/$BM_USER/.inputrc
     sed -i 's/# "\\e\[B": history-search-forward/"\\e[B": history-search-forward/g' /home/$BM_USER/.inputrc
@@ -340,10 +337,12 @@ if [[ "$INSTALL_PHPSYSINFO" = true ]]; then
     cd -
 
     cp $BM_PHPSYSINFO_CONFIG_FILE{.new,}
-    sed -i 's/DEFAULT_DISPLAY_MODE="auto"/DEFAULT_DISPLAY_MODE="bootstrap"/g' $BM_PHPSYSINFO_CONFIG_FILE
-    sed -i 's/SHOW_PICKLIST_LANG=true/SHOW_PICKLIST_LANG=false/g' $BM_PHPSYSINFO_CONFIG_FILE
-    sed -i 's/SHOW_PICKLIST_TEMPLATE=true/SHOW_PICKLIST_TEMPLATE=false/g' $BM_PHPSYSINFO_CONFIG_FILE
-    sed -i 's/REFRESH=60000/REFRESH=20000/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/DEFAULT_DISPLAY_MODE=.*/DEFAULT_DISPLAY_MODE="bootstrap"/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/SHOW_PICKLIST_LANG=.*/SHOW_PICKLIST_LANG=false/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/SHOW_PICKLIST_TEMPLATE=.*/SHOW_PICKLIST_TEMPLATE=false/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/REFRESH=.*/REFRESH=20000/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/SENSOR_PROGRAM=.*/SENSOR_PROGRAM="PiTemp"/g' $BM_PHPSYSINFO_CONFIG_FILE
+    sed -i 's/SHOW_NETWORK_ACTIVE_SPEED=.*/SHOW_NETWORK_ACTIVE_SPEED="bps"/g' $BM_PHPSYSINFO_CONFIG_FILE
 fi
 
 SETUP_SERVICES=true
@@ -391,7 +390,7 @@ WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
 
     sudo systemctl enable $STARTUP_SERVICE_FILENAME
 
-    CMD_ALIAS='Cmnd_Alias BM_MODES ='
+    CMD_ALIAS='Cmnd_Alias BM_MODES = /usr/bin/vcgencmd get_throttled, /usr/bin/vcgencmd measure_temp,'
 
     MODES='standby listen audiostream'
     if [[ "$BM_USE_CAM" = true ]]; then
