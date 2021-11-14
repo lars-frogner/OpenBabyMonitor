@@ -6,6 +6,7 @@ header('Pragma: no-cache');
 header('Content-Type: application/octet-stream');
 
 require_once(dirname(__DIR__) . '/config/path_config.php');
+require_once(dirname(__DIR__) . '/config/error_config.php');
 $file_path = SITE_DIR . "/bandwidth_test/test_data.bin";
 
 header("Content-Length: $file_size");
@@ -13,6 +14,9 @@ header("Content-Length: $file_size");
 $start_time = microtime(true);
 
 $f = fopen($file_path, 'rb');
+if ($f === false) {
+  bm_error("Failed opening test data file $file_path");
+}
 $data = fread($f, $file_size);
 fclose($f);
 
