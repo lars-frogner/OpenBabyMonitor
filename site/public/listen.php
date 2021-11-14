@@ -1,18 +1,14 @@
 <?php
 require_once(dirname(__DIR__) . '/config/path_config.php');
+require_once(dirname(__DIR__) . '/config/env_config.php');
 require_once(dirname(__DIR__) . '/config/error_config.php');
+require_once(SRC_DIR . '/session.php');
+require_once(SRC_DIR . '/settings.php');
+require_once(SRC_DIR . '/sse.php');
 
-header('Content-Type: text/event-stream');
-header('Cache-Control: no-cache');
+redirectIfLoggedOut('index.php');
 
-function sendSSEMessage($event, $data) {
-  echo "event: $event\n";
-  echo "data: $data\n\n";
-  while (ob_get_level() > 0) {
-    ob_end_flush();
-  }
-  flush();
-}
+sendSSEHeaders();
 
 $inotify_instance = inotify_init();
 if (!$inotify_instance) {

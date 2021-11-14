@@ -309,6 +309,7 @@ require_once(TEMPLATES_DIR . '/main.php');
   <?php } ?>
   <script src="js/main.js"></script>
   <script src="js/network.js"></script>
+  <script src="js/monitoring.js"></script>
 
 </body>
 
