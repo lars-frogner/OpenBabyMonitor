@@ -49,6 +49,7 @@ require_once(TEMPLATES_DIR . '/js-cookie_js.php');
 <script src="js/monitoring.js"></script>
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
+<script src="js/navbar_main.js"></script>
 <script src="js/debugging.js"></script>
 
 </html>
