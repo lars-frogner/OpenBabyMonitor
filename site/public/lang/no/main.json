@@ -24,18 +24,6 @@
     "child_crying_and_babbling": "Barnet gråter og babler om hverandre.",
     "crying_or_babbling_alert": "Varsel om gråt eller babling",
     "child_crying_or_babbling": "Barnet lager lyder, men det er ikke tydelig om det er gråt eller babling.",
-    "dont_ask_again": "Ikke spør igjen",
-    "dont_show_again": "Ikke vis igjen",
-    "not_supported_unencrypted": "Nettleservarsler støttes ikke på ukrypterte nettsider",
-    "switch_site": "Fortsett til ny side",
-    "stay": "Bli på denne siden",
-    "want_to_switch_site": "Vil du gå til den krypterte (https) versjonen av siden?",
-    "not_supported_by_browser": "Denne nettleseren støtter ikke varsler",
-    "ok": "Ok",
-    "premission_required": "Tillatelse kreves for å bruke nettlerservarsler",
-    "grant_permission": "Gi tillatelse",
-    "continue_without": "Fortsett uten",
     "listening_for_activity": "Lytter etter aktivitet",
-    "browser_notifications_deactivated": "Nettleservarsler er deaktivert",
     "server_error": "Det oppstod en feil på serveren"
 }

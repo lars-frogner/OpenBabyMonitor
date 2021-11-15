@@ -14,7 +14,7 @@ function subscribeToMonitoringMessages() {
     _MONITORING_EVENT_SOURCE.addEventListener('frequency_capped', handleFrequencyCappedEvent);
     _MONITORING_EVENT_SOURCE.addEventListener('throttled', handleThrottledEvent);
     _MONITORING_EVENT_SOURCE.addEventListener('temp_lim_active', handleTempLimActiveEvent);
-    _MONITORING_EVENT_SOURCE.onerror = handleErrorEvent;
+    _MONITORING_EVENT_SOURCE.onerror = handleMonitoringErrorEvent;
 }
 
 function unsubscribeFromMonitoringMessages() {
@@ -45,7 +45,7 @@ function handleTempLimActiveEvent(event) {
     console.log(event);
 }
 
-function handleErrorEvent(event) {
+function handleMonitoringErrorEvent(event) {
     switch (event.target.readyState) {
         case EventSource.CONNECTING:
             break

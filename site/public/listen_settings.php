@@ -47,8 +47,7 @@ require_once(TEMPLATES_DIR . '/settings.php');
       <form id="listen_settings_form" action="" method="post">
         <div class="row">
           <?php
-          $permission_button_html = '<div class="border text-center my-3"><p class="my-2" id="notification_message"></p><button id="notification_button" class="btn btn-primary mb-2" style="display: none;"></button></div>';
-          $input_scripts = generateInputs($setting_type, $grouped_values, ['browser_notifications' => $permission_button_html], []);
+          $input_scripts = generateInputs($setting_type, $grouped_values, [], []);
           ?>
         </div>
         <div class="my-4">
@@ -65,6 +64,8 @@ require_once(TEMPLATES_DIR . '/settings.php');
 require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 require_once(TEMPLATES_DIR . '/jquery_js.php');
 require_once(TEMPLATES_DIR . '/js-cookie_js.php');
+
+require_once(TEMPLATES_DIR . '/notifications_js.php');
 ?>
 
 <script>
@@ -83,7 +84,6 @@ require_once(TEMPLATES_DIR . '/js-cookie_js.php');
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
-<script src="js/listen_settings.js"></script>
 <script>
   <?php generateBehavior($setting_type); ?>
 </script>

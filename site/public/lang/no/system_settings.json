@@ -3,7 +3,18 @@
     "submit": "Bekreft",
     "undo": "Angre",
     "reset": "Tilbakestill",
+    "ask_secure_redirect": "Foreslå å bytte til sikker side",
+    "show_unsupported_message": "Vis beskjed om manglende støtte",
+    "ask_notification_permission": "Spør om tillatelse",
     "measure_temperature": "Vis enhetens temperatur",
     "query_interval": "Intervall mellom målinger (s)",
-    "g_monitoring": "Overvåkning"
+    "g_browser_notifications": "Nettleservarsler",
+    "g_monitoring": "Overvåkning",
+    "unavailable_insecure": "Utilgjengelig på ukryptert side",
+    "switch_to_encrypted": "Gå til kryptert side",
+    "unsupported_by_browser": "Ikke støttet av nettleseren",
+    "blocked": "Blokkert",
+    "allowed": "Tillatt",
+    "not_allowed": "Ikke tillatt",
+    "grant_permission": "Gi tillatelse"
 }

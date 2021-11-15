@@ -24,18 +24,6 @@
     "child_crying_and_babbling": "The child wavers between cyring and babbling.",
     "crying_or_babbling_alert": "Notification about crying or babbling",
     "child_crying_or_babbling": "The child makes sounds that could be either crying or babbling.",
-    "dont_ask_again": "Don't ask again",
-    "dont_show_again": "Don't show again",
-    "not_supported_unencrypted": "Browser notifications are not supported on insecure sites",
-    "switch_site": "Switch to new site",
-    "stay": "Stay on this site",
-    "want_to_switch_site": "Do you want to switch to the secure (https) version of this site?",
-    "not_supported_by_browser": "This browser does not support notifications",
-    "ok": "Ok",
-    "premission_required": "Premission is required to use browser notifications",
-    "grant_permission": "Grant permission",
-    "continue_without": "Continue without",
     "listening_for_activity": "Listening for activity",
-    "browser_notifications_deactivated": "Browser notifications are deactivated",
     "server_error": "An error occured on the server"
 }

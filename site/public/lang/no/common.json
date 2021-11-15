@@ -28,5 +28,16 @@
     "nav_you_are_in_client_mode": "Du er nå koblet til via et eksternt trådløst nettverk. Enheten vil koble seg av nettverket og opprette sitt eget tilgangspunkt. Du vil logges ut og midlertidig miste forbindelsen med enheten. Enheten vil ikke lenger ha tilgang til internett.",
     "nav_you_are_in_ap_mode": "Du er nå koblet til via enhetens tilgangspunkt, som vil deaktiveres. Du vil logges ut og midlertidig miste forbindelsen med enheten.",
     "nav_device_not_in_standby": "Enheten står ikke i hvilemodus. Den vil fortsette i nåværende modus selv om du logger ut.",
-    "nav_unsaved_settings": "Merk at du har endringer i innstillingene som ikke er lagret."
+    "nav_unsaved_settings": "Merk at du har endringer i innstillingene som ikke er lagret.",
+    "dont_ask_again": "Ikke spør igjen",
+    "dont_show_again": "Ikke vis igjen",
+    "not_supported_unencrypted": "Nettleservarsler støttes ikke på ukrypterte nettsider",
+    "switch_site": "Fortsett til ny side",
+    "stay": "Bli på denne siden",
+    "want_to_switch_site": "Vil du gå til den krypterte (https) versjonen av siden?",
+    "not_supported_by_browser": "Denne nettleseren støtter ikke nettlerservarsler",
+    "ok": "Ok",
+    "premission_required": "Tillatelse kreves for å bruke nettlerservarsler",
+    "grant_permission": "Gi tillatelse",
+    "continue_without": "Fortsett uten"
 }

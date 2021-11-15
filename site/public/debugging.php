@@ -42,6 +42,8 @@ redirectIfLoggedOut('index.php');
 require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 require_once(TEMPLATES_DIR . '/jquery_js.php');
 require_once(TEMPLATES_DIR . '/js-cookie_js.php');
+
+require_once(TEMPLATES_DIR . '/notifications_js.php');
 ?>
 
 <script src="js/style.js"></script>

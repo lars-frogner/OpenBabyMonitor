@@ -271,32 +271,13 @@
                     "value": "sound_level_threshold"
                 }
             }
-        },
-        "ask_secure_redirect": {
-            "group": "browser_notifications",
-            "name": "ask_secure_redirect",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": true
-        },
-        "show_unsupported_message": {
-            "group": "browser_notifications",
-            "name": "show_unsupported_message",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": true
-        },
-        "ask_notification_permission": {
-            "group": "browser_notifications",
-            "name": "ask_notification_permission",
-            "type": "BOOLEAN NOT NULL",
-            "initial_value": true
         }
     },
     "listen_groups": {
         "recording": "g_recording",
         "interpretation": "g_interpretation",
         "notifications": "g_notifications",
-        "notify_on": "g_notify_on",
-        "browser_notifications": "g_browser_notifications"
+        "notify_on": "g_notify_on"
     },
     "audiostream_settings": {
         "encrypted": {
@@ -623,6 +604,24 @@
         "info": "g_info"
     },
     "system_settings": {
+        "ask_secure_redirect": {
+            "group": "browser_notifications",
+            "name": "ask_secure_redirect",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "show_unsupported_message": {
+            "group": "browser_notifications",
+            "name": "show_unsupported_message",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "ask_notification_permission": {
+            "group": "browser_notifications",
+            "name": "ask_notification_permission",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
         "query_interval": {
             "group": "monitoring",
             "name": "query_interval",
@@ -642,6 +641,7 @@
         }
     },
     "system_groups": {
+        "browser_notifications": "g_browser_notifications",
         "monitoring": "g_monitoring"
     }
 }

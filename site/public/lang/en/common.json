@@ -28,5 +28,16 @@
     "nav_you_are_in_client_mode": "You are now connected through an external wireless network. The device will disconnect from the network and create its own access point. You will be signed out and temporarily disconnected from the device. The device will no longer be able to access the internet.",
     "nav_you_are_in_ap_mode": "You are now connected through the device access point, which will be deactivated. You will be signed out and temporarily disconnected from the device.",
     "nav_device_not_in_standby": "The device is not in standby mode. It will still remain in the current mode after you sign out.",
-    "nav_unsaved_settings": "Note that you have unsaved modifications to the settings."
+    "nav_unsaved_settings": "Note that you have unsaved modifications to the settings.",
+    "dont_ask_again": "Don't ask again",
+    "dont_show_again": "Don't show again",
+    "not_supported_unencrypted": "Browser notifications are not supported on insecure sites",
+    "switch_site": "Switch to new site",
+    "stay": "Stay on this site",
+    "want_to_switch_site": "Do you want to switch to the secure (https) version of this site?",
+    "not_supported_by_browser": "This browser does not support browser notifications",
+    "ok": "Ok",
+    "premission_required": "Premission is required to use browser notifications",
+    "grant_permission": "Grant permission",
+    "continue_without": "Continue without"
 }

@@ -3,9 +3,6 @@
     "submit": "Confirm",
     "undo": "Undo",
     "reset": "Reset",
-    "ask_secure_redirect": "Suggest switching to secure site",
-    "show_unsupported_message": "Show message when unsupported",
-    "ask_notification_permission": "Ask for permission",
     "notify_on_crying": "Crying",
     "and": "and",
     "or": "or",
@@ -25,16 +22,8 @@
     "probability_threshold": "with a confidence above (%)",
     "min_notification_interval": "Allow new notification after (s)",
     "autoplay_on_notify": "Stream audio after notifying",
-    "g_browser_notifications": "Browser notifications",
     "g_notify_on": "Notify about",
     "g_notifications": "Notification",
     "g_recording": "Recording",
-    "g_interpretation": "Audio interpretation",
-    "unavailable_insecure": "Unavailable on insecure site",
-    "switch_to_encrypted": "Switch to secure site",
-    "unsupported_by_browser": "Not supported by the browser",
-    "blocked": "Blocked",
-    "allowed": "Allowed",
-    "not_allowed": "Not allowed",
-    "grant_permission": "Grant permission"
+    "g_interpretation": "Audio interpretation"
 }

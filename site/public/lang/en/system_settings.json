@@ -3,7 +3,18 @@
     "submit": "Confirm",
     "undo": "Undo",
     "reset": "Reset",
+    "ask_secure_redirect": "Suggest switching to secure site",
+    "show_unsupported_message": "Show message when unsupported",
+    "ask_notification_permission": "Ask for permission",
     "measure_temperature": "Show device temperature",
     "query_interval": "Interval between measurements (s)",
-    "g_monitoring": "Monitoring"
+    "g_browser_notifications": "Browser notifications",
+    "g_monitoring": "Monitoring",
+    "unavailable_insecure": "Unavailable on insecure site",
+    "switch_to_encrypted": "Switch to secure site",
+    "unsupported_by_browser": "Not supported by the browser",
+    "blocked": "Blocked",
+    "allowed": "Allowed",
+    "not_allowed": "Not allowed",
+    "grant_permission": "Grant permission"
 }

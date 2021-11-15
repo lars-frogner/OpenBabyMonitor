@@ -47,14 +47,11 @@ require_once(TEMPLATES_DIR . '/main.php');
         <div class="row h-100 align-items-center justify-content-center px-0">
 
           <div id="mode_content_listen" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : ''; ?>>
-            <svg id="listen_inactive_icon" class="bi mb-3" style="width: 15vh; height: 15vh;" fill="currentColor">
-              <use href="media/bootstrap-icons.svg#bell" />
-            </svg>
-            <svg id="listen_active_icon" class="bi mb-3" style="width: 15vh; height: 15vh; display: none;" fill="currentColor">
+            <svg class="bi mb-3" style="width: 15vh; height: 15vh;" fill="currentColor">
               <use href="media/bootstrap-icons.svg#bell-fill" />
             </svg>
 
-            <p id="listen_notifications_msg" class="mb-5"></p>
+            <p class="mb-5"><?php echo LANG['listening_for_activity']; ?></p>
 
             <div class="row align-items-center justify-content-center" id="listen_visualization_mode_box">
               <div class="col-auto fw-bold">
@@ -273,6 +270,8 @@ require_once(TEMPLATES_DIR . '/main.php');
   require_once(TEMPLATES_DIR . '/anime_js.php');
   require_once(TEMPLATES_DIR . '/jquery_js.php');
   require_once(TEMPLATES_DIR . '/js-cookie_js.php');
+
+  require_once(TEMPLATES_DIR . '/notifications_js.php');
   ?>
 
   <script>
@@ -283,9 +282,6 @@ require_once(TEMPLATES_DIR . '/main.php');
     const VIDEOSTREAM_MODE = <?php echo (USES_CAMERA) ? MODE_VALUES['videostream'] : null; ?>;
     const INITIAL_MODE = <?php echo $mode; ?>;
 
-    var SETTING_ASK_SECURE_REDIRECT = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'ask_secure_redirect', true); ?>;
-    var SETTING_SHOW_UNSUPPORTED_MESSAGE = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'show_unsupported_message', true); ?>;
-    var SETTING_ASK_NOTIFICATION_PERMISSION = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'ask_notification_permission', true); ?>;
     const SETTING_MODEL = '<?php echo INFERENCE_MODEL; ?>';
     const SETTING_MIN_SOUND_LEVEL = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'min_sound_level', true); ?>;
     const SETTING_AUTOPLAY_ON_NOTIFY = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'autoplay_on_notify', true); ?>;
