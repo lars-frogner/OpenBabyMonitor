@@ -1,25 +1,26 @@
 const TEMPERATURE_LABEL_ID = 'temperature_label';
-var _EVENT_SOURCE;
+var _MONITORING_EVENT_SOURCE;
 
 $(function () {
-    subscribeToMonitoringMessages()
+    subscribeToMonitoringMessages();
 });
 
 function subscribeToMonitoringMessages() {
-    _EVENT_SOURCE = new EventSource('monitoring.php');
+    _MONITORING_EVENT_SOURCE = new EventSource('monitoring.php');
     if (MEASURE_TEMPERATURE) {
-        _EVENT_SOURCE.addEventListener('temperature', handleTemperatureEvent);
+        _MONITORING_EVENT_SOURCE.addEventListener('temperature', handleTemperatureEvent);
     }
-    _EVENT_SOURCE.addEventListener('under_voltage', handleUnderVoltageEvent);
-    _EVENT_SOURCE.addEventListener('frequency_capped', handleFrequencyCappedEvent);
-    _EVENT_SOURCE.addEventListener('throttled', handleThrottledEvent);
-    _EVENT_SOURCE.addEventListener('temp_lim_active', handleTempLimActiveEvent);
-    _EVENT_SOURCE.onerror = handleErrorEvent;
+    _MONITORING_EVENT_SOURCE.addEventListener('under_voltage', handleUnderVoltageEvent);
+    _MONITORING_EVENT_SOURCE.addEventListener('frequency_capped', handleFrequencyCappedEvent);
+    _MONITORING_EVENT_SOURCE.addEventListener('throttled', handleThrottledEvent);
+    _MONITORING_EVENT_SOURCE.addEventListener('temp_lim_active', handleTempLimActiveEvent);
+    _MONITORING_EVENT_SOURCE.onerror = handleErrorEvent;
 }
 
 function unsubscribeFromMonitoringMessages() {
-    if (_EVENT_SOURCE) {
-        _EVENT_SOURCE.close();
+    if (_MONITORING_EVENT_SOURCE) {
+        _MONITORING_EVENT_SOURCE.close();
+        _MONITORING_EVENT_SOURCE = null;
     }
 }
 
@@ -44,7 +45,16 @@ function handleTempLimActiveEvent(event) {
     console.log(event);
 }
 
-function handleErrorEvent(error) {
-    console.error("SSE stream failed:", error);
-    _EVENT_SOURCE.close();
+function handleErrorEvent(event) {
+    switch (event.target.readyState) {
+        case EventSource.CONNECTING:
+            break
+        case EventSource.CLOSED:
+            _MONITORING_EVENT_SOURCE = null;
+            break
+        default:
+            console.error("SSE stream failed:", error);
+            _MONITORING_EVENT_SOURCE.close();
+            _MONITORING_EVENT_SOURCE = null;
+    }
 }

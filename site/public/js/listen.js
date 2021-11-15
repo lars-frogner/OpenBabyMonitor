@@ -24,7 +24,7 @@ const NOTIFICATION_SOUND = new Audio('media/notification_sound.mp3');
 const USES_SECURE_PROTOCOL = location.protocol === 'https:';
 const SECURE_URL = 'https://' + location.host + location.pathname;
 
-var _EVENT_SOURCE;
+var _LISTEN_EVENT_SOURCE;
 var _REDIRECT_MODAL_TRIGGER = {};
 var _UNSUPPORTED_MODAL_TRIGGER = {};
 var _PERMISSION_MODAL_TRIGGER = {};
@@ -173,9 +173,9 @@ function askNotificationPermission() {
 }
 
 function subscribeToListenMessages() {
-    _EVENT_SOURCE = new EventSource('listen.php');
-    _EVENT_SOURCE.addEventListener('notification', handleNotificationEvent);
-    _EVENT_SOURCE.onerror = handleErrorEvent;
+    _LISTEN_EVENT_SOURCE = new EventSource('listen.php');
+    _LISTEN_EVENT_SOURCE.addEventListener('notification', handleNotificationEvent);
+    _LISTEN_EVENT_SOURCE.onerror = handleErrorEvent;
 }
 
 function handleNotificationEvent(event) {
@@ -224,15 +224,24 @@ function handleSoundLevelEvent(event) {
     moveIndicatorTo(soundLevelToIndicatorCoordinates(soundLevel));
 }
 
-function handleErrorEvent(error) {
-    console.error("SSE stream failed:", error);
-    _EVENT_SOURCE.close();
+function handleErrorEvent(event) {
+    switch (event.target.readyState) {
+        case EventSource.CONNECTING:
+            break
+        case EventSource.CLOSED:
+            _LISTEN_EVENT_SOURCE = null;
+            break
+        default:
+            console.error("SSE stream failed:", error);
+            _LISTEN_EVENT_SOURCE.close();
+            _LISTEN_EVENT_SOURCE = null;
+    }
 }
 
 function activateLiveResultsMode() {
     $('#' + LISTEN_ANIMATION_CONTAINER_ID).show();
     if (usesNeuralNetworkModel()) {
-        _EVENT_SOURCE.addEventListener('probabilities', handleClassificationResultEvent);
+        _LISTEN_EVENT_SOURCE.addEventListener('probabilities', handleClassificationResultEvent);
 
         const container = $('#' + LISTEN_ANIMATION_CONTAINER_ID);
         const indicator = $('#' + LISTEN_ANIMATION_INDICATOR_ID);
@@ -241,7 +250,7 @@ function activateLiveResultsMode() {
             top: (container.height() - indicator.height() / 2).toFixed() + 'px'
         })
     } else {
-        _EVENT_SOURCE.addEventListener('sound_level', handleSoundLevelEvent);
+        _LISTEN_EVENT_SOURCE.addEventListener('sound_level', handleSoundLevelEvent);
         $('#' + LISTEN_ANIMATION_CONTEXT_ID).css({ left: soundLevelToIndicatorCoordinates(SETTING_MIN_SOUND_LEVEL).left });
     }
 }
@@ -249,15 +258,16 @@ function activateLiveResultsMode() {
 function deactivateLiveResultsMode() {
     $('#' + LISTEN_ANIMATION_CONTAINER_ID).hide();
     if (usesNeuralNetworkModel()) {
-        _EVENT_SOURCE.removeEventListener('probabilities', handleClassificationResultEvent);
+        _LISTEN_EVENT_SOURCE.removeEventListener('probabilities', handleClassificationResultEvent);
     } else {
-        _EVENT_SOURCE.removeEventListener('sound_level', handleSoundLevelEvent)
+        _LISTEN_EVENT_SOURCE.removeEventListener('sound_level', handleSoundLevelEvent)
     }
 }
 
 function unsubscribeFromListenMessages() {
-    if (_EVENT_SOURCE) {
-        _EVENT_SOURCE.close();
+    if (_LISTEN_EVENT_SOURCE) {
+        _LISTEN_EVENT_SOURCE.close();
+        _LISTEN_EVENT_SOURCE = null;
     }
 }
 
