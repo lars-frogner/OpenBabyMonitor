@@ -45,7 +45,7 @@ function generateInputs($setting_type, $grouped_setting_values, $pre_group_html,
 
 function generateGroupStart($name) {
   $name_trans = LANG[$name];
-  line('<div class="col-auto mx-2">');
+  line('<div class="col-auto px-3 mb-3">');
   line("<h2>$name_trans</h2>");
 }
 
@@ -67,7 +67,7 @@ function generateSelect($setting, $setting_name, $initial_value) {
 
   line('<div class="mb-3">');
   line('  <div class="row">');
-  line('    <div class="col-10">');
+  line('    <div class="col-auto">');
   line("      <label class=\"form-label\" for=\"$id\">$name_trans</label>");
   line("      <select name=\"$setting_name\" class=\"form-select\" id=\"$id\">");
   foreach ($values as $name => $value) {
@@ -77,7 +77,7 @@ function generateSelect($setting, $setting_name, $initial_value) {
   }
   line('      </select>');
   if ($has_descriptions) {
-    line("      <p class=\"mt-1\" id=\"$descript_id\">" . LANG[$descriptions[$initial_value]] . '</p>');
+    line("      <div class=\"mt-1\" id=\"$descript_id\" style=\"max-width: 16em;\">" . LANG[$descriptions[$initial_value]] . '</div>');
   }
   line('    </div>');
   line('  </div>');
@@ -131,10 +131,10 @@ function generateRange($setting, $setting_name, $initial_value) {
   line('<div class="mb-3">');
   line("  <label class=\"form-label\" for=\"$id\">$name_trans</label>");
   line('  <div class="row flex-nowrap">');
-  line('    <div class="col-10">');
+  line('    <div class="col-auto">');
   line("      <input type=\"range\" name=\"$setting_name\" class=\"form-range\" value=\"$initial_value\" min=\"$min\" max=\"$max\" step=\"$step\" id=\"$id\" oninput=\"$('#' + '$value_id').prop('value', this.value);\">");
   line('    </div>');
-  line('    <div class="col-1 px-0" style="min-width: ' . $n_output_chars . 'em;">');
+  line('    <div class="col-auto px-0" style="min-width: ' . $n_output_chars . 'em;">');
   line("      <output id=\"$value_id\">$initial_value</output>");
   line('    </div>');
   line('  </div>');
