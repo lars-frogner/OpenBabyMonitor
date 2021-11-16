@@ -51,9 +51,29 @@ function abortIfSessionExpired() {
 }
 
 function addCurrentURIAsGETRequest($destination) {
-  return $destination . '?target_uri=' . urlencode(substr("$_SERVER[REQUEST_URI]", 1));
+  return addQueryToURI($destination, 'target_uri', substr("$_SERVER[REQUEST_URI]", 1));
 }
 
 function getURIFromGETRequest() {
   return isset($_GET['target_uri']) ? urldecode($_GET['target_uri']) : null;
+}
+
+function addQueryToURI($uri, $name, $value, $full_url = false, $allow_multiple = false) {
+  $url_parts = parse_url($uri);
+  if (isset($url_parts['query'])) {
+    parse_str($url_parts['query'], $params);
+  } else {
+    $params = array();
+  }
+
+  if ($allow_multiple) {
+    $params[$name][] = $value;
+  } else {
+    $params[$name] = $value;
+  }
+
+  $url_parts['query'] = http_build_query($params);
+
+  $new_uri = $url_parts['path'] . '?' . $url_parts['query'];
+  return $full_url ? ($url_parts['scheme'] . '://' . $url_parts['host'] . $uri) : $new_uri;
 }

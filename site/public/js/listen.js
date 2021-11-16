@@ -39,8 +39,6 @@ function usesNeuralNetworkModel() {
 }
 
 function initializeListenMode() {
-    performBrowserNotificationRequest();
-
     styleClassificationAnimation();
     subscribeToListenMessages();
 

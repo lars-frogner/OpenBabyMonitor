@@ -33,7 +33,7 @@ if (!$automatically_signed_out) {
               <h3 class="card-title text-center"><?php echo LANG['please_sign_in']; ?></h3>
               <?php
               if (isset($_POST['submit'])) {
-                tryLogin($_DATABASE, $_POST['password'], $target_uri, '<hr><p class="text-center text-danger">Feil passord</p>');
+                tryLogin($_DATABASE, $_POST['password'], addQueryToURI($target_uri, 'signin', '1'), '<hr><p class="text-center text-danger">Feil passord</p>');
               }
               ?>
               <form action="" method="post">
