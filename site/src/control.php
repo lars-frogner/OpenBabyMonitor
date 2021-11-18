@@ -251,7 +251,16 @@ function executeConnectionToNetwork($ssid, $password, $remember) {
 }
 
 function executeRemovalOfKnownNetwork($ssid) {
-  executeServerControlActionWithResult('remove_network', "'$ssid'");
+  $result = executeServerControlActionWithResult('remove_network', "'$ssid'");
+  $result_code = $result['result_code'];
+  if ($result_code != 0) {
+    if ($result_code == 1) {
+      return false;
+    } else {
+      bm_error("Removal of to network with SSID $ssid failed with error code $result_code:\n" . join("\n", $result['output']));
+    }
+  }
+  return true;
 }
 
 function executeSettingOfNewAPPassword($password) {
