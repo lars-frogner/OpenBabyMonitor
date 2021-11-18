@@ -1,8 +1,7 @@
 const MAIN_CONTAINER_ID = 'main_container';
 const SETTINGS_FORM_CONTAINER_ID = 'network_settings_form_container';
 const SWITCHING_INFO_ID = 'switching_network_info';
-const AVAILABLE_NETWORKS_SELECT_ID = 'available_networks';
-const KNOWN_NETWORKS_SELECT_ID = 'known_networks';
+const NETWORK_STATUS_MSG_CLASS = 'network-status-msg';
 const NETWORK_PASSWORD_INPUT_ID = 'network_password_input';
 const REMEMBER_CHECK_ID = 'remember_check';
 const CONNECT_SUBMIT_BUTTON_ID = 'connect_submit_button';
@@ -20,20 +19,206 @@ const CHANGE_AP_PASSWORD_BUTTON_ID = 'change_ap_password_button';
 
 const DISABLED_BUTTON_CLASS = 'btn btn-secondary';
 const BUTTON_CLASSES = {};
-BUTTON_CLASSES[CONNECT_BUTTON_ID] = 'btn btn-primary';
-BUTTON_CLASSES[DISCONNECT_BUTTON_ID] = 'btn btn-warning';
-BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-danger';
+BUTTON_CLASSES[CONNECT_BUTTON_ID] = 'btn btn-success';
+BUTTON_CLASSES[DISCONNECT_BUTTON_ID] = 'btn btn-danger';
+BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-warning';
 BUTTON_CLASSES[CHANGE_SITE_PASSWORD_BUTTON_ID] = 'btn btn-primary';
 BUTTON_CLASSES[CHANGE_AP_PASSWORD_BUTTON_ID] = 'btn btn-primary';
 
+const ICON_UNSELECTED_BACKGROUND_COLOR = 'DimGray';
+const ICON_SELECTED_BACKGROUND_COLOR = 'ForestGreen';
+const ICON_CONNECTED_UNSELECTED_BACKGROUND_COLOR = 'DodgerBlue';
+const ICON_CONNECTED_SELECTED_BACKGROUND_COLOR = 'Crimson';
+
 $(function () {
-    connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmOnclick: () => { performPrePostActions(); enabled($('#' + CONNECT_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
-    connectModalToLink(DISCONNECT_BUTTON_ID, { header: LANG['sure_want_to_disconnect'], confirm: LANG['disconnect'], dismiss: LANG['cancel'], confirmClass: 'btn btn-warning', confirmOnclick: () => { enabled($('#' + DISCONNECT_SUBMIT_BUTTON_ID))[0].click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_access_point'], showText: () => { return true; } });
-    connectModalToLink(FORGET_BUTTON_ID, { header: LANG['sure_want_to_forget'], confirm: LANG['forget'], dismiss: LANG['cancel'], confirmClass: 'btn btn-danger', confirmOnclick: () => { performPrePostActions(); enabled($('#' + FORGET_SUBMIT_BUTTON_ID)).click(); } }, null);
+    generateNetworkSelectStyle();
+    setupAvailableNetworksSelect();
+    setupKnownNetworksSelect();
+
+    connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmClass: BUTTON_CLASSES[CONNECT_BUTTON_ID], confirmOnclick: () => { performPreSwitchingPostActions(); enabled($('#' + CONNECT_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
+    connectModalToLink(DISCONNECT_BUTTON_ID, { header: LANG['sure_want_to_disconnect'], confirm: LANG['disconnect'], dismiss: LANG['cancel'], confirmClass: BUTTON_CLASSES[DISCONNECT_BUTTON_ID], confirmOnclick: () => { performPreSwitchingPostActions(); enabled($('#' + DISCONNECT_SUBMIT_BUTTON_ID))[0].click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_access_point'], showText: () => { return true; } });
+    connectModalToLink(FORGET_BUTTON_ID, { header: LANG['sure_want_to_forget'], confirm: LANG['forget'], dismiss: LANG['cancel'], confirmClass: BUTTON_CLASSES[FORGET_BUTTON_ID], confirmOnclick: () => { enabled($('#' + FORGET_SUBMIT_BUTTON_ID)).click(); } }, null);
     connectModalToLink(CHANGE_SITE_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_site_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_SITE_PASSWORD_SUBMIT_BUTTON_ID)).click(); } }, null);
     connectModalToLink(CHANGE_AP_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_ap_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_AP_PASSWORD_SUBMIT_BUTTON_ID)).click(); } }, null);
     $('#' + MAIN_CONTAINER_ID).show();
 });
+
+function generateNetworkSelectStyle() {
+    $('<style>.network-option { color: ' + FOREGROUND_COLOR + '; background-color: ' + BACKGROUND_COLOR + '; }</style>').appendTo('head');
+    if (getColorScheme() == 'dark') {
+        $('<style>.network-option:hover { filter: brightness(130%); } .network-option-selected { filter: brightness(130%); } .network-icon { color: ' + FOREGROUND_COLOR + '; } .network-icon-selected { filter: brightness(70%); } </style>').appendTo('head');
+    } else {
+        $('<style>.network-option:hover { filter: brightness(90%); } .network-option-selected { filter: brightness(90%); } .network-icon { color: ' + BACKGROUND_COLOR + '; } .network-icon-selected { filter: brightness(110%); } </style>').appendTo('head');
+    }
+}
+
+function setupAvailableNetworksSelect() {
+    const radios = getAvailableNetworksRadioButtons();
+
+    radios.each(function () {
+        const clickedRadio = this;
+        const clickedSSID = clickedRadio.value;
+        setIconToUnselected(clickedSSID);
+        const option = getAvailableNetworksSelectOption(clickedSSID);
+        option.click(function () {
+            const selectedRadios = getSelectedAvailableNetworksRadioButton().get();
+            selectedRadios.forEach(selectedRadio => {
+                unselectAvailableNetworksOption(selectedRadio);
+            });
+            selectAvailableNetworksOptionAndNetwork(clickedRadio);
+        });
+    });
+}
+
+function setupKnownNetworksSelect() {
+    const radios = getKnownNetworksRadioButtons();
+    radios.each(function () {
+        const clickedRadio = this;
+        const clickedSSID = clickedRadio.value;
+        const option = getKnownNetworksSelectOption(clickedSSID);
+        option.click(function () {
+            const selectedRadios = getSelectedKnownNetworksRadioButton().get();
+            selectedRadios.forEach(selectedRadio => {
+                unselectKnownNetworksOption(selectedRadio);
+            });
+            selectKnownNetworksOptionAndNetwork(clickedRadio);
+        });
+    });
+}
+
+function updateSelectedAvailableNetworksOptions(clickedSSID) {
+    const selectedRadios = getSelectedAvailableNetworksRadioButton().get();
+    selectedRadios.forEach(selectedRadio => {
+        unselectAvailableNetworksOption(selectedRadio);
+    });
+    if (clickedSSID) {
+        const clickedRadio = getAvailableNetworksRadioButton(clickedSSID).get()[0];
+        selectAvailableNetworksOption(clickedRadio);
+    }
+}
+
+function updateSelectedKnownNetworksOptions(clickedSSID) {
+    const selectedRadios = getSelectedKnownNetworksRadioButton().get();
+    selectedRadios.forEach(selectedRadio => {
+        unselectKnownNetworksOption(selectedRadio);
+    });
+    if (clickedSSID) {
+        const clickedRadio = getKnownNetworksRadioButton(clickedSSID).get()[0];
+        selectKnownNetworksOption(clickedRadio);
+    }
+}
+
+function getAvailableNetworksRadioButtons() {
+    return $('[id^=available_radio_]');
+}
+
+function getSelectedAvailableNetworksRadioButton() {
+    return $('[id^=available_radio_]:checked');
+}
+
+function getAvailableNetworksSelectOptions() {
+    return $('[id^=available_option_]');
+}
+
+function getAvailableNetworksRadioButton(ssid) {
+    return $('#available_radio_' + ssid);
+}
+
+function getAvailableNetworksSelectOption(ssid) {
+    return $('#available_option_' + ssid);
+}
+
+function getAvailableNetworksIcon(ssid) {
+    return $('#available_icon_' + ssid);
+}
+
+function getKnownNetworksRadioButtons() {
+    return $('[id^=known_radio_]');
+}
+
+function getSelectedKnownNetworksRadioButton() {
+    return $('[id^=known_radio_]:checked');
+}
+
+function getKnownNetworksSelectOptions() {
+    return $('[id^=known_option_]');
+}
+
+function getKnownNetworksRadioButton(ssid) {
+    return $('#known_radio_' + ssid);
+}
+
+function getKnownNetworksSelectOption(ssid) {
+    return $('#known_option_' + ssid);
+}
+
+function selectAvailableNetworksOptionAndNetwork(radio) {
+    const networkMeta = NETWORK_INFO[radio.value];
+    selectAvailableNetworksOption(radio);
+    if (networkMeta.isKnown) {
+        updateSelectedKnownNetworksOptions(radio.value);
+    } else {
+        updateSelectedKnownNetworksOptions(null);
+    }
+    selectNetwork(networkMeta);
+}
+
+function selectKnownNetworksOptionAndNetwork(radio) {
+    const networkMeta = NETWORK_INFO[radio.value];
+    selectKnownNetworksOption(radio);
+    if (networkMeta.isAvailable) {
+        updateSelectedAvailableNetworksOptions(radio.value);
+    } else {
+        updateSelectedAvailableNetworksOptions(null);
+    }
+    selectNetwork(networkMeta);
+}
+
+function selectAvailableNetworksOption(radio) {
+    const option = getAvailableNetworksSelectOption(radio.value);
+    option.addClass('network-option-selected');
+    setIconToSelected(radio.value);
+    setChecked(radio, true);
+}
+
+
+function selectKnownNetworksOption(radio) {
+    const option = getKnownNetworksSelectOption(radio.value);
+    option.addClass('network-option-selected');
+    setChecked(radio, true);
+}
+
+function unselectAvailableNetworksOption(radio) {
+    const option = getAvailableNetworksSelectOption(radio.value);
+    option.removeClass('network-option-selected');
+    setIconToUnselected(radio.value);
+    setChecked(radio, false);
+}
+
+function unselectKnownNetworksOption(radio) {
+    const option = getKnownNetworksSelectOption(radio.value);
+    option.removeClass('network-option-selected');
+    setChecked(radio, false);
+}
+
+function setIconToSelected(ssid) {
+    const networkMeta = NETWORK_INFO[ssid];
+    const icon = getAvailableNetworksIcon(ssid);
+    icon.addClass('network-icon-selected');
+    icon.css({ 'background-color': networkMeta.isConnected ? ICON_CONNECTED_SELECTED_BACKGROUND_COLOR : ICON_SELECTED_BACKGROUND_COLOR });
+}
+
+function setIconToUnselected(ssid) {
+    const networkMeta = NETWORK_INFO[ssid];
+    const icon = getAvailableNetworksIcon(ssid);
+    icon.removeClass('network-icon-selected');
+    icon.css({ 'background-color': networkMeta.isConnected ? ICON_CONNECTED_UNSELECTED_BACKGROUND_COLOR : ICON_UNSELECTED_BACKGROUND_COLOR });
+}
+
+
+function setChecked(radio, checked) {
+    radio.checked = checked;
+}
 
 function enabled(button) {
     button.prop('disabled', false);
@@ -66,68 +251,39 @@ function enablePasswordInput(focus) {
     }
 }
 
-function selectNoNetwork() {
-    disablePasswordInput();
-    $('#' + REMEMBER_CHECK_ID).prop('disabled', true);
-    disableButton($('#' + CONNECT_BUTTON_ID));
-    disableButton($('#' + DISCONNECT_BUTTON_ID));
-    disableButton($('#' + FORGET_BUTTON_ID));
-}
-
-function selectAvailableNetwork(networkMeta) {
-    disableButton($('#' + DISCONNECT_BUTTON_ID));
-    disableButton($('#' + FORGET_BUTTON_ID));
-    if (networkMeta.requiresPassword && !networkMeta.isKnown) {
-        enablePasswordInput(true);
+function selectNetwork(networkMeta) {
+    if (networkMeta.isConnected) {
         disableButton($('#' + CONNECT_BUTTON_ID));
-    } else {
         disablePasswordInput();
-        enableButton($('#' + CONNECT_BUTTON_ID));
-    }
-    if (networkMeta.isKnown) {
         $('#' + REMEMBER_CHECK_ID).prop('disabled', true);
+        enableButton($('#' + DISCONNECT_BUTTON_ID));
     } else {
+        disableButton($('#' + DISCONNECT_BUTTON_ID));
+        if (networkMeta.isAvailable && networkMeta.requiresPassword) {
+            disableButton($('#' + CONNECT_BUTTON_ID));
+            enablePasswordInput(true);
+        } else {
+            disablePasswordInput();
+            enableButton($('#' + CONNECT_BUTTON_ID));
+        }
         $('#' + REMEMBER_CHECK_ID).prop('disabled', false);
     }
+    if (networkMeta.isKnown) {
+        disablePasswordInput();
+        $('#' + REMEMBER_CHECK_ID).prop('disabled', true);
+        enableButton($('#' + FORGET_BUTTON_ID));
+    } else {
+        disableButton($('#' + FORGET_BUTTON_ID));
+    }
 }
 
-function selectConnectedNetwork() {
-    disablePasswordInput();
-    $('#' + REMEMBER_CHECK_ID).prop('disabled', true);
-    disableButton($('#' + CONNECT_BUTTON_ID));
-    enableButton($('#' + DISCONNECT_BUTTON_ID));
-    disableButton($('#' + FORGET_BUTTON_ID));
-}
-
-function selectKnownNetwork() {
-    disablePasswordInput();
-    $('#' + REMEMBER_CHECK_ID).prop('disabled', true);
-    disableButton($('#' + CONNECT_BUTTON_ID));
-    disableButton($('#' + DISCONNECT_BUTTON_ID));
-    enableButton($('#' + FORGET_BUTTON_ID));
-}
-
-function performPrePostActions() {
+function performPreSwitchingPostActions() {
     setDisabledForNavbar(true);
     $('#' + SETTINGS_FORM_CONTAINER_ID).find('*').hide();
+    $('.' + NETWORK_STATUS_MSG_CLASS).hide();
     $('#' + SWITCHING_INFO_ID).show();
     $('#' + MODAL_ID).modal('hide');
 }
-
-$('#' + AVAILABLE_NETWORKS_SELECT_ID).change(function () {
-    $('#' + KNOWN_NETWORKS_SELECT_ID).prop('value', '');
-    const networkMeta = $('#' + this.value).data('networkMeta');
-    if (networkMeta.isConnected) {
-        selectConnectedNetwork();
-    } else {
-        selectAvailableNetwork(networkMeta);
-    }
-});
-
-$('#' + KNOWN_NETWORKS_SELECT_ID).change(function () {
-    $('#' + AVAILABLE_NETWORKS_SELECT_ID).prop('value', '');
-    selectKnownNetwork();
-});
 
 $('#' + NETWORK_PASSWORD_INPUT_ID).on('input', function () {
     if (this.value.length < 8 || this.value.length > 63) {

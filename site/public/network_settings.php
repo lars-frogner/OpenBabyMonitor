@@ -3,6 +3,7 @@ require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 require_once(TEMPLATES_DIR . '/network_settings.php');
 
+bm_warning(print_r($_POST, true));
 $connection_succeeded = null;
 $password_changed = null;
 $which_password = null;
@@ -36,6 +37,8 @@ $connected_network = obtainConnectedNetworkSSID();
 <head>
   <?php
   require_once(TEMPLATES_DIR . '/head_common.php');
+
+  storeNetworkInfo($available_networks, $known_networks, $connected_network);
   ?>
 </head>
 
@@ -50,16 +53,20 @@ $connected_network = obtainConnectedNetworkSSID();
 
   <main id="main_container" style="display: none;">
     <?php if ($connection_succeeded === true) { ?>
-      <div class="d-flex flex-row justify-content-center mt-3">
-        <div class="d-flex flex-column">
-          <span class="alert alert-success text-center"><?php echo LANG['connection_succeeded']; ?></span>
+      <div class="network-status-msg">
+        <div class="d-flex flex-row justify-content-center mt-3">
+          <div class="d-flex flex-column">
+            <span class="alert alert-success text-center"><?php echo LANG['connection_succeeded']; ?></span>
+          </div>
         </div>
       </div>
     <?php } ?>
     <?php if ($connection_succeeded === false) { ?>
-      <div class="d-flex flex-row justify-content-center mt-3">
-        <div class="d-flex flex-column">
-          <span class="alert alert-danger text-center"><?php echo LANG['connection_failed']; ?></span>
+      <div class="network-status-msg">
+        <div class="d-flex flex-row justify-content-center mt-3">
+          <div class="d-flex flex-column">
+            <span class="alert alert-danger text-center"><?php echo LANG['connection_failed']; ?></span>
+          </div>
         </div>
       </div>
     <?php } ?>
@@ -72,9 +79,11 @@ $connected_network = obtainConnectedNetworkSSID();
       </div>
     </div>
     <?php if ($password_changed === true) { ?>
-      <div class="d-flex flex-row justify-content-center mt-3">
-        <div class="d-flex flex-column">
-          <span class="alert alert-success text-center"><?php echo LANG[$which_password . '_password_changed']; ?></span>
+      <div class="network-status-msg">
+        <div class="d-flex flex-row justify-content-center mt-3">
+          <div class="d-flex flex-column">
+            <span class="alert alert-success text-center"><?php echo LANG[$which_password . '_password_changed']; ?></span>
+          </div>
         </div>
       </div>
     <?php } ?>
@@ -82,13 +91,13 @@ $connected_network = obtainConnectedNetworkSSID();
       <h1 class="my-4"><?php echo LANG['network_settings']; ?></h1>
       <form id="network_settings_form" action="" method="post">
         <div class="row mb-3">
-          <div class="col-auto mx-3 my-2">
+          <div class="col-auto px-3 my-2">
             <div class="form-group">
-              <label class="form-label h3" for="available_networks"><?php echo LANG['available_networks']; ?></label>
-              <?php generateAvailableNetworksSelect($available_networks, $known_networks, $connected_network, 'available_networks'); ?>
+              <div class="form-label h3 mb-3" for="available_networks"><?php echo LANG['available_networks']; ?></div>
+              <?php generateAvailableNetworksRadioAndSelect($available_networks, 'available_networks'); ?>
             </div>
             <div class="row form-group align-items-center my-3">
-              <div class="col-auto mb-3">
+              <div class="col-auto">
                 <div class="form-floating">
                   <input type="password" name="password" class="form-control" id="network_password_input" placeholder="" disabled>
                   <label class="text-bm" for="network_password_input">
@@ -96,27 +105,31 @@ $connected_network = obtainConnectedNetworkSSID();
                   </label>
                 </div>
               </div>
-              <div class="col-auto mb-3">
+              <div class="col-auto">
                 <div class="form-check">
                   <input type="checkbox" name="remember" class="form-check-input" id="remember_check" disabled>
                   <label class="form-check-label" for="remember_check"><?php echo LANG['remember']; ?></label>
                 </div>
               </div>
-              <div class="col-auto mb-3">
-                <button type="submit" name="connect" style="display: none;" id="connect_submit_button" disabled></button><button class="btn btn-secondary" id="connect_button" disabled><?php echo LANG['connect']; ?></button>
-                <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button" disabled></a><button class="btn btn-secondary" id="disconnect_button" disabled><?php echo LANG['disconnect']; ?></button>
+            </div>
+            <div class="row form-group align-items-center mb-3">
+              <div class="col-auto">
+                <button type="submit" name="connect" style="display: none;" id="connect_submit_button" disabled></button>
+                <button class="btn btn-secondary" id="connect_button" disabled><?php echo LANG['connect']; ?></button>
+                <a href="activate_ap_mode.php" style="display: none;" id="disconnect_submit_button" disabled></a>
+                <button class="btn btn-secondary" id="disconnect_button" disabled><?php echo LANG['disconnect']; ?></button>
               </div>
             </div>
           </div>
-          <div class="col-auto mx-3 my-2">
-            <label class="form-label h3" for="known_networks"><?php echo LANG['known_networks']; ?></label>
-            <?php generateKnownNetworksSelect($known_networks, 'known_networks'); ?>
+          <div class="col-auto px-3 my-2">
+            <label class="form-label h3 mb-3" for="known_networks"><?php echo LANG['known_networks']; ?></label>
+            <?php generateKnownNetworksRadioAndSelect($known_networks, 'known_networks'); ?>
             <div class="form-group my-3">
               <button type="submit" name="forget" style="display: none;" id="forget_submit_button" disabled></button><button class="btn btn-secondary" id="forget_button" disabled><?php echo LANG['forget']; ?></button>
             </div>
           </div>
-          <div class="col-auto mx-3 my-2">
-            <h3><?php echo LANG['change_site_password']; ?></h3>
+          <div class="col-auto px-3 my-2">
+            <label class="form-label h3 mb-3"><?php echo LANG['change_site_password']; ?></label>
             <div class="form-floating">
               <input type="password" name="password" class="form-control" id="site_password_input" placeholder="">
               <label class="text-bm" for="site_password_input">
@@ -127,8 +140,8 @@ $connected_network = obtainConnectedNetworkSSID();
               <button type="submit" name="change_site_password" style="display: none;" id="change_site_password_submit_button" disabled></button><button class="btn btn-secondary" id="change_site_password_button" disabled><?php echo LANG['change']; ?></button>
             </div>
           </div>
-          <div class="col-auto mx-3 my-2">
-            <h3><?php echo LANG['change_ap_password']; ?></h3>
+          <div class="col-auto px-3 my-2">
+            <label class="form-label h3 mb-3"><?php echo LANG['change_ap_password']; ?></label>
             <div class="form-floating">
               <input type="password" name="password" class="form-control" id="ap_password_input" placeholder="">
               <label class="text-bm" for="ap_password_input">
