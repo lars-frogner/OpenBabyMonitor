@@ -49,11 +49,9 @@ function changeModeTo(modeName) {
 function swapRadio(radio) {
     MODE_RADIO_IDS.forEach(radioId => {
         if (radioId == radio.prop('id')) {
-            radio.prop('checked', true);
             radio.parent().addClass('active');
         } else {
             otherRadio = $('#' + radioId);
-            otherRadio.prop('checked', false);
             otherRadio.parent().removeClass('active');
         }
     });
