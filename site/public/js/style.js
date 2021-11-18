@@ -5,9 +5,9 @@ $(function () {
     manageColorSchemeCookie();
 
     if (getColorScheme() === 'dark') {
-        $('<style>.text-bm, .btn-bm { color: ' + FOREGROUND_COLOR + '; filter: brightness(80%); } .btn-bm:hover { color: ' + FOREGROUND_COLOR + '; filter: brightness(100%); }</style>').appendTo('head');
+        $('<style>.text-bm, .btn-bm { color: ' + FOREGROUND_COLOR + '; filter: brightness(80%); } .btn-bm:hover { filter: brightness(100%); }</style>').appendTo('head');
     } else {
-        $('<style>.text-bm, .btn-bm { color: ' + FOREGROUND_COLOR + '; filter: brightness(120%); } .btn-bm:hover { color: ' + FOREGROUND_COLOR + '; filter: brightness(200%); }</style>').appendTo('head');
+        $('<style>.text-bm { color: ' + FOREGROUND_COLOR + '; } .btn-bm { filter: brightness(160%); } .btn-bm:hover { filter: brightness(60%); }</style>').appendTo('head');
     }
 });
 
