@@ -58,8 +58,9 @@ function setupAvailableNetworksSelect() {
     radios.each(function () {
         const clickedRadio = this;
         const clickedSSID = clickedRadio.value;
+        const clickedId = NETWORK_INFO[clickedSSID].id;
         setIconToUnselected(clickedSSID);
-        const option = getAvailableNetworksSelectOption(clickedSSID);
+        const option = getAvailableNetworksSelectOption(clickedId);
         option.click(function () {
             const selectedRadios = getSelectedAvailableNetworksRadioButton().get();
             selectedRadios.forEach(selectedRadio => {
@@ -75,7 +76,8 @@ function setupKnownNetworksSelect() {
     radios.each(function () {
         const clickedRadio = this;
         const clickedSSID = clickedRadio.value;
-        const option = getKnownNetworksSelectOption(clickedSSID);
+        const clickedId = NETWORK_INFO[clickedSSID].id;
+        const option = getKnownNetworksSelectOption(clickedId);
         option.click(function () {
             const selectedRadios = getSelectedKnownNetworksRadioButton().get();
             selectedRadios.forEach(selectedRadio => {
@@ -86,24 +88,24 @@ function setupKnownNetworksSelect() {
     });
 }
 
-function updateSelectedAvailableNetworksOptions(clickedSSID) {
+function updateSelectedAvailableNetworksOptions(clickedId) {
     const selectedRadios = getSelectedAvailableNetworksRadioButton().get();
     selectedRadios.forEach(selectedRadio => {
         unselectAvailableNetworksOption(selectedRadio);
     });
-    if (clickedSSID) {
-        const clickedRadio = getAvailableNetworksRadioButton(clickedSSID).get()[0];
+    if (clickedId) {
+        const clickedRadio = getAvailableNetworksRadioButton(clickedId).get()[0];
         selectAvailableNetworksOption(clickedRadio);
     }
 }
 
-function updateSelectedKnownNetworksOptions(clickedSSID) {
+function updateSelectedKnownNetworksOptions(clickedId) {
     const selectedRadios = getSelectedKnownNetworksRadioButton().get();
     selectedRadios.forEach(selectedRadio => {
         unselectKnownNetworksOption(selectedRadio);
     });
-    if (clickedSSID) {
-        const clickedRadio = getKnownNetworksRadioButton(clickedSSID).get()[0];
+    if (clickedId) {
+        const clickedRadio = getKnownNetworksRadioButton(clickedId).get()[0];
         selectKnownNetworksOption(clickedRadio);
     }
 }
@@ -120,16 +122,16 @@ function getAvailableNetworksSelectOptions() {
     return $('[id^=available_option_]');
 }
 
-function getAvailableNetworksRadioButton(ssid) {
-    return $('#available_radio_' + ssid);
+function getAvailableNetworksRadioButton(id) {
+    return $('#available_radio_' + id);
 }
 
-function getAvailableNetworksSelectOption(ssid) {
-    return $('#available_option_' + ssid);
+function getAvailableNetworksSelectOption(id) {
+    return $('#available_option_' + id);
 }
 
-function getAvailableNetworksIcon(ssid) {
-    return $('#available_icon_' + ssid);
+function getAvailableNetworksIcon(id) {
+    return $('#available_icon_' + id);
 }
 
 function getKnownNetworksRadioButtons() {
@@ -144,19 +146,19 @@ function getKnownNetworksSelectOptions() {
     return $('[id^=known_option_]');
 }
 
-function getKnownNetworksRadioButton(ssid) {
-    return $('#known_radio_' + ssid);
+function getKnownNetworksRadioButton(id) {
+    return $('#known_radio_' + id);
 }
 
-function getKnownNetworksSelectOption(ssid) {
-    return $('#known_option_' + ssid);
+function getKnownNetworksSelectOption(id) {
+    return $('#known_option_' + id);
 }
 
 function selectAvailableNetworksOptionAndNetwork(radio) {
     const networkMeta = NETWORK_INFO[radio.value];
     selectAvailableNetworksOption(radio);
     if (networkMeta.isKnown) {
-        updateSelectedKnownNetworksOptions(radio.value);
+        updateSelectedKnownNetworksOptions(networkMeta.id);
     } else {
         updateSelectedKnownNetworksOptions(null);
     }
@@ -167,7 +169,7 @@ function selectKnownNetworksOptionAndNetwork(radio) {
     const networkMeta = NETWORK_INFO[radio.value];
     selectKnownNetworksOption(radio);
     if (networkMeta.isAvailable) {
-        updateSelectedAvailableNetworksOptions(radio.value);
+        updateSelectedAvailableNetworksOptions(networkMeta.id);
     } else {
         updateSelectedAvailableNetworksOptions(null);
     }
@@ -175,7 +177,7 @@ function selectKnownNetworksOptionAndNetwork(radio) {
 }
 
 function selectAvailableNetworksOption(radio) {
-    const option = getAvailableNetworksSelectOption(radio.value);
+    const option = getAvailableNetworksSelectOption(NETWORK_INFO[radio.value].id);
     option.addClass('network-option-selected');
     setIconToSelected(radio.value);
     setChecked(radio, true);
@@ -183,34 +185,34 @@ function selectAvailableNetworksOption(radio) {
 
 
 function selectKnownNetworksOption(radio) {
-    const option = getKnownNetworksSelectOption(radio.value);
+    const option = getKnownNetworksSelectOption(NETWORK_INFO[radio.value].id);
     option.addClass('network-option-selected');
     setChecked(radio, true);
 }
 
 function unselectAvailableNetworksOption(radio) {
-    const option = getAvailableNetworksSelectOption(radio.value);
+    const option = getAvailableNetworksSelectOption(NETWORK_INFO[radio.value].id);
     option.removeClass('network-option-selected');
     setIconToUnselected(radio.value);
     setChecked(radio, false);
 }
 
 function unselectKnownNetworksOption(radio) {
-    const option = getKnownNetworksSelectOption(radio.value);
+    const option = getKnownNetworksSelectOption(NETWORK_INFO[radio.value].id);
     option.removeClass('network-option-selected');
     setChecked(radio, false);
 }
 
 function setIconToSelected(ssid) {
     const networkMeta = NETWORK_INFO[ssid];
-    const icon = getAvailableNetworksIcon(ssid);
+    const icon = getAvailableNetworksIcon(networkMeta.id);
     icon.addClass('network-icon-selected');
     icon.css({ 'background-color': networkMeta.isConnected ? ICON_CONNECTED_SELECTED_BACKGROUND_COLOR : ICON_SELECTED_BACKGROUND_COLOR });
 }
 
 function setIconToUnselected(ssid) {
     const networkMeta = NETWORK_INFO[ssid];
-    const icon = getAvailableNetworksIcon(ssid);
+    const icon = getAvailableNetworksIcon(networkMeta.id);
     icon.removeClass('network-icon-selected');
     icon.css({ 'background-color': networkMeta.isConnected ? ICON_CONNECTED_UNSELECTED_BACKGROUND_COLOR : ICON_UNSELECTED_BACKGROUND_COLOR });
 }
