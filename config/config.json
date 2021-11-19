@@ -638,6 +638,18 @@
             "name": "measure_temperature",
             "type": "BOOLEAN NOT NULL",
             "initial_value": true
+        },
+        "warn_under_voltage": {
+            "group": "monitoring",
+            "name": "warn_under_voltage",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
+        },
+        "warn_overheat": {
+            "group": "monitoring",
+            "name": "warn_overheat",
+            "type": "BOOLEAN NOT NULL",
+            "initial_value": true
         }
     },
     "system_groups": {

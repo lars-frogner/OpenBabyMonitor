@@ -7,6 +7,8 @@
     "show_unsupported_message": "Show message when unsupported",
     "ask_notification_permission": "Ask for permission",
     "measure_temperature": "Show device temperature",
+    "warn_under_voltage": "Warn about low voltage",
+    "warn_overheat": "Warn about overheating",
     "query_interval": "Interval between measurements (s)",
     "g_browser_notifications": "Browser notifications",
     "g_monitoring": "Monitoring",

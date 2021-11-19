@@ -7,6 +7,8 @@
     "show_unsupported_message": "Vis beskjed om manglende støtte",
     "ask_notification_permission": "Spør om tillatelse",
     "measure_temperature": "Vis enhetens temperatur",
+    "warn_under_voltage": "Advar om lav spenning",
+    "warn_overheat": "Advar om overoppheting",
     "query_interval": "Intervall mellom målinger (s)",
     "g_browser_notifications": "Nettleservarsler",
     "g_monitoring": "Overvåkning",
