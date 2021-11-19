@@ -39,5 +39,10 @@
     "ok": "Ok",
     "premission_required": "Tillatelse kreves for å bruke nettlerservarsler",
     "grant_permission": "Gi tillatelse",
-    "continue_without": "Fortsett uten"
+    "continue_without": "Fortsett uten",
+    "close": "Lukk",
+    "under_voltage_warning": "Advarsel om lav spenning!",
+    "under_voltage_warning_text": "Strømforsyningen har for lav spenning. Vennligst slå av enheten og utbedre dette. Hvis enheten drives av et batteri trenger dette å lades opp igjen. Hvis ikke er det mulig at strømforsyningen er defekt.",
+    "overheat_warning": "Advarsel om overoppheting!",
+    "overheat_warning_text": "Enheten blir for varm. Prosessoren har blitt sakket ned for å begrense ytterligere oppvarming. Vennligst påse at enheten har tilstrekkelig ventilasjon, og begrens bruken av video- eller lydstrømming."
 }

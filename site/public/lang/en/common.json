@@ -39,5 +39,10 @@
     "ok": "Ok",
     "premission_required": "Premission is required to use browser notifications",
     "grant_permission": "Grant permission",
-    "continue_without": "Continue without"
+    "continue_without": "Continue without",
+    "close": "Close",
+    "under_voltage_warning": "Low voltage warning!",
+    "under_voltage_warning_text": "The power supply voltage is too low. Please shut down the unit and address this. If the unit is powered by a battery, it needs to be recharged. Otherwise, the power supply may be malfunctioning.",
+    "overheat_warning": "Overheat warning!",
+    "overheat_warning_text": "The unit is becoming too hot. The CPU has been slowed down to limit further heating. Please ensure that the unit has proper ventilation, and limit the use of video or audio streaming."
 }

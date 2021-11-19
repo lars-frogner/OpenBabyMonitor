@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/config/path_config.php');
 require_once(dirname(__DIR__) . '/config/error_config.php');
+require_once(dirname(__DIR__) . '/config/env_config.php');
 require_once(dirname(__DIR__) . '/config/monitoring_config.php');
 require_once(SRC_DIR . '/sse.php');
 
@@ -34,16 +35,11 @@ while (!connection_aborted()) {
   sendSSEMessage('temperature', measureTemperature());
   $throttled_status = getThrottled();
   if ($throttled_status & UNDER_VOLTAGE_FLAG) {
+    bm_warning_to_file('Detected under-voltage', getenv('BM_SERVER_LOG_PATH'));
     sendSSEMessage('under_voltage');
-  }
-  if ($throttled_status & FREQUENCY_CAPPED_FLAG) {
-    sendSSEMessage('frequency_capped');
-  }
-  if ($throttled_status & CURRENTLY_THROTTLED_FLAG) {
-    sendSSEMessage('throttled');
-  }
-  if ($throttled_status & SOFT_TEMP_LIM_ACTIVE_FLAG) {
-    sendSSEMessage('temp_lim_active');
+  } elseif ($throttled_status & (FREQUENCY_CAPPED_FLAG | CURRENTLY_THROTTLED_FLAG)) {
+    bm_warning_to_file('Detected frequency capping or throttling due to overheating', getenv('BM_SERVER_LOG_PATH'));
+    sendSSEMessage('overheat');
   }
   sleep(MONITORING_QUERY_INTERVAL);
 }
