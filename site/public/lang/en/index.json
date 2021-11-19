@@ -2,5 +2,6 @@
     "please_sign_in": "Please sign in",
     "password": "Password",
     "sign_in": "Sign in",
+    "wrong_password": "Invalid password",
     "was_signed_out": "You were automatically signed out."
 }

@@ -7,6 +7,11 @@ $automatically_signed_out = $target_uri != null;
 if (!$automatically_signed_out) {
   $target_uri = 'main.php';
 }
+
+$login_successful = null;
+if (isset($_POST['submit'])) {
+  $login_successful = tryLogin($_DATABASE, $_POST['password'], addQueryToURI($target_uri, 'signin', '1'));
+}
 ?>
 
 <!DOCTYPE html>
@@ -31,11 +36,10 @@ if (!$automatically_signed_out) {
           <div class="card">
             <article class="card-body">
               <h3 class="card-title text-center"><?php echo LANG['please_sign_in']; ?></h3>
-              <?php
-              if (isset($_POST['submit'])) {
-                tryLogin($_DATABASE, $_POST['password'], addQueryToURI($target_uri, 'signin', '1'), '<hr><p class="text-center text-danger">Feil passord</p>');
-              }
-              ?>
+              <?php if ($login_successful === false) { ?>
+                <hr>
+                <p class="text-center text-danger"><?php echo LANG['wrong_password']; ?></p>
+              <?php } ?>
               <form action="" method="post">
                 <div class="my-3 form-group">
                   <label class="visually-hidden" for="password"><?php echo LANG['password']; ?></label>

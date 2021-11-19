@@ -2,13 +2,13 @@
 require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(__DIR__ . '/security.php');
 
-function tryLogin($database, $password, $destination, $otherwise) {
+function tryLogin($database, $password, $destination) {
   $password_hash = readHashedPassword($database);
   if (password_verify($password, $password_hash)) {
     $_SESSION['login'] = true;
     redirectTo($destination);
   } else {
-    echo $otherwise;
+    return false;
   }
 }
 
