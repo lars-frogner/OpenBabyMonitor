@@ -8,10 +8,7 @@ function sendSSEHeaders() {
 
 function sendSSEMessage($event, $data = null) {
   echo "event: $event\n";
-  if ($data !== null) {
-    echo "data: $data\n";
-  }
-  echo "\n";
+  echo "data: $data\n\n";
   while (ob_get_level() > 0) {
     ob_end_flush();
   }
