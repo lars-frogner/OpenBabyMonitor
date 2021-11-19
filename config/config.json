@@ -146,9 +146,9 @@
             "group": "interpretation",
             "name": "min_sound_level",
             "type": "FLOAT NOT NULL",
-            "initial_value": -30,
+            "initial_value": -20,
             "range": {
-                "min": -45,
+                "min": -40,
                 "max": 0,
                 "step": 0.1
             }

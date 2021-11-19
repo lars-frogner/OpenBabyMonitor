@@ -10,7 +10,7 @@ const LISTEN_ANIMATION_LABEL_CLASS = "listen-animation-label";
 const LISTEN_ANIMATION_LABEL_BG_CLASS = "listen-animation-label-bg";
 const LISTEN_ANIMATION_INDICATOR_CLASS = "listen-animation-indicator";
 
-const MIN_DBFS = -50;
+const MIN_DBFS = -40;
 const MAX_DBFS = 0;
 
 const LISTEN_NOTIFICATION_HEADERS = { sound: LANG['sound_alert'], bad: LANG['crying_alert'], good: LANG['babbling_alert'], bad_and_good: LANG['crying_and_babbling_alert'], bad_or_good: LANG['crying_or_babbling_alert'] };
