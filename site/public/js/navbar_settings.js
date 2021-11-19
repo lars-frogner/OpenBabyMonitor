@@ -21,5 +21,17 @@ $(function () {
     connectModalToLink(SHUTDOWN_NAV_LINK_ID, SHUTDOWN_MODAL_BASE_PROPERTIES, MODAL_ADDITIONAL_SETTER);
     connectModalToObject(_AP_MODE_MODAL_TRIGGER, AP_MODAL_BASE_PROPERTIES, [AP_MODAL_BASE_BODY_SETTER, MODAL_ADDITIONAL_SETTER]);
     connectModalToObject(_CLIENT_MODE_MODAL_TRIGGER, CLIENT_MODAL_BASE_PROPERTIES, [CLIENT_MODAL_BASE_BODY_SETTER, MODAL_ADDITIONAL_SETTER]);
+
+    var client_no_network_properties;
+    var client_no_network_body;
+    if (LOCATION == 'network_settings') {
+        client_no_network_properties = CLIENT_MODAL_NO_NETWORK_AT_NETWORK_BASE_PROPERTIES;
+        client_no_network_body = CLIENT_MODAL_NO_NETWORK_AT_NETWORK_BASE_BODY_SETTER;
+    } else {
+        client_no_network_properties = CLIENT_MODAL_NO_NETWORK_BASE_PROPERTIES;
+        client_no_network_body = [CLIENT_MODAL_NO_NETWORK_BASE_BODY_SETTER, MODAL_ADDITIONAL_SETTER];
+    }
+    connectModalToObject(_CLIENT_MODE_NO_NETWORK_MODAL_TRIGGER, client_no_network_properties, client_no_network_body);
+
     setDisabledForNavbar(false);
 });

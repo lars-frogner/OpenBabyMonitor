@@ -15,3 +15,6 @@
 <?php require_once(TEMPLATES_DIR . '/language.php'); ?>
 
 <script src="js/session.js"></script>
+<script>
+  const LOCATION = '<?php echo LOCATION; ?>';
+</script>

@@ -151,3 +151,7 @@
     </div>
   </div>
 </nav>
+
+<script>
+  const ANY_KNOWN_NETWORKS = <?php echo anyKnownNetworks($_DATABASE) ? 'true' : 'false'; ?>;
+</script>
