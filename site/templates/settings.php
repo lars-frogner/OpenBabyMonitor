@@ -77,7 +77,7 @@ function generateSelect($setting, $setting_name, $initial_value) {
   }
   line('      </select>');
   if ($has_descriptions) {
-    line("      <div class=\"mt-1\" id=\"$descript_id\" style=\"max-width: 16em;\">" . LANG[$descriptions[$initial_value]] . '</div>');
+    line("      <div class=\"mt-1\" id=\"$descript_id\" style=\"max-width: 16rem;\">" . LANG[$descriptions[$initial_value]] . '</div>');
   }
   line('    </div>');
   line('  </div>');

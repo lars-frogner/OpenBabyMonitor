@@ -97,9 +97,9 @@ function createKnownNetworksSelectOption($ssid) {
 
 function createAvailableNetworksSelectIcon($ssid, $quality) {
   $icon = getWifiIcon($quality);
-  $circle_size = '2.0em';
-  $icon_size = '1.5em';
-  $icon_offset = '0.25em';
+  $circle_size = '2.0rem';
+  $icon_size = '1.5rem';
+  $icon_offset = '0.25rem';
   line('<div class="d-flex flex-nowrap align-items-center">');
   line("  <div id=\"available_icon_$ssid\" class=\"network-icon me-2\" style=\"position: relative; width: $circle_size; height: $circle_size; border-radius: 50%;\">");
   line("    <svg class=\"bi\" style=\"position: absolute; left: $icon_offset; top: $icon_offset; height: $icon_size; width: $icon_size;\" fill=\"currentColor\">");

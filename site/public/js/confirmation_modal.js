@@ -18,7 +18,7 @@ function setConfirmationModalProperties(properties) {
     if (properties.hasOwnProperty('icon_size')) {
         $('#' + MODAL_ICON_ID).css({ width: properties['icon_size'], height: properties['icon_size'] });
     } else {
-        $('#' + MODAL_ICON_ID).css({ width: '1.5em', height: '1.5em' });
+        $('#' + MODAL_ICON_ID).css({ 'min-width': '2.5rem', 'min-height': '2.5rem', width: '2.5rem', height: '2.5rem' });
     }
     if (properties.hasOwnProperty('header')) {
         $('#' + MODAL_HEADER_ID).html(properties['header']);
