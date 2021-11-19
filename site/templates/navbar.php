@@ -64,18 +64,20 @@
             <?php echo LANG['nav_server']; ?>
           </a>
           <ul class="dropdown-menu" style="min-width: 1em;">
-            <li><a id="server_status_nav_link" class="dropdown-item<?php echo LOCATION == 'server_status' ? ' active' : ''; ?> d-flex align-items-center" href="server_status.php">
+            <div class="pe-0 dropdown-item d-flex align-items-center">
+              <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use href="media/bootstrap-icons.svg#activity" />
+                  <use href="media/bootstrap-icons.svg#broadcast-pin" />
                 </svg>
-                <?php echo LANG['nav_server_status']; ?>
-              </a></li>
-            <li><a id="server_debugging_nav_link" class="dropdown-item<?php echo LOCATION == 'debugging' ? ' active' : ''; ?> d-flex align-items-center" href="debugging.php">
-                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use href="media/bootstrap-icons.svg#bug" />
-                </svg>
-                <?php echo LANG['nav_debugging']; ?>
-              </a></li>
+                <?php echo LANG['nav_access_point']; ?>
+              </div>
+              <div class="form-check form-switch my-0 ms-2">
+                <input id="ap_mode_switch" class="form-check-input" type="checkbox" role="button" <?php echo ACCESS_POINT_ACTIVE ? 'checked' : ''; ?>>
+              </div>
+            </div>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
             <li><a id="logout_nav_link" class="dropdown-item d-flex align-items-center" href="logout.php">
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
                   <use href="media/bootstrap-icons.svg#door-open" />
@@ -95,57 +97,57 @@
                 <?php echo LANG['nav_shutdown']; ?>
               </a></li>
             <li>
-              <div class="pe-0 dropdown-item d-flex align-items-center">
-                <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
-                  <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                    <use href="media/bootstrap-icons.svg#broadcast-pin" />
-                  </svg>
-                  <?php echo LANG['nav_access_point']; ?>
-                </div>
-                <div class="form-check form-switch my-0 ms-2">
-                  <input id="ap_mode_switch" class="form-check-input" type="checkbox" role="button" <?php echo ACCESS_POINT_ACTIVE ? 'checked' : ''; ?>>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </li>
-        <li class="nav-item dropdown me-auto">
-          <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
-            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use href="media/bootstrap-icons.svg#chat-text" />
-            </svg>
-            <?php echo LANG['nav_language']; ?>
-          </a>
-          <ul class="dropdown-menu" style="min-width: 1em;">
             <li>
-              <a id="language_en_nav_link" class="dropdown-item<?php echo LANGUAGE == 'en' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=en"'; ?>">
-                <span class="me-2 flag-icon flag-icon-gb" style="height: 1.1em; width: 1.1em;"></span>
-                English
-              </a>
+              <hr class="dropdown-divider">
             </li>
-            <li>
-              <a id="language_no_nav_link" class="dropdown-item<?php echo LANGUAGE == 'no' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=no"'; ?>">
-                <span class="me-2 flag-icon flag-icon-no" style="height: 1.1em; width: 1.1em;"></span>
-                Norsk
-              </a>
-            </li>
-          </ul>
+            <li><a id="server_status_nav_link" class="dropdown-item<?php echo LOCATION == 'server_status' ? ' active' : ''; ?> d-flex align-items-center" href="server_status.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use href="media/bootstrap-icons.svg#activity" />
+                </svg>
+                <?php echo LANG['nav_server_status']; ?>
+              </a></li>
+            <li><a id="server_debugging_nav_link" class="dropdown-item<?php echo LOCATION == 'debugging' ? ' active' : ''; ?> d-flex align-items-center" href="debugging.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use href="media/bootstrap-icons.svg#bug" />
+                </svg>
+                <?php echo LANG['nav_debugging']; ?>
+              </a></li>
         </li>
-        <?php if (MEASURE_TEMPERATURE) { ?>
-          <li class="nav-item d-flex align-items-center text-bm">
-            <div class="d-flex align-items-center py-2">
-              <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                <use href="media/bootstrap-icons.svg#thermometer-half" />
-              </svg>
-              <div id="temperature_label"></div>
-            </div>
+      </ul>
+      </li>
+      <li class="nav-item dropdown me-auto">
+        <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
+          <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+            <use href="media/bootstrap-icons.svg#chat-text" />
+          </svg>
+          <?php echo LANG['nav_language']; ?>
+        </a>
+        <ul class="dropdown-menu" style="min-width: 1em;">
+          <li>
+            <a id="language_en_nav_link" class="dropdown-item<?php echo LANGUAGE == 'en' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=en"'; ?>">
+              <span class="me-2 flag-icon flag-icon-gb" style="height: 1.1em; width: 1.1em;"></span>
+              English
+            </a>
           </li>
-        <?php } ?>
+          <li>
+            <a id="language_no_nav_link" class="dropdown-item<?php echo LANGUAGE == 'no' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=no"'; ?>">
+              <span class="me-2 flag-icon flag-icon-no" style="height: 1.1em; width: 1.1em;"></span>
+              Norsk
+            </a>
+          </li>
+        </ul>
+      </li>
+      <?php if (MEASURE_TEMPERATURE) { ?>
+        <li class="nav-item d-flex align-items-center text-bm">
+          <div class="d-flex align-items-center py-2">
+            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+              <use href="media/bootstrap-icons.svg#thermometer-half" />
+            </svg>
+            <div id="temperature_label"></div>
+          </div>
+        </li>
+      <?php } ?>
       </ul>
     </div>
   </div>
 </nav>
-
-<script>
-  const MEASURE_TEMPERATURE = <?php echo MEASURE_TEMPERATURE ? 'true' : 'false'; ?>;
-</script>
