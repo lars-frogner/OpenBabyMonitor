@@ -14,15 +14,15 @@ $(function () {
 });
 
 function setupBrowserNotificationRedirectModal() {
-    connectModalToObject(_REDIRECT_MODAL_TRIGGER, { checkboxLabel: LANG['dont_ask_again'], checkboxChecked: !SETTING_ASK_SECURE_REDIRECT, confirmOnclick: function () { redirectModalCallback(function () { window.location.replace(SECURE_URL); }); }, dismissOnclick: redirectModalCallback, header: LANG['not_supported_unencrypted'], confirm: LANG['switch_site'], dismiss: LANG['stay'] }, { text: LANG['want_to_switch_site'], showText: () => { return true; } });
+    connectModalToObject(_REDIRECT_MODAL_TRIGGER, { checkboxLabel: LANG['dont_ask_again'], checkboxChecked: false, confirmOnclick: function () { redirectModalCallback(function () { window.location.replace(SECURE_URL); }); }, dismissOnclick: redirectModalCallback, header: LANG['not_supported_unencrypted'], confirm: LANG['switch_site'], dismiss: LANG['stay'] }, { text: LANG['want_to_switch_site'], showText: () => { return true; } });
 }
 
 function setupBrowserNotificationUnsupportedModal() {
-    connectModalToObject(_UNSUPPORTED_MODAL_TRIGGER, { checkboxLabel: LANG['dont_show_again'], checkboxChecked: !SETTING_SHOW_UNSUPPORTED_MESSAGE, dismissOnclick: unsupportedModalCallback, header: LANG['not_supported_by_browser'], dismiss: LANG['ok'] });
+    connectModalToObject(_UNSUPPORTED_MODAL_TRIGGER, { checkboxLabel: LANG['dont_show_again'], checkboxChecked: false, dismissOnclick: unsupportedModalCallback, header: LANG['not_supported_by_browser'], dismiss: LANG['ok'] });
 }
 
 function setupBrowserNotificationPermissionModal() {
-    connectModalToObject(_PERMISSION_MODAL_TRIGGER, { checkboxLabel: LANG['dont_ask_again'], checkboxChecked: !SETTING_ASK_NOTIFICATION_PERMISSION, confirmOnclick: function () { askBrowserNotificationPermission(); hideModalWithoutDismissCallback(); }, dismissOnclick: permissionModalCallback, header: LANG['premission_required'], confirm: LANG['grant_permission'], dismiss: LANG['continue_without'] });
+    connectModalToObject(_PERMISSION_MODAL_TRIGGER, { checkboxLabel: LANG['dont_ask_again'], checkboxChecked: false, confirmOnclick: function () { askBrowserNotificationPermission(); hideModalWithoutDismissCallback(); }, dismissOnclick: permissionModalCallback, header: LANG['premission_required'], confirm: LANG['grant_permission'], dismiss: LANG['continue_without'] });
 }
 
 function redirectModalCallback(onCompletion) {
@@ -92,25 +92,8 @@ function browserNotificationsBlocked() {
     return Notification.permission === 'denied';
 }
 
-function indicateBrowserNotificationsActivated() {
-    // $('#' + LISTEN_INACTIVE_ICON_ID).hide();
-    // $('#' + LISTEN_ACTIVE_ICON_ID).show();
-    // $('#' + NOTIFICATIONS_MSG_ID).html(LANG['listening_for_activity']);
-}
-
-function indicateBrowserNotificationsDeactivated() {
-    // $('#' + LISTEN_INACTIVE_ICON_ID).show();
-    // $('#' + LISTEN_ACTIVE_ICON_ID).hide();
-    // $('#' + NOTIFICATIONS_MSG_ID).html(LANG['listening_for_activity'] + '<br>(' + LANG['browser_notifications_deactivated'] + ')');
-}
-
 function askBrowserNotificationPermission(callback) {
     function handlePermission(permission) {
-        if (permission === 'granted') {
-            indicateBrowserNotificationsActivated();
-        } else {
-            indicateBrowserNotificationsDeactivated();
-        }
         if (callback) {
             callback(permission);
         }
