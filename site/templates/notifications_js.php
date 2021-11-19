@@ -5,4 +5,5 @@
   var SETTING_ASK_NOTIFICATION_PERMISSION = <?php echo readValuesFromTable($_DATABASE, 'system_settings', 'ask_notification_permission', true); ?>;
 </script>
 
+<script src="js/update_settings.js"></script>
 <script src="js/notifications.js"></script>
