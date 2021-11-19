@@ -202,3 +202,12 @@ function tableKeyExists($database, $table_name, $primary_key, $key_value) {
   $result = $result->fetch_all(MYSQLI_NUM);
   return $result[0][0];
 }
+
+function tableHasEntries($database, $table_name) {
+  $result = $database->query("SELECT EXISTS(SELECT 1 FROM `$table_name`);");
+  if (!$result) {
+    bm_error("Could not check if table $table_name has any entries: " . $database->error);
+  }
+  $result = $result->fetch_all(MYSQLI_NUM);
+  return $result[0][0] == 1;
+}
