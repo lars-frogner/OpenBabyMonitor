@@ -13,4 +13,12 @@ function bm_warning($message) {
   error_log('Warning: ' . $message);
 }
 
+function bm_warning_to_file($message, $file_path) {
+  error_log(bm_get_timestamp() . 'Warning: ' . $message . "\n", 3, $file_path);
+}
+
+function bm_get_timestamp() {
+  return '[' . date('D M d H:i:s:u Y') . '] ';
+}
+
 define('SESSION_EXPIRED', -1);
