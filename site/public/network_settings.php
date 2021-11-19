@@ -3,7 +3,6 @@ require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 require_once(TEMPLATES_DIR . '/network_settings.php');
 
-bm_warning(print_r($_POST, true));
 $connection_succeeded = null;
 $password_changed = null;
 $which_password = null;
@@ -163,6 +162,7 @@ require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 require_once(TEMPLATES_DIR . '/js-cookie_js.php');
 
 require_once(TEMPLATES_DIR . '/notifications_js.php');
+require_once(TEMPLATES_DIR . '/monitoring_js.php');
 ?>
 
 <script>
@@ -174,7 +174,6 @@ require_once(TEMPLATES_DIR . '/notifications_js.php');
 </script>
 <script src="js/style.js"></script>
 <script src="js/jquery_utils.js"></script>
-<script src="js/monitoring.js"></script>
 <script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
