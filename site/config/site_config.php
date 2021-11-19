@@ -10,6 +10,7 @@ require_once(SRC_DIR . '/security.php');
 require_once(SRC_DIR . '/session.php');
 require_once(SRC_DIR . '/database.php');
 require_once(SRC_DIR . '/control.php');
+require_once(SRC_DIR . '/network.php');
 require_once(__DIR__ . '/language_config.php');
 
 switch (basename($_SERVER['SCRIPT_NAME'])) {

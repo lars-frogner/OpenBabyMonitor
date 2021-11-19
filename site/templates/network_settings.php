@@ -1,36 +1,11 @@
 <?php
 require_once(dirname(__DIR__) . '/config/path_config.php');
+require_once(dirname(__DIR__) . '/config/network_config.php');
 require_once(SRC_DIR . '/database.php');
 require_once(SRC_DIR . '/control.php');
 
-define('KNOWN_NETWORKS_TABLE_NAME', 'known_networks');
-
 function line($string) {
   echo $string . "\n";
-}
-
-function networkIsKnown($database, $ssid) {
-  return tableKeyExists($database, KNOWN_NETWORKS_TABLE_NAME, 'ssid', "'$ssid'");
-}
-
-function readKnownNetworks($database) {
-  return readValuesFromTable($database, KNOWN_NETWORKS_TABLE_NAME, 'ssid', true, true);
-}
-
-function connectToNetwork($database, $ssid, $password, $remember) {
-  $success = executeConnectionToNetwork($ssid, $password, $remember);
-  if ($success && $remember) {
-    insertValuesIntoTable($database, KNOWN_NETWORKS_TABLE_NAME, array('ssid' => $ssid));
-  }
-  return $success;
-}
-
-function removeKnownNetwork($database, $ssid) {
-  $success = executeRemovalOfKnownNetwork($ssid);
-  if ($success) {
-    deleteTableRows($database, KNOWN_NETWORKS_TABLE_NAME, "ssid = '$ssid'");
-  }
-  return $success;
 }
 
 function storeNetworkInfo($available_networks, $known_networks, $connected_network) {
