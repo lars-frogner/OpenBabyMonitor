@@ -77,9 +77,10 @@ require_once(TEMPLATES_DIR . '/main.php');
                   <use href="media/bootstrap-icons.svg#volume-off-fill" />
                 </svg>
                 <div id="listen_animation_line" style="position: absolute; left: 2.5em; top: calc(50% - 1px); width: calc(100% - (2 * 2.5em + 0.5em)); height: 0%;">
-                  <div id="listen_animation_indicator" style="position: absolute; width: 2.5em; height: calc(0.87 * 2.5em); top: calc(-0.87 * 2.5em); left: 0%;">
-                    <div class="listen-animation-indicator" style="position: absolute; width: 100%; height: 100%; left: -50%; -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
-                    <svg class="listen-animation-label-bg bi" style="position: absolute; width: calc(100% - 30%); height: calc(100% - 30%); left: calc(-50% + 30% / 2 + 3%); top: calc(0% + 30% / 2 - 10%);">
+                  <div id="listen_animation_indicator" style="position: absolute; width: 2.2em; height: 2.2em; top: -2.2em; left: 0%;">
+                    <div class="listen-animation-indicator" style="position: absolute; width: 100%; height: 100%; left: -50%; top: calc(100% / 2 - 70.71%); border-radius: 50%;"></div>
+                    <div class="listen-animation-indicator" style="position: absolute; width: 70.72%; height: 35.36%; left: calc(-70.72% / 2); top: calc(100% - 35.36%); -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
+                    <svg class="listen-animation-label-bg bi" style="position: absolute; width: calc(100% - 30%); height: calc(100% - 30%); left: calc((30% - 100%) / 2 + 2%); top: calc((30% - 100%) / 2 - 70.71% + 100%);">
                       <use href="media/bootstrap-icons.svg#ear-fill" />
                     </svg>
                   </div>
