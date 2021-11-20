@@ -29,7 +29,7 @@
     "nav_go_to_network": "Go to network settings",
     "nav_you_are_in_client_mode": "You are now connected through an external wireless network. The device will disconnect from the network and create its own access point. You will be signed out and temporarily disconnected from the device. The device will no longer be able to access the internet.",
     "nav_you_are_in_ap_mode": "You are now connected through the device access point, which will be deactivated. You will be signed out and temporarily disconnected from the device.",
-    "nav_please_go_to_network": "The access point can not be disabled when there are no known networks to connect to.",
+    "nav_cannot_deactivate_ap": "The access point can not be disabled when there are no known networks to connect to.",
     "nav_please_go_to_network": "Please go to the network settings and connect to a network.",
     "nav_device_not_in_standby": "The device is not in standby mode. It will still remain in the current mode after you sign out.",
     "nav_unsaved_settings": "Note that you have unsaved modifications to the settings.",
