@@ -1,13 +1,46 @@
 # Raspberry Pi baby monitor
 
+The purpose of this project is to make use of the great flexibility and availability of the [Raspberry Pi](https://www.raspberrypi.org/) mini-computer to create a user friendly and capable yet inexpensive baby monitor or babycall. Equipped with a small microphone and optionally an integrated camera, the device is controlled through a local web site accessible with a phone or computer on a wireless network. The device can then provide a live feed of audio or video to this web site, or listen passively and give a notification once the baby is crying.
+
+## Features
+
+* Fully DIY and open source. Simply obtain a Raspberry Pi and a few peripherals (see [Equipment](#Equipment)), download one of the pre-built disk images and install it on the Pi (see [Installation](#Installation)).
+* Controlled through a web browser from any device on the local network. No special reciever required, and no client software to install.
+* Can either be connected to the home Wi-Fi or provide its own wireless access point.
+* Detects baby crying using either a simple loudness threshold or a neural network trained on Google's [AudioSet](https://research.google.com/audioset/) dataset to distinguish between crying, babbling and ambient sounds.
+* Live audio streaming and optionally video streaming in up to 1080p resolution.
+* Low power consumption (see [Power consumption](#Power-consumption)), enabling tens of hours of battery life when powered by even a modestly sized portable power bank.
+
 ## Equipment
 
-* [Raspberry Pi Zero W](https://www.raspberrypi.com/products/raspberry-pi-zero-w/)
-* [5.1V / 2.5A DC power supply with Micro USB plug](https://www.raspberrypi.com/products/micro-usb-power-supply/)
-* [Case for Raspberry Pi Zero](https://www.raspberrypi.com/products/raspberry-pi-zero-case/)
-* [USB microphone](https://www.adafruit.com/product/3367) with [adapter to Micro USB](https://www.adafruit.com/product/2910)
+* A Raspberry Pi computer, preferably a [Raspberry Pi Zero W](https://www.raspberrypi.com/products/raspberry-pi-zero-w/), which is priced at around $10. The non-W version of the Pi Zero will not do, as it does not have an inbuilt network adapter. Other, more powerful but pricier models like the [Zero 2 W](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/), [3B/3B+](https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/) or [4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) should also work.
+* A MicroSD card with at least 8 GB of storage.
+* A [5.1V  power supply with Micro USB plug](https://www.raspberrypi.com/products/micro-usb-power-supply/) for Pi Zero 1/2 or Pi 3, or [with USB-C plug](https://www.raspberrypi.com/products/type-c-power-supply/) for Pi 4. These also cost around $10. To avoid the need for a wall outlet, a 5V power bank with an appropriate cable can be used instead.
+* A case for the Pi, e.g. [this](https://www.raspberrypi.com/products/raspberry-pi-zero-case/) for Pi Zero, [this](https://www.raspberrypi.com/products/raspberry-pi-3-case/) for Pi 3B or [this](https://www.raspberrypi.com/products/raspberry-pi-4-case/) for Pi 4B. These official cases cost around $6. Note that the Zero models have a smaller form factor, and unlike for the non-Zero models their official case comes with a convenient mount and hole for the [Pi Camera](https://www.raspberrypi.com/products/camera-module-v2/).
+* A [USB microphone](https://www.adafruit.com/product/3367), with an [adapter to Micro USB](https://www.adafruit.com/product/2910) if using a Pi Zero 1/2. This costs around $9.
+* For optional video streaming, the [Raspberry Pi Camera Module 2](https://www.raspberrypi.com/products/camera-module-v2/), or its [NoIR](https://www.raspberrypi.com/products/pi-noir-camera-v2/) variant is required. These are priced at around $27. The NoIR version has no infrared blocking filter, making the camera more sensitive at the expense of colour accuracy. (Hence the NoIR version is arguably the best choice for use in a baby monitor.) Note that the cheaper ZeroCam is not supported.
+* For mounting the Pi on a bed or a stroller, a flexible phone tripod can be of great use.
 
-## Setup
+## Installation
+
+## Power consumption
+
+Below are measured values of the power consumption of a Pi Zero baby monitor in different modes of operation.
+
+| Mode                             | Power (W) |
+| -------------------------------- | --------: |
+| Standby                          |      0.50 |
+| Cry detection (threshold)        |      0.55 |
+| Cry detection (small neural net) |    < 0.60 |
+| Cry detection (large neural net) |    < 0.75 |
+| Audio streaming                  |      0.60 |
+| Video streaming (480p)           |      1.30 |
+| Video streaming (720p)           |      1.45 |
+| Video streaming (1080p)          |      1.65 |
+
+Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last between 15 hours (if continuously streaming full HD video) and 50 hours (if in standby) on a single charge.
+
+## Manual setup
 
 1. Write a [Raspbian Buster Lite image](https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-14/2020-02-13-raspbian-buster-lite.zip) to an SD card, using for instance the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
 
@@ -30,10 +63,11 @@
     ```
     ssh pi@raspberrypi
     ```
-    Try `raspberrypi.local` or `raspberrypi.home` as hostname if `raspberrypi` doesn't work.
+    Try adding `.local`, `.home` or `.lan` after `raspberrypi` if it doesn't work.
 
-5. When you have successfully SSH'ed into the device, proceed by installing Git:
+5. When you have successfully SSH'ed into the device, proceed by updating the package lists and installing Git:
     ```
+    sudo apt -y update
     sudo apt -y install git
     ```
 
@@ -76,15 +110,16 @@
     ```
     ssh pi@<hostname>
     ```
+    Again, try adding `.local`, `.home` or `.lan` after the hostname in the `ssh` command if it doesn't work.
 
 10. Run the main setup script:
     ```
     babymonitor/setup.sh
     ```
-    You will be asked to enter a new password for the baby monitor website.
+    You will be asked to enter a new password for the baby monitor website. The device will reboot when finished.
 
-11. Run the network configuration script:
+11. Log back in (as in step 9) and run the network configuration script:
     ```
     babymonitor/setup_network.sh
     ```
-    You will be asked to enter a new password for the baby monitor wireless access point.
+    You will be asked to enter a new password for the baby monitor wireless access point. The device will reboot when finished.
