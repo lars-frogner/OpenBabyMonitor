@@ -261,7 +261,7 @@ function selectNetwork(networkMeta) {
         enableButton($('#' + DISCONNECT_BUTTON_ID));
     } else {
         disableButton($('#' + DISCONNECT_BUTTON_ID));
-        if (networkMeta.isAvailable && networkMeta.requiresPassword) {
+        if (networkMeta.isAvailable && networkMeta.requiresPassword && !networkMeta.isKnown) {
             disableButton($('#' + CONNECT_BUTTON_ID));
             enablePasswordInput(true);
         } else {
