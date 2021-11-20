@@ -15,14 +15,14 @@ if (isset($_POST['submit'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
 
 <head>
   <?php require_once(TEMPLATES_DIR . '/head_common.php'); ?>
 </head>
 
-<body>
-  <main id="main_container" class="vh-100" style="display: none;">
+<body class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
+  <main id="main_container" class="w-100 h-100" style="min-width: 100%; min-height: 100%; display: none;">
     <div class="container h-100">
       <div class="row h-100 justify-content-center align-items-center">
         <?php if ($automatically_signed_out) { ?>

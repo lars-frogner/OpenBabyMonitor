@@ -13,7 +13,7 @@ require_once(TEMPLATES_DIR . '/main.php');
 ?>
 
 <!DOCTYPE html>
-<html>
+<html class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
 
 <head>
   <?php
@@ -32,8 +32,8 @@ require_once(TEMPLATES_DIR . '/main.php');
   <script src="js/sync_time.js"></script>
 </head>
 
-<body>
-  <div class="d-flex flex-column min-vh-100 vh-100">
+<body class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
+  <div class="d-flex flex-column w-100 h-100" style="min-width: 100%; min-height: 100%;">
     <header>
       <?php
       require_once(TEMPLATES_DIR . '/navbar.php');
@@ -41,7 +41,7 @@ require_once(TEMPLATES_DIR . '/main.php');
       ?>
     </header>
 
-    <main id="main" class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
+    <main id=" main" class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
 
       <div id="main_container" class="container-fluid h-100" style="display: none;">
         <div class="row h-100 align-items-center justify-content-center px-0">

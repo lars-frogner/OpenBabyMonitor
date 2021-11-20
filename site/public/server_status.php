@@ -6,7 +6,7 @@ setPHPSysInfoDefaultTemplate((COLOR_SCHEME === 'dark') ? 'dark' : 'phpsysinfo');
 ?>
 
 <!DOCTYPE html>
-<html>
+<html class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
 
 <head>
   <?php
@@ -14,8 +14,8 @@ setPHPSysInfoDefaultTemplate((COLOR_SCHEME === 'dark') ? 'dark' : 'phpsysinfo');
   ?>
 </head>
 
-<body>
-  <div class="d-flex flex-column min-vh-100 vh-100">
+<body class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
+  <div class="d-flex flex-column w-100 h-100" style="min-width: 100%; min-height: 100%;">
     <header>
       <?php
       require_once(TEMPLATES_DIR . '/navbar.php');
