@@ -43,7 +43,7 @@ require_once(TEMPLATES_DIR . '/main.php');
       ?>
     </header>
 
-    <main id=" main" class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
+    <main id="main" class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
 
       <div id="main_container" class="container-fluid h-100" style="display: none;">
         <div class="row h-100 align-items-center justify-content-center px-0">
