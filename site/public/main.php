@@ -12,8 +12,10 @@ define('HIDDEN_STYLE', 'style="display: none;"');
 require_once(TEMPLATES_DIR . '/main.php');
 ?>
 
+<link href="css/fill.css" rel="stylesheet">
+
 <!DOCTYPE html>
-<html class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
+<html class="fillview">
 
 <head>
   <?php
@@ -32,8 +34,8 @@ require_once(TEMPLATES_DIR . '/main.php');
   <script src="js/sync_time.js"></script>
 </head>
 
-<body class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
-  <div class="d-flex flex-column w-100 h-100" style="min-width: 100%; min-height: 100%;">
+<body class="fillview">
+  <div class="d-flex flex-column fillview">
     <header>
       <?php
       require_once(TEMPLATES_DIR . '/navbar.php');

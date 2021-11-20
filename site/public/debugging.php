@@ -3,8 +3,10 @@ require_once(dirname(__DIR__) . '/config/site_config.php');
 redirectIfLoggedOut('index.php');
 ?>
 
+<link href="css/fill.css" rel="stylesheet">
+
 <!DOCTYPE html>
-<html class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
+<html class="fillview">
 
 <head>
   <?php
@@ -12,8 +14,8 @@ redirectIfLoggedOut('index.php');
   ?>
 </head>
 
-<body class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
-  <div class="d-flex flex-column w-100 h-100" style="min-width: 100%; min-height: 100%;">
+<body class="fillview">
+  <div class="d-flex flex-column fillview">
     <header>
       <?php
       require_once(TEMPLATES_DIR . '/navbar.php');

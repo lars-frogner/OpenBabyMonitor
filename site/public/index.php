@@ -14,15 +14,17 @@ if (isset($_POST['submit'])) {
 }
 ?>
 
+<link href="css/fill.css" rel="stylesheet">
+
 <!DOCTYPE html>
-<html class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
+<html class="fillview">
 
 <head>
   <?php require_once(TEMPLATES_DIR . '/head_common.php'); ?>
 </head>
 
-<body class="w-100 h-100" style="min-width: 100%; min-height: 100%;">
-  <main id="main_container" class="w-100 h-100" style="min-width: 100%; min-height: 100%; display: none;">
+<body class="fillview">
+  <main id="main_container" class="fillview">
     <div class="container h-100">
       <div class="row h-100 justify-content-center align-items-center">
         <?php if ($automatically_signed_out) { ?>
