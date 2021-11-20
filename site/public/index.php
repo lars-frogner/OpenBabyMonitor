@@ -25,7 +25,7 @@ if (isset($_POST['submit'])) {
 
 <body class="fillview">
   <main id="main_container" class="fillview">
-    <div class="container h-100">
+    <div class="container fillview">
       <div class="row h-100 justify-content-center align-items-center">
         <?php if ($automatically_signed_out) { ?>
           <div class="d-flex flex-row justify-content-center align-self-start mt-3">
