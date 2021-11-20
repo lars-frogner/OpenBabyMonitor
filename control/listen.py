@@ -60,6 +60,7 @@ class SoundLevelNotifier:
         ) < self.fraction_threshold:
             return None
         else:
+            self.last_notification_time = time.time()
             return 'sound'
 
 
