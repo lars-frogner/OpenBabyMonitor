@@ -8,18 +8,18 @@ $password_changed = null;
 $which_password = null;
 if (isset($_POST['connect'])) {
   $ssid = $_POST['available_networks'];
-  $password = isset($_POST['password']) ? $_POST['password'] : null;
+  $password = isset($_POST['network_password']) ? $_POST['network_password'] : null;
   $remember = isset($_POST['remember']);
   $connection_succeeded = connectToNetwork($_DATABASE, $ssid, $password, $remember);
 } elseif (isset($_POST['forget'])) {
   $ssid = $_POST['known_networks'];
   removeKnownNetwork($_DATABASE, $ssid);
 } elseif (isset($_POST['change_site_password'])) {
-  updatePassword($_DATABASE, $_POST['password']);
+  updatePassword($_DATABASE, $_POST['site_password']);
   $password_changed = true;
   $which_password = 'site';
 } elseif (isset($_POST['change_ap_password'])) {
-  executeSettingOfNewAPPassword($_POST['password']);
+  executeSettingOfNewAPPassword($_POST['ap_password']);
   $password_changed = true;
   $which_password = 'ap';
 }
@@ -98,7 +98,7 @@ $connected_network = obtainConnectedNetworkSSID();
             <div class="row form-group align-items-center my-3">
               <div class="col-auto">
                 <div class="form-floating">
-                  <input type="password" name="password" class="form-control" id="network_password_input" placeholder="" disabled>
+                  <input type="password" name="network_password" class="form-control" id="network_password_input" placeholder="" disabled>
                   <label class="text-bm" for="network_password_input">
                     <?php echo LANG['password'] . ' (8-63 ' . LANG['password_characters'] . ')'; ?>
                   </label>
@@ -130,7 +130,7 @@ $connected_network = obtainConnectedNetworkSSID();
           <div class="col-auto px-3 my-2">
             <label class="form-label h3 mb-3"><?php echo LANG['change_site_password']; ?></label>
             <div class="form-floating">
-              <input type="password" name="password" class="form-control" id="site_password_input" placeholder="">
+              <input type="password" name="site_password" class="form-control" id="site_password_input" placeholder="">
               <label class="text-bm" for="site_password_input">
                 <?php echo LANG['new_password'] . ' (4+ ' . LANG['password_characters'] . ')'; ?>
               </label>
@@ -142,7 +142,7 @@ $connected_network = obtainConnectedNetworkSSID();
           <div class="col-auto px-3 my-2">
             <label class="form-label h3 mb-3"><?php echo LANG['change_ap_password']; ?></label>
             <div class="form-floating">
-              <input type="password" name="password" class="form-control" id="ap_password_input" placeholder="">
+              <input type="password" name="ap_password" class="form-control" id="ap_password_input" placeholder="">
               <label class="text-bm" for="ap_password_input">
                 <?php echo LANG['new_password'] . ' (8-63 ' . LANG['password_characters'] . ')'; ?>
               </label>
