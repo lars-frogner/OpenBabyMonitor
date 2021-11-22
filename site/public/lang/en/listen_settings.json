@@ -17,7 +17,7 @@
     "sound_level_threshold_descript": "Considers any sound above the threshold relevant. Lowest power usage.",
     "small_network_descript": "Interprets sounds. Less accurate than large network, but uses less lower.",
     "large_network_descript": "Interprets sounds. More accurate than small network, but uses more power.",
-    "fraction_threshold": "Notify when a fraction of (%)",
+    "fraction_threshold": "Notify when a fraction of at least (%)",
     "consecutive_recordings": "of the last (number) recordings are decisive",
     "probability_threshold": "with a confidence above (%)",
     "min_notification_interval": "Allow new notification after (s)",

@@ -17,7 +17,7 @@
     "sound_level_threshold_descript": "Anser alle lyder over grensen som relevante. Lavest strømforbruk.",
     "small_network_descript": "Tolker lyder. Mindre pålitelig enn stort nettverk, men bruker mindre strøm.",
     "large_network_descript": "Tolker lyder. Mer pålitelig enn lite nettverk, men bruker mer strøm.",
-    "fraction_threshold": "Varsle når en andel på (%)",
+    "fraction_threshold": "Varsle når en andel på minst (%)",
     "consecutive_recordings": "av de siste (antall) opptak slår ut",
     "probability_threshold": "med sikkerhet over (%)",
     "min_notification_interval": "Tillat nytt varsel etter (s)",
