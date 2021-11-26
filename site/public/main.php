@@ -115,19 +115,24 @@ require_once(TEMPLATES_DIR . '/main.php');
             <?php } ?>
           </div>
 
-          <div id="mode_content_audio" class="col w-100" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : ''; ?>>
+          <div id="mode_content_audio" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : ''; ?>>
             <div class="row justify-content-center align-items-center">
               <div class="col-sm-6 mb-5 text-center" style="display: none;">
                 <p id="mode_content_audio_error" class="alert alert-danger text-center"></p>
                 <a class="btn btn-secondary" href="main.php"><?php echo LANG['refresh_page']; ?></a>
               </div>
             </div>
-            <div class="row align-items-center justify-content-center" id="audiostream_visualization_mode_box" style="display: none;">
+
+            <svg id="audiostream_icon" class="bi mt-3" style="width: 15vh; height: 15vh;" fill="currentColor">
+              <use href="media/bootstrap-icons.svg#mic-fill" />
+            </svg>
+
+            <div class="row align-items-center justify-content-center mb-4 mt-5" id="audiostream_visualization_mode_box" style="display: none;">
               <div class="col-auto fw-bold">
                 <?php echo LANG['visualization']; ?>
               </div>
               <div class="col-auto">
-                <form>
+                <form class="mb-0">
                   <div class="form-check form-check-inline">
                     <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_none_radio" autocomplete="off" onclick="switchAudioVisualizationModeTo(null);" checked>
                     <label class="form-check-label" for="audiostream_none_radio"><?php echo LANG['none']; ?></label>
@@ -143,7 +148,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                 </form>
               </div>
             </div>
-            <div class="row align-items-center justify-content-center" id="audiostream_fftsize_range_box" style="display: none;">
+            <div class="row align-items-center justify-content-center mb-2" id="audiostream_fftsize_range_box" style="display: none;">
               <div class="col-auto">
                 <label class="form-label" for="audiostream_fftsize_range"><?php echo LANG['samples_per_frame']; ?></label>
               </div>
@@ -160,7 +165,7 @@ require_once(TEMPLATES_DIR . '/main.php');
             </div>
             <div class="row justify-content-center" id="audiostream_canvas_box">
             </div>
-            <div class="row justify-content-center" id="audiostream_player_box">
+            <div class="row justify-content-center mb-3" id="audiostream_player_box">
             </div>
           </div>
 

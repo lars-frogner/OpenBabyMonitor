@@ -1,4 +1,5 @@
 const MODE_CONTENT_AUDIO_ID = 'mode_content_audio';
+const AUDIO_ICON_ID = 'audiostream_icon';
 const AUDIO_PLAYER_PARENT_ID = 'audiostream_player_box';
 const AUDIO_CANVAS_PARENT_ID = 'audiostream_canvas_box';
 const AUDIO_VISUALIZATION_MODE_PARENT_ID = 'audiostream_visualization_mode_box';
@@ -9,7 +10,7 @@ const AUDIO_ERROR_ID = 'mode_content_audio_error';
 
 let AUDIO_STREAM_SRC = 'streaming/audiostream/index.m3u8';
 
-const CANVAS_ASPECT_RATIO = 1.0;
+const CANVAS_ASPECT_RATIO = 1.7;
 const CANVAS_MAX_WIDTH = 600;
 
 const CANVAS_TIME_BACKGROUND = BACKGROUND_COLOR;
@@ -315,6 +316,7 @@ class AudioVisualizer {
     #mode;
 
     constructor(audioContext, mode) {
+        this.#shrinkAudioIcon();
         $('#' + AUDIO_FFTSIZE_PARENT_ID).show();
 
         this.#audioContext = audioContext;
@@ -412,6 +414,7 @@ class AudioVisualizer {
 
     destroy() {
         $('#' + AUDIO_FFTSIZE_PARENT_ID).hide();
+        this.#unshrinkAudioIcon();
         this.stopAnimation();
         this.#audioContext.player.removeEventListener('play', this.#startAnimationBound);
         this.#audioContext.player.removeEventListener('pause', this.#stopAnimationBound);
@@ -449,6 +452,18 @@ class AudioVisualizer {
         var targetHeight = width / CANVAS_ASPECT_RATIO;
         var height = Math.min(maxHeight, targetHeight);
         this.#canvasObject.prop({ width: width, height: height }).css({ width: width + 'px', height: height + 'px' });
+    }
+
+    #shrinkAudioIcon() {
+        $('#' + AUDIO_ICON_ID).css({ width: '5vh', height: '5vh' });
+        $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).removeClass('mt-5');
+        $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).addClass('mt-4');
+    }
+
+    #unshrinkAudioIcon() {
+        $('#' + AUDIO_ICON_ID).css({ width: '15vh', height: '15vh' });
+        $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).removeClass('mt-4');
+        $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).addClass('mt-5');
     }
 
     static #createCanvas() {
