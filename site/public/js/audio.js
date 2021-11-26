@@ -13,13 +13,11 @@ let AUDIO_STREAM_SRC = 'streaming/audiostream/index.m3u8';
 const CANVAS_ASPECT_RATIO = 1.7;
 const CANVAS_MAX_WIDTH = 600;
 
-const CANVAS_TIME_BACKGROUND = BACKGROUND_COLOR;
 const CANVAS_TIME_FOREGROUND = FOREGROUND_COLOR;
 const CANVAS_TIME_LINEWIDTH = 2;
 const CANVAS_TIME_SAMPLE_OFFSET = -127.5;
 const CANVAS_TIME_SAMPLE_SCALE = 1 / 64;
 
-const CANVAS_FREQUENCY_BACKGROUND = BACKGROUND_COLOR;
 const CANVAS_FREQUENCY_FOREGROUND = FOREGROUND_COLOR;
 const CANVAS_FREQUENCY_GRID_COLOR = 'rgb(130, 130, 130)';
 const CANVAS_FREQUENCY_GRID_DASH = [10, 10];
@@ -332,6 +330,9 @@ class AudioVisualizer {
         this.#audioContext.player.addEventListener('pause', this.#stopAnimationBound);
 
         this.#setMode(mode);
+        if (this.#audioContext.player.paused) {
+            this.clearCanvas();
+        }
     }
 
     get mode() {
@@ -541,13 +542,11 @@ class AudioVisualizer {
     }
 
     static #clearCanvasTimeDomain(canvasContext, width, height) {
-        canvasContext.fillStyle = CANVAS_TIME_BACKGROUND;
-        canvasContext.fillRect(0, 0, width, height);
+        canvasContext.clearRect(0, 0, width, height);
     }
 
     static #clearCanvasFrequencyDomain(canvasContext, width, height) {
-        canvasContext.fillStyle = CANVAS_FREQUENCY_BACKGROUND;
-        canvasContext.fillRect(0, 0, width, height);
+        canvasContext.clearRect(0, 0, width, height);
 
         const idxToFrequency = (idx) => SETTING_MIN_FREQUENCY + idx * (SETTING_MAX_FREQUENCY - SETTING_MIN_FREQUENCY) / (CANVAS_FREQUENCY_N_GRID_LINES - 1);
         const pitchToX = (m) => width * (m - AudioVisualizer.#MIN_PITCH) / (AudioVisualizer.#MAX_PITCH - AudioVisualizer.#MIN_PITCH);
