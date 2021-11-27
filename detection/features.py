@@ -1,5 +1,6 @@
 import time
 import subprocess
+import queue
 import numpy as np
 import librosa_destilled
 
@@ -150,6 +151,8 @@ class AudioFeatureExtractor:
             else:
                 features, energies = self.compute_splitted_features(
                     waveforms, return_energies=True)
+
+                # Note: Probably better to use loudness than energy here
                 is_accepted = list(map(self.feature_is_accepted, energies))
                 return (is_accepted,
                         *((features, waveforms) if return_waveforms else
@@ -199,7 +202,10 @@ class AudioFeatureExtractor:
             fmin=self.min_frequency,
             fmax=self.max_frequency)
 
-    def compute_mel_spectrogram_python_speech_features(self, waveform):
+    def compute_mel_spectrogram_python_speech_features(self,
+                                                       waveform,
+                                                       return_spectrogram=False
+                                                       ):
         frames = self.python_speech_features.sigproc.framesig(
             waveform,
             self.window_length,
@@ -208,7 +214,10 @@ class AudioFeatureExtractor:
         spectrogram = self.python_speech_features.sigproc.magspec(
             frames, self.fft_length).T
         mel_spectrogram = np.dot(self.mel_filterbank, spectrogram)
-        return mel_spectrogram
+        if return_spectrogram:
+            return mel_spectrogram, spectrogram
+        else:
+            return mel_spectrogram
 
     def compute_log_mel_spectrogram(self, waveform, return_energies=False):
         mel_spectrogram = self.compute_mel_spectrogram(waveform)
@@ -221,6 +230,23 @@ class AudioFeatureExtractor:
 
     def compute_feature(self, *args, **kwargs):
         return self.compute_log_mel_spectrogram(*args, **kwargs)
+
+    def compute_feature_and_loudness(self, waveform):
+        mel_spectrogram, spectrogram = self.compute_mel_spectrogram_python_speech_features(
+            waveform, return_spectrogram=True)
+        return mel_spectrogram, self.compute_loudness(spectrogram)
+
+    def compute_loudness(self, spectrogram):
+        return librosa_destilled.spectrogram_rms(
+            self.compute_A_weighted_spectrogram(spectrogram)).squeeze()
+
+    def create_A_weights(self):
+        frequencies = librosa_destilled.fft_frequencies(
+            self.sampling_rate, self.fft_length)
+        self.a_weights = librosa_destilled.A_amplitude_weighting(frequencies)
+
+    def compute_A_weighted_spectrogram(self, spectrogram):
+        return self.a_weights[:, np.newaxis] * spectrogram
 
     def benchmark(self, waveform, n_repeats=1000):
         start_time = time.time()
@@ -255,6 +281,15 @@ class AudioFeatureExtractor:
         fig.tight_layout()
         plt.show()
 
+    def plot_with_loudness(self, waveform, fig_kwargs={}):
+        import matplotlib.pyplot as plt
+        fig, axes = plt.subplots(nrows=2, **fig_kwargs)
+        self.plot_waveform(axes[0], waveform, xlabel=None)
+        feature, loudness = self.compute_feature_and_loudness(waveform)
+        self.plot_feature(fig, axes[1], feature, loudness=loudness)
+        fig.tight_layout()
+        plt.show()
+
     def plot_waveform(self, ax, waveform, xlabel='Time [s]'):
         end_time = self.sample_num_to_time(waveform.size - 1)
         ax.plot(np.linspace(0, end_time, waveform.size), waveform)
@@ -268,6 +303,7 @@ class AudioFeatureExtractor:
                      ax,
                      feature,
                      energy=None,
+                     loudness=None,
                      show_feature_boundaries=True):
 
         if isinstance(feature, (list, tuple)):
@@ -306,6 +342,14 @@ class AudioFeatureExtractor:
                               ls='--')
             energy_ax.set_ylabel('Energy')
 
+        if loudness is not None:
+            loudness_ax = ax.twinx()
+            loudness_ax.plot(np.linspace(start_time, end_time, loudness.size),
+                             loudness,
+                             color='tab:red',
+                             lw=1.0)
+            loudness_ax.set_ylabel('Loudness')
+
         from mpl_toolkits.axes_grid1 import make_axes_locatable
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('top', size='5%', pad=0.05)
@@ -316,6 +360,14 @@ class AudioFeatureExtractor:
         ax.set_yticks(np.arange(1, feature.shape[0] + 1, 4))
         ax.set_xlabel('Time [s]')
         ax.set_ylabel('Filter')
+
+
+def amplitude_to_db(amplitude):
+    return 20 * np.log10(amplitude)
+
+
+def db_to_amplitude(db):
+    return 10**(0.05 * db)
 
 
 class AudioByteInterpreter:
@@ -386,20 +438,74 @@ class Recorder:
         with subprocess.Popen(self.arecord_args + [f'--samples={n_samples:d}'],
                               stdout=subprocess.PIPE,
                               stderr=subprocess.DEVNULL) as process:
+            record_time = time.time() + 0.5 * n_samples / self.sampling_rate
             waveform_bytes = process.stdout.read(
                 self.interpreter.compute_n_bytes(n_samples))
         waveform = self.interpreter(waveform_bytes)
-        level = self.compute_sound_pressure_level(waveform)
-        return waveform * self.amplification, level
+        return waveform, record_time
 
-    def compute_sound_pressure_level(self, waveform):
-        # dBFS: max is 0 (strongest measurable by microphone), min is -inf (silence)
-        return 20 * np.log10((waveform.max() - waveform.min()) /
-                             self.interpreter.max_sample_range)
+    def amplify_waveform(self, waveform):
+        return waveform if self.amplification == 1 else waveform * self.amplification
+
+    def amplify_feature(self, feature):
+        return feature if self.amplification == 1 else feature + np.log(
+            self.amplification)
+
+
+class LoudnessAnalyzer:
+    def __init__(self,
+                 foreground_fraction=0.05,
+                 background_fraction=0.05,
+                 background_averaging_count=10):
+        self.foreground_fraction = foreground_fraction
+        self.background_fraction = background_fraction
+        self.background_averaging_count = background_averaging_count
+
+        self.foreground_loudness_level = None
+
+        self.background_loudness = queue.Queue(
+            maxsize=background_averaging_count)
+        self.total_background_loudness = 0
+
+    def add_loudness(self, loudness):
+        loudness.sort()
+
+        n_foreground_loudnesses = int(self.foreground_fraction * loudness.size)
+        foreground_loudness = np.mean(loudness[-n_foreground_loudnesses:])
+        self.add_foreground_loudness(foreground_loudness)
+
+        n_background_loudnesses = int(self.background_fraction * loudness.size)
+        background_loudness = np.mean(loudness[:n_background_loudnesses])
+        self.add_background_loudness(background_loudness)
+
+    def get_loudness_levels(self):
+        foreground_loudness_level = self.get_foreground_loudness_level()
+        background_loudness_level = self.get_background_loudness_level()
+        return background_loudness_level, foreground_loudness_level - background_loudness_level
+
+    def get_foreground_loudness_level(self):
+        assert self.foreground_loudness_level is not None
+        return self.foreground_loudness_level
+
+    def get_background_loudness_level(self):
+        assert self.background_loudness.qsize() > 0
+        average_background_loudness = self.total_background_loudness / self.background_loudness.qsize(
+        )
+        return amplitude_to_db(average_background_loudness)
+
+    def add_foreground_loudness(self, foreground_loudness):
+        self.foreground_loudness_level = amplitude_to_db(foreground_loudness)
+
+    def add_background_loudness(self, background_loudness):
+        background_loudness_change = (
+            background_loudness - self.background_loudness.get()
+        ) if self.background_loudness.full() else background_loudness
+        self.total_background_loudness += background_loudness_change
+        self.background_loudness.put(background_loudness)
 
 
 class Standardizer:
-    def __init__(self, standardization_file='standardization.npz'):
+    def __init__(self, standardization_file):
         self.read_standardization_file(standardization_file)
 
     def read_standardization_file(self, standardization_file):
@@ -407,30 +513,45 @@ class Standardizer:
         self.mean = standardization['mean']
         self.standard_deviation = standardization['standard_deviation']
 
-    def standardize(self, feature):
+    def __call__(self, feature):
         feature -= self.mean
         feature /= self.standard_deviation
 
 
-class FeatureProvider(Standardizer):
+class FeatureProvider:
     def __init__(self,
                  audio_device,
                  feature_extractor,
-                 min_sound_level=-np.inf,
+                 min_sound_contrast=0,
                  amplification=1,
-                 **kwargs):
-        super().__init__(**kwargs)
+                 standardization_file=None):
         self.feature_extractor = feature_extractor
+        self.feature_extractor.create_A_weights()
         self.recorder = Recorder(audio_device,
                                  sampling_rate=feature_extractor.sampling_rate,
                                  amplification=amplification)
-        self.min_sound_level = min_sound_level
+        self.analyzer = LoudnessAnalyzer()
+        self.min_sound_contrast = min_sound_contrast
+        self.standardizer = None if standardization_file is None else Standardizer(
+            standardization_file)
 
     def __call__(self):
-        waveform, sound_level = self.recorder.record_waveform(
+        waveform, record_time = self.recorder.record_waveform(
             self.feature_extractor.feature_length)
-        if sound_level < self.min_sound_level:
-            return None
-        feature = self.feature_extractor.compute_feature(waveform)
-        self.standardize(feature)
-        return feature
+
+        feature, loudness = self.feature_extractor.compute_feature_and_loudness(
+            waveform)
+
+        self.analyzer.add_loudness(loudness)
+        background_sound_level, sound_level_over_background = self.analyzer.get_loudness_levels(
+        )
+
+        if sound_level_over_background < self.min_sound_contrast:
+            return None, background_sound_level, sound_level_over_background, record_time
+
+        feature = self.recorder.amplify_feature(feature)
+
+        if self.standardizer is not None:
+            self.standardizer(feature)
+
+        return feature, background_sound_level, sound_level_over_background, record_time

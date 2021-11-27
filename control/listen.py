@@ -28,11 +28,11 @@ class Model:
 
 class SoundLevelNotifier:
     def __init__(self,
-                 min_sound_level=-30,
+                 min_sound_contrast=15,
                  fraction_threshold=60,
                  consecutive_recordings=5,
                  min_notification_interval=180):
-        self.min_sound_level = min_sound_level
+        self.min_sound_contrast = min_sound_contrast
         self.fraction_threshold = fraction_threshold * 1e-2
         self.consecutive_recordings = consecutive_recordings
         self.min_notification_interval = min_notification_interval
@@ -43,7 +43,7 @@ class SoundLevelNotifier:
         self.last_notification_time = -np.inf
 
     def add_sound_level_measurement(self, sound_level):
-        self.prediction_history.append(sound_level >= self.min_sound_level)
+        self.prediction_history.append(sound_level >= self.min_sound_contrast)
 
     def compute_fraction_in_prediction_history(self):
         return self.prediction_history.count(True) / len(
@@ -192,7 +192,7 @@ def listen_with_settings(*args, model='large_network', **kwargs):
 
 def listen_with_settings_sound_level_threshold(config,
                                                interval=5.0,
-                                               min_sound_level=-30,
+                                               min_sound_contrast=15,
                                                fraction_threshold=60,
                                                consecutive_recordings=5,
                                                min_notification_interval=180,
@@ -207,36 +207,35 @@ def listen_with_settings_sound_level_threshold(config,
     update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
                 os.environ['BM_SERVER_LOG_PATH'])
 
-    recorder = features.Recorder(get_audio_device())
-
-    feature_extractor = create_feature_extractor(config)
+    feature_provider = create_feature_provider(config, control_dir,
+                                               min_sound_contrast)
 
     notifier = SoundLevelNotifier(
-        min_sound_level=min_sound_level,
+        min_sound_contrast=min_sound_contrast,
         fraction_threshold=fraction_threshold,
         consecutive_recordings=consecutive_recordings,
         min_notification_interval=min_notification_interval)
 
     while True:
-        last_record_time = time.time()
-        _, sound_level = recorder.record_waveform(
-            feature_extractor.feature_length)
+        last_start_time = time.time()
+        _, bg_sound_level, signal_sound_level, record_time = feature_provider()
 
-        notifier.add_sound_level_measurement(sound_level)
+        notifier.add_sound_level_measurement(signal_sound_level)
         notification = notifier.detect_notification()
 
-        write_sound_level(sound_level_file, sound_level)
+        write_sound_level(sound_level_file, bg_sound_level, signal_sound_level,
+                          record_time)
 
         if notification is not None:
             write_notification(notification_file, notification)
 
-        time.sleep(max(0, interval - (time.time() - last_record_time)))
+        time.sleep(max(0, interval - (time.time() - last_start_time)))
 
 
 def listen_with_settings_network(config,
                                  amplification=10,
                                  interval=5.0,
-                                 min_sound_level=-30,
+                                 min_sound_contrast=15,
                                  model='large_network',
                                  fraction_threshold=60,
                                  consecutive_recordings=5,
@@ -266,15 +265,19 @@ def listen_with_settings_network(config,
         update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
                     os.environ['BM_SERVER_LOG_PATH'])
 
-        feature_provider = create_feature_provider(config, control_dir,
-                                                   min_sound_level,
-                                                   amplification)
+        feature_provider = create_feature_provider(config,
+                                                   control_dir,
+                                                   min_sound_contrast,
+                                                   amplification=amplification,
+                                                   standardize=True)
 
         while True:
-            last_record_time = time.time()
-            feature = feature_provider()
-            task_queue.put(feature)
-            time.sleep(max(0, interval - (time.time() - last_record_time)))
+            last_start_time = time.time()
+            feature, bg_sound_level, signal_sound_level, record_time = feature_provider(
+            )
+            task_queue.put(
+                (feature, bg_sound_level, signal_sound_level, record_time))
+            time.sleep(max(0, interval - (time.time() - last_start_time)))
 
 
 def process_features(task_queue, config, control_dir, model,
@@ -292,23 +295,40 @@ def process_features(task_queue, config, control_dir, model,
 
     ambient_probabilities = np.array([1, 0, 0])
 
-    while True:
-        feature = task_queue.get()
+    feature, prev_bg_sound_level, prev_signal_sound_level, prev_record_time = task_queue.get(
+    )
+    probabilities = find_probabilities(feature, ambient_probabilities, model)
+    notifier.add_prediction(probabilities)
 
-        if feature is None:
-            probabilities = ambient_probabilities
-        else:
-            probabilities = 10**model.forward(feature)
-            probabilities /= np.sum(probabilities)
+    while True:
+        feature, bg_sound_level, signal_sound_level, record_time = task_queue.get(
+        )
+
+        write_probabilities(notifier.label_names, probabilities_file,
+                            probabilities, prev_bg_sound_level,
+                            prev_signal_sound_level, prev_record_time)
+        prev_bg_sound_level = bg_sound_level
+        prev_signal_sound_level = signal_sound_level
+        prev_record_time = record_time
+
+        probabilities = find_probabilities(feature, ambient_probabilities,
+                                           model)
 
         notifier.add_prediction(probabilities)
         notification = notifier.detect_notification()
 
-        write_probabilities(notifier.label_names, probabilities_file,
-                            probabilities)
-
         if notification is not None:
             write_notification(notification_file, notification)
+
+
+def find_probabilities(feature, ambient_probabilities, model):
+    if feature is None:
+        probabilities = ambient_probabilities
+    else:
+        probabilities = 10**model.forward(feature)
+        probabilities /= np.sum(probabilities)
+
+    return probabilities
 
 
 def set_mic_gain_to_max():
@@ -342,27 +362,41 @@ def create_inference_notifier(config, **notifier_settings):
     return notifier
 
 
-def create_feature_provider(config, control_dir, min_sound_level,
-                            amplification):
-    standardization_file = control_dir / 'standardization.npz'
+def create_feature_provider(config,
+                            control_dir,
+                            min_sound_contrast,
+                            amplification=1,
+                            standardize=False):
+    standardization_file = control_dir / 'standardization.npz' if standardize else None
     return features.FeatureProvider(get_audio_device(),
                                     create_feature_extractor(config),
-                                    min_sound_level=min_sound_level,
+                                    min_sound_contrast=min_sound_contrast,
                                     amplification=amplification,
                                     standardization_file=standardization_file)
 
 
-def write_sound_level(sound_level_file, sound_level):
+def get_extra_info_dict(bg_sound_level, signal_sound_level, record_time):
+    return {
+        'bg': f'{bg_sound_level:.2f}',
+        'ct': f'{signal_sound_level:.2f}',
+        't': f'{record_time:.3f}'
+    }
+
+
+def write_sound_level(sound_level_file, *args):
     with open(sound_level_file, 'w') as f:
-        f.write(f'{sound_level:.2f}')
+        json.dump(get_extra_info_dict(*args), f)
 
 
-def write_probabilities(label_names, probabilities_file, probabilities):
+def write_probabilities(label_names, probabilities_file, probabilities, *args):
     with open(probabilities_file, 'w') as f:
         json.dump(
             {
-                label_names[i]: '{:.3f}'.format(p)
-                for i, p in enumerate(probabilities)
+                **{
+                    label_names[i]: '{:.3f}'.format(p)
+                    for i, p in enumerate(probabilities)
+                },
+                **get_extra_info_dict(*args)
             }, f)
 
 
@@ -373,4 +407,3 @@ def write_notification(notification_file, notification):
 
 if __name__ == '__main__':
     listen()
-    # listen_with_settings(control.get_config(), interval=0, min_energy=0)

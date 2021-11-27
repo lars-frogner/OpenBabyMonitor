@@ -118,7 +118,7 @@
             "group": "recording",
             "name": "interval",
             "type": "INT UNSIGNED NOT NULL",
-            "initial_value": 5,
+            "initial_value": 0,
             "range": {
                 "min": 0,
                 "max": 60,
@@ -142,14 +142,14 @@
                 }
             }
         },
-        "min_sound_level": {
+        "min_sound_contrast": {
             "group": "interpretation",
-            "name": "min_sound_level",
+            "name": "min_sound_contrast",
             "type": "FLOAT NOT NULL",
-            "initial_value": -20,
+            "initial_value": 15,
             "range": {
-                "min": -40,
-                "max": 0,
+                "min": 0,
+                "max": 40,
                 "step": 0.1
             }
         },
@@ -173,7 +173,7 @@
             "group": "notifications",
             "name": "fraction_threshold",
             "type": "INT UNSIGNED NOT NULL",
-            "initial_value": 60,
+            "initial_value": 50,
             "range": {
                 "min": 0,
                 "max": 100,
@@ -184,7 +184,7 @@
             "group": "notifications",
             "name": "consecutive_recordings",
             "type": "INT UNSIGNED NOT NULL",
-            "initial_value": 5,
+            "initial_value": 6,
             "range": {
                 "min": 1,
                 "max": 20,
@@ -195,7 +195,7 @@
             "group": "notifications",
             "name": "probability_threshold",
             "type": "INT UNSIGNED NOT NULL",
-            "initial_value": 85,
+            "initial_value": 80,
             "range": {
                 "min": 0,
                 "max": 100,

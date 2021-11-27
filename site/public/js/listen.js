@@ -161,8 +161,8 @@ function styleClassificationAnimation() {
     });
 }
 
-function soundLevelToIndicatorCoordinates(soundLevel) {
-    const relative_location = 100 * (soundLevel - MIN_DBFS) / (MAX_DBFS - MIN_DBFS);
+function foregroundContrastToIndicatorCoordinates(foregroundContrast) {
+    const relative_location = 100 * (foregroundContrast - MIN_FOREGROUND_CONTRAST) / (MAX_FOREGROUND_CONTRAST - MIN_FOREGROUND_CONTRAST);
     return { left: relative_location.toFixed() + '%' };
 }
 
