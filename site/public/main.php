@@ -49,18 +49,18 @@ require_once(TEMPLATES_DIR . '/main.php');
         <div class="row h-100 align-items-center justify-content-center px-0">
 
           <div id="mode_content_listen" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['listen']) ? HIDDEN_STYLE : ''; ?>>
-            <svg class="bi mb-3" style="width: 15vh; height: 15vh;" fill="currentColor">
+            <svg id="listen_icon" class="bi mb-4 mt-3" style="width: 15vh; height: 15vh;" fill="currentColor">
               <use href="media/bootstrap-icons.svg#bell-fill" />
             </svg>
 
-            <p class="mb-5"><?php echo LANG['listening_for_activity']; ?></p>
+            <p><?php echo LANG['listening_for_activity']; ?></p>
 
-            <div class="row align-items-center justify-content-center" id="listen_visualization_mode_box">
+            <div class="row align-items-center justify-content-center mb-3 mt-5" id="listen_visualization_mode_box">
               <div class="col-auto fw-bold">
                 <?php echo LANG['visualization']; ?>
               </div>
               <div class="col-auto">
-                <form>
+                <form class="mb-0">
                   <div class="form-check form-check-inline">
                     <input type="radio" class="form-check-input" name="listen_control_radio" id="listen_none_radio" autocomplete="off" onclick="deactivateLiveResultsMode();" checked disabled>
                     <label class="form-check-label" for="listen_none_radio"><?php echo LANG['none']; ?></label>
@@ -73,8 +73,46 @@ require_once(TEMPLATES_DIR . '/main.php');
               </div>
             </div>
 
+            <div class="row justify-content-center mb-4">
+              <div class="col-auto">
+                <div class="card" id="listen_info_card" style="width: 18rem; display: none;">
+                  <div class="card-header py-1 btn-bm" data-bs-toggle="collapse" href="#listen_info_card_body">
+                    <?php echo LANG['recording_details']; ?>
+                  </div>
+                  <div id="listen_info_card_body" class="collapse">
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item py-0">
+                        <div class="row align-items-center">
+                          <div class="col-8 py-1 text-start border-end"><?php echo LANG['foreground_contrast']; ?></div>
+                          <div id="listen_info_card_contrast" class="col-4 py-1 text-end listen-info-card-item"></div>
+                        </div>
+                      </li>
+                      <li class="list-group-item py-0">
+                        <div class="row align-items-center">
+                          <div class="col-8 py-1 text-start border-end"><?php echo LANG['background_level']; ?></div>
+                          <div id="listen_info_card_bg_sound_level" class="col-4 py-1 text-end listen-info-card-item"></div>
+                        </div>
+                      </li>
+                      <li class="list-group-item py-0">
+                        <div class="row align-items-center">
+                          <div class="col-8 py-1 text-start border-end"><?php echo LANG['delay']; ?></div>
+                          <div id="listen_info_card_delay" class="col-4 py-1 text-end listen-info-card-item"></div>
+                        </div>
+                      </li>
+                      <li class="list-group-item py-0">
+                        <div class="row align-items-center">
+                          <div class="col-8 py-1 text-start border-end"><?php echo LANG['interval']; ?></div>
+                          <div id="listen_info_card_interval" class="col-4 py-1 text-end listen-info-card-item"></div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <?php if (INFERENCE_MODEL == 'sound_level_threshold') { ?>
-              <div id="listen_animation_container" class="container ratio px-0 mt-5" style="position: relative; --bs-aspect-ratio: 20%; display: none;">
+              <div id="listen_animation_container" class="container ratio px-0 mb-3" style="position: relative; --bs-aspect-ratio: 20%; display: none;">
                 <svg class="listen-animation-label bi" style="position: absolute; left: 0%; top: calc(50% - 2.5rem / 2); width: 2.5rem; height: 2.5rem;">
                   <use href="media/bootstrap-icons.svg#volume-off-fill" />
                 </svg>
@@ -97,7 +135,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                 </svg>
               </div>
             <?php } else { ?>
-              <div id="listen_animation_container" class="container ratio px-0 mt-3" style="position: relative; --bs-aspect-ratio: 86.6%; display: none;">
+              <div id="listen_animation_container" class="container ratio px-0 mb-3" style="position: relative; width: 25vh; --bs-aspect-ratio: 86.6%; display: none;">
                 <div id="listen_animation_context" style="position: absolute; width: 100%; height: 100%; filter: brightness(3); background: linear-gradient(to top, rgba(20,39,59,1), rgba(20,39,59,0)), linear-gradient(to left, rgba(31,57,35,1), rgba(31,57,35,0) 80%), linear-gradient(to right, rgba(80,10,10,1), rgba(80,10,10,0) 80%); -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
                 <svg class="listen-animation-label-bg bi" style="position: absolute; left: 1.0rem; top: 0.2rem; width: 1.8rem; height: 1.8rem;">
                   <use href="media/bootstrap-icons.svg#emoji-frown-fill" />
@@ -163,7 +201,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                 </div>
               </div>
             </div>
-            <div class="row justify-content-center" id="audiostream_canvas_box">
+            <div class="row justify-content-center mt-" id="audiostream_canvas_box">
             </div>
             <div class="row justify-content-center mb-3" id="audiostream_player_box">
             </div>
@@ -177,7 +215,7 @@ require_once(TEMPLATES_DIR . '/main.php');
           <?php } ?>
 
           <div id="mode_content_standby" class="col-auto text-center" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : ''; ?>>
-            <svg class="bi mb-5 text-bm" style="width: 25vh; height: 25vh;" fill="currentColor">
+            <svg class="bi mb-5 mt-3 text-bm" style="width: 25vh; height: 25vh;" fill="currentColor">
               <use href="media/bootstrap-icons.svg#moon-fill" />
             </svg>
             <p class="mb-5 text-bm"><?php echo LANG['device_in_standby']; ?></p>
@@ -292,7 +330,7 @@ require_once(TEMPLATES_DIR . '/main.php');
     const INITIAL_MODE = <?php echo $mode; ?>;
 
     const SETTING_MODEL = '<?php echo INFERENCE_MODEL; ?>';
-    const SETTING_MIN_SOUND_LEVEL = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'min_sound_level', true); ?>;
+    const SETTING_MIN_SOUND_CONTRAST = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'min_sound_contrast', true); ?>;
     const SETTING_AUTOPLAY_ON_NOTIFY = <?php echo readValuesFromTable($_DATABASE, 'listen_settings', 'autoplay_on_notify', true); ?>;
     const SETTING_SAMPLING_RATE = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'sampling_rate', true); ?>;
     const SETTING_VOLUME = <?php echo readValuesFromTable($_DATABASE, 'audiostream_settings', 'volume', true); ?>;
