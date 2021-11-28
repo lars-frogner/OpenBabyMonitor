@@ -141,7 +141,7 @@ function handleListenErrorEvent(event) {
 
 function activateLiveResultsMode() {
     shrinkListenIcon();
-    $('#' + LISTEN_INFO_CARD_ID + ' .' + LISTEN_INFO_CARD_ITEM_CLASS).html('-');
+    $('#' + LISTEN_INFO_CARD_ID + ' .' + LISTEN_INFO_CARD_ITEM_CLASS).html('');
     $('#' + LISTEN_INFO_CARD_ID).show();
     $('#' + LISTEN_ANIMATION_CONTAINER_ID).show();
     if (usesNeuralNetworkModel()) {
