@@ -440,14 +440,10 @@ _EOF_
     # Make sure inotify PHP extension is loaded
     echo 'extension=inotify.so' | sudo tee $PHP_DIR/mods-available/inotify.ini
     sudo phpenmod inotify
-    sudo sed -i "/;extension=xsl/aextension=inotify" $PHP_INI_CLI_PATH
-    sudo sed -i "/;extension=xsl/aextension=inotify" $PHP_INI_APACHE_PATH
 
     # Make sure zip PHP extension is loaded
     echo 'extension=zip.so' | sudo tee $PHP_DIR/mods-available/zip.ini
     sudo phpenmod zip
-    sudo sed -i "/;extension=xsl/aextension=zip" $PHP_INI_CLI_PATH
-    sudo sed -i "/;extension=xsl/aextension=zip" $PHP_INI_APACHE_PATH
 
     # Set time zone
     sudo sed -i "s/;date.timezone =/date.timezone = ${BM_TIMEZONE/'/'/'\/'}/g" $PHP_INI_CLI_PATH
