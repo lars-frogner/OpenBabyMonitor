@@ -49,7 +49,6 @@ while (!connection_aborted()) {
       sendSSEMessage('sound_level', file_get_contents($sound_level_file));
     } elseif ($event['wd'] == $probabilities_descriptor) {
       $probabilities = file_get_contents($probabilities_file);
-      bm_warning($probabilities);
       sendSSEMessage('probabilities', $probabilities);
     } elseif ($event['wd'] == $notification_descriptor) {
       sendSSEMessage('notification', file_get_contents($notification_file));
