@@ -28,6 +28,17 @@ def read_settings(mode, config, database):
     return dict(zip(settings, values))
 
 
+def read_setting(mode, setting, config, database):
+    table_name = mode + '_settings'
+    if table_name not in config:
+        return {}
+
+    with database as open_database:
+        value = open_database.read_values_from_table(table_name, setting)
+
+    return dict([(setting, value)])
+
+
 def update_mode_in_database(mode, config, open_database):
     open_database.update_values_in_table(
         'modes',

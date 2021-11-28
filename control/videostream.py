@@ -3,6 +3,7 @@
 import os
 import subprocess
 import control
+import mic
 
 MODE = 'videostream'
 HORIZONTAL_RESOLUTIONS = {480: 640, 720: 1280, 1080: 1920}
@@ -12,7 +13,8 @@ def stream_video():
     control.register_shutdown_handler()
     control.enter_mode(
         MODE, lambda mode, config, database: stream_video_with_settings(
-            **control.read_settings(mode, config, database)))
+            **control.read_settings(mode, config, database),
+            **control.read_setting('audiostream', 'gain', config, database)))
 
 
 def stream_video_with_settings(encrypted=True,
@@ -32,11 +34,14 @@ def stream_video_with_settings(encrypted=True,
                                blue_gain=0.0,
                                capture_audio=True,
                                show_time=True,
+                               gain=100,
                                **kwargs):
     picam_dir = os.environ['BM_PICAM_DIR']
     output_dir = os.environ['BM_PICAM_STREAM_DIR']
     log_path = os.environ['BM_SERVER_LOG_PATH']
-    mic_id = os.environ['BM_MIC_ID']
+    mic_id = mic.get_mic_id()
+
+    mic.update_current_mic_volume(gain)
 
     assert vertical_resolution in HORIZONTAL_RESOLUTIONS, \
         'Vertical resolution ({}) is not one of {}'.format(
