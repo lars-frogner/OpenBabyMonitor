@@ -168,6 +168,7 @@ function deactivateLiveResultsMode() {
     } else {
         _LISTEN_EVENT_SOURCE.removeEventListener('sound_level', handleSoundLevelEvent)
     }
+    _LAST_EVENT_TIME = null;
 }
 
 function unsubscribeFromListenMessages() {
@@ -175,6 +176,7 @@ function unsubscribeFromListenMessages() {
         _LISTEN_EVENT_SOURCE.close();
         _LISTEN_EVENT_SOURCE = null;
     }
+    _LAST_EVENT_TIME = null;
 }
 
 function shrinkListenIcon() {
