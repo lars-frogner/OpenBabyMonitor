@@ -50,7 +50,7 @@ def stream_audio_with_settings(encrypted=True,
 
     with open(log_path, 'a') as log_file:
         subprocess.check_call(
-            ['ffmpeg', '-hide_banner', '-loglevel', 'error'] + input_args +
+            ['ffmpeg', '-hide_banner', '-loglevel', 'fatal'] + input_args +
             codec_args + stream_args + encryption_args + [output_file],
             stdout=subprocess.DEVNULL,
             stderr=log_file,
