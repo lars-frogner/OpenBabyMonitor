@@ -160,6 +160,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_RESULT_FILE=$BM_SERVER_ACTION_RESULT_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MODE_LOCK_FILE=$BM_MODE_LOCK_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_DEBUG=$BM_DEBUG" >> $BM_ENV_EXPORTS_PATH
 
     # Copy environment variables (without 'export') into environment file for services and PHP
     ENV_VAR_EXPORTS=$(cat $BM_ENV_EXPORTS_PATH)

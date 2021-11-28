@@ -97,6 +97,9 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
 
     # The time zone that the device should use
     BM_TIMEZONE=Europe/Oslo
+
+    # Set to 1 to enable debugging features
+    BM_DEBUG=0
     ```
     Change the values to your preference.
 
