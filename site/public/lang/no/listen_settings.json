@@ -10,6 +10,7 @@
     "interval": "Ventetid mellom opptak (s)",
     "amplification": "Signalforsterkning",
     "min_sound_contrast": "Nødvendig lydnivå<br>(dB over bakgrunn)",
+    "background_loudness_level_offset": "Justering for rapportert<br>bakgrunnslydnivå (dB)",
     "model": "Modell",
     "model_sound_level_threshold": "Lydnivågrense",
     "model_small_network": "Lite nevralt nettverk",

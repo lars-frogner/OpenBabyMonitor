@@ -10,6 +10,7 @@
     "interval": "Time between recordings (s)",
     "amplification": "Signal amplification",
     "min_sound_contrast": "Required sound level<br>(dB over background)",
+    "background_loudness_level_offset": "Offset for reported background<br>sound level (dB)",
     "model": "Model",
     "model_sound_level_threshold": "Sound level threshold",
     "model_small_network": "Small neural network",

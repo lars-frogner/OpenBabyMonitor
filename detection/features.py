@@ -453,13 +453,18 @@ class Recorder:
 
 
 class LoudnessAnalyzer:
-    def __init__(self,
-                 foreground_fraction=0.05,
-                 background_fraction=0.05,
-                 background_averaging_count=10):
-        self.foreground_fraction = foreground_fraction
+    def __init__(
+            self,
+            background_loudness_level_offset=0,  # Adjustable in settings
+            background_loudness_level_ref=-67.8,  # Hard coded
+            background_fraction=0.05,
+            background_averaging_count=10,
+            foreground_fraction=0.05):
+        self.background_loudness_level_offset = background_loudness_level_offset
+        self.background_loudness_level_ref = background_loudness_level_ref
         self.background_fraction = background_fraction
         self.background_averaging_count = background_averaging_count
+        self.foreground_fraction = foreground_fraction
 
         self.foreground_loudness_level = None
 
@@ -481,7 +486,9 @@ class LoudnessAnalyzer:
     def get_loudness_levels(self):
         foreground_loudness_level = self.get_foreground_loudness_level()
         background_loudness_level = self.get_background_loudness_level()
-        return background_loudness_level, foreground_loudness_level - background_loudness_level
+        loudness_level_over_background = foreground_loudness_level - background_loudness_level
+        background_loudness_level += self.background_loudness_level_offset - self.background_loudness_level_ref
+        return background_loudness_level, loudness_level_over_background
 
     def get_foreground_loudness_level(self):
         assert self.foreground_loudness_level is not None
@@ -523,15 +530,21 @@ class FeatureProvider:
                  audio_device,
                  feature_extractor,
                  min_sound_contrast=0,
+                 background_loudness_level_offset=0,
                  amplification=1,
                  standardization_file=None):
         self.feature_extractor = feature_extractor
         self.feature_extractor.create_A_weights()
+
         self.recorder = Recorder(audio_device,
                                  sampling_rate=feature_extractor.sampling_rate,
                                  amplification=amplification)
-        self.analyzer = LoudnessAnalyzer()
+
+        self.analyzer = LoudnessAnalyzer(
+            background_loudness_level_offset=background_loudness_level_offset)
+
         self.min_sound_contrast = min_sound_contrast
+
         self.standardizer = None if standardization_file is None else Standardizer(
             standardization_file)
 

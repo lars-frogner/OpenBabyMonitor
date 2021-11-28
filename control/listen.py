@@ -190,13 +190,15 @@ def listen_with_settings(*args, model='large_network', **kwargs):
         listen_with_settings_network(*args, model=model, **kwargs)
 
 
-def listen_with_settings_sound_level_threshold(config,
-                                               interval=5.0,
-                                               min_sound_contrast=15,
-                                               fraction_threshold=60,
-                                               consecutive_recordings=5,
-                                               min_notification_interval=180,
-                                               **kwargs):
+def listen_with_settings_sound_level_threshold(
+        config,
+        interval=5.0,
+        min_sound_contrast=15,
+        background_loudness_level_offset=0,
+        fraction_threshold=60,
+        consecutive_recordings=5,
+        min_notification_interval=180,
+        **kwargs):
     control.register_shutdown_handler()
 
     control_dir = pathlib.Path(os.environ['BM_DIR']) / 'control'
@@ -206,8 +208,9 @@ def listen_with_settings_sound_level_threshold(config,
 
     mic.update_current_mic_volume(100)
 
-    feature_provider = create_feature_provider(config, control_dir,
-                                               min_sound_contrast)
+    feature_provider = create_feature_provider(
+        config, control_dir, min_sound_contrast,
+        background_loudness_level_offset)
 
     notifier = SoundLevelNotifier(
         min_sound_contrast=min_sound_contrast,
@@ -235,6 +238,7 @@ def listen_with_settings_network(config,
                                  amplification=10,
                                  interval=5.0,
                                  min_sound_contrast=15,
+                                 background_loudness_level_offset=0,
                                  model='large_network',
                                  fraction_threshold=60,
                                  consecutive_recordings=5,
@@ -261,14 +265,15 @@ def listen_with_settings_network(config,
         # prevent it from inheriting the handlers
         control.register_shutdown_handler()
 
-        update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
-                    os.environ['BM_SERVER_LOG_PATH'])
+        mic.update_current_mic_volume(100)
 
-        feature_provider = create_feature_provider(config,
-                                                   control_dir,
-                                                   min_sound_contrast,
-                                                   amplification=amplification,
-                                                   standardize=True)
+        feature_provider = create_feature_provider(
+            config,
+            control_dir,
+            min_sound_contrast,
+            background_loudness_level_offset,
+            amplification=amplification,
+            standardize=True)
 
         while True:
             last_start_time = time.time()
@@ -359,14 +364,17 @@ def create_inference_notifier(config, **notifier_settings):
 def create_feature_provider(config,
                             control_dir,
                             min_sound_contrast,
+                            background_loudness_level_offset,
                             amplification=1,
                             standardize=False):
     standardization_file = control_dir / 'standardization.npz' if standardize else None
-    return features.FeatureProvider(get_audio_device(),
-                                    create_feature_extractor(config),
-                                    min_sound_contrast=min_sound_contrast,
-                                    amplification=amplification,
-                                    standardization_file=standardization_file)
+    return features.FeatureProvider(
+        get_audio_device(),
+        create_feature_extractor(config),
+        min_sound_contrast=min_sound_contrast,
+        background_loudness_level_offset=background_loudness_level_offset,
+        amplification=amplification,
+        standardization_file=standardization_file)
 
 
 def get_extra_info_dict(bg_sound_level, signal_sound_level, record_time):

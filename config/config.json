@@ -153,6 +153,17 @@
                 "step": 0.1
             }
         },
+        "background_loudness_level_offset": {
+            "group": "interpretation",
+            "name": "background_loudness_level_offset",
+            "type": "FLOAT NOT NULL",
+            "initial_value": 0,
+            "range": {
+                "min": -25,
+                "max": 25,
+                "step": 0.1
+            }
+        },
         "model": {
             "group": "interpretation",
             "name": "model",
