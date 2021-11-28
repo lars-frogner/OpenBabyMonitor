@@ -66,7 +66,7 @@ function requestModeChange(radio) {
         body: data
     })
         .then(response => response.text())
-        .then(responseText => { logoutIfSessionExpired(responseText); handleModeChangeResponse(radio.prop('id'), radio.prop('value'), responseText); })
+        .then(responseText => { handleModeChangeResponse(radio.prop('id'), radio.prop('value'), responseText); })
         .catch(error => {
             console.error(error)
         });
@@ -85,6 +85,9 @@ function handleModeChangeResponse(checkedRadioId, checkedRadioValue, responseTex
             setCurrentMode(checkedRadioValue);
             setVisibleContent(getContentIdByRadioId(checkedRadioId));
             setDisabledForRelevantElements(false);
+            break;
+        case '-1':
+            logout();
             break;
         default:
             if (!responseText) {
