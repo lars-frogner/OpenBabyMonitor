@@ -4,6 +4,7 @@ const LISTEN_NONE_RADIO_ID = "listen_none_radio";
 const LISTEN_LIVE_RADIO_ID = "listen_live_radio";
 const LISTEN_CONTROL_VISUALIZATION_MODE_BOX_ID = 'listen_visualization_mode_box';
 const LISTEN_INFO_CARD_ID = 'listen_info_card';
+const LISTEN_INFO_CARD_HEADER_ICON_ID = 'listen_info_card_header_icon';
 const LISTEN_INFO_CARD_ITEM_CLASS = 'listen-info-card-item';
 const LISTEN_ANIMATION_CONTAINER_ID = "listen_animation_container";
 const LISTEN_ANIMATION_CONTEXT_ID = "listen_animation_context";
@@ -23,6 +24,7 @@ var _LISTEN_EVENT_SOURCE;
 var _LISTEN_NOTIFICATION_MODAL_TRIGGER = {};
 var _LISTEN_BROWSER_NOTIFICATION;
 
+var _LISTEN_INFO_CARD_SHOWING = false;
 var _LIVE_RESULTS_MODE_ACTIVE = false;
 
 var _LAST_EVENT_TIME;
@@ -40,6 +42,11 @@ $(function () {
         }
     });
 });
+
+function toggleListenInfoCardHeaderIcon() {
+    $('#' + LISTEN_INFO_CARD_HEADER_ICON_ID).attr('href', 'media/bootstrap-icons.svg#caret-' + (_LISTEN_INFO_CARD_SHOWING ? 'down' : 'up') + '-fill');
+    _LISTEN_INFO_CARD_SHOWING = !_LISTEN_INFO_CARD_SHOWING;
+}
 
 function usesNeuralNetworkModel() {
     return SETTING_MODEL != 'sound_level_threshold';

@@ -76,8 +76,12 @@ require_once(TEMPLATES_DIR . '/main.php');
             <div class="row justify-content-center mb-4">
               <div class="col-auto">
                 <div class="card" id="listen_info_card" style="width: 18rem; display: none;">
-                  <div class="card-header py-1 btn-bm" data-bs-toggle="collapse" href="#listen_info_card_body">
-                    <?php echo LANG['recording_details']; ?>
+                  <div class="card-header py-1 btn-bm d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#listen_info_card_body" onclick="toggleListenInfoCardHeaderIcon();">
+                    <div style="width: 1rem;"></div>
+                    <div><?php echo LANG['recording_details']; ?></div>
+                    <svg class="bi" style="width: 1rem; height: 1rem;" fill="currentColor">
+                      <use id="listen_info_card_header_icon" href="media/bootstrap-icons.svg#caret-down-fill" />
+                    </svg>
                   </div>
                   <div id="listen_info_card_body" class="collapse">
                     <ul class="list-group list-group-flush">
