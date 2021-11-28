@@ -23,6 +23,8 @@ var _LISTEN_EVENT_SOURCE;
 var _LISTEN_NOTIFICATION_MODAL_TRIGGER = {};
 var _LISTEN_BROWSER_NOTIFICATION;
 
+var _LIVE_RESULTS_MODE_ACTIVE = false;
+
 var _LAST_EVENT_TIME;
 
 $(function () {
@@ -46,6 +48,9 @@ function usesNeuralNetworkModel() {
 function initializeListenMode() {
     styleClassificationAnimation();
     subscribeToListenMessages();
+    if (_LIVE_RESULTS_MODE_ACTIVE) {
+        addLiveResultsEventListener();
+    }
 
     $('#' + LISTEN_NONE_RADIO_ID).prop('disabled', false);
     $('#' + LISTEN_LIVE_RADIO_ID).prop('disabled', false);
@@ -55,6 +60,9 @@ function initializeListenMode() {
 
 function deactivateListenMode() {
     removeListenBrowserNotification();
+    if (_LIVE_RESULTS_MODE_ACTIVE) {
+        removeLiveResultsEventListener();
+    }
     unsubscribeFromListenMessages();
 }
 
@@ -139,14 +147,37 @@ function handleListenErrorEvent(event) {
     }
 }
 
+function addLiveResultsEventListener() {
+    if (!_LISTEN_EVENT_SOURCE) {
+        return;
+    }
+    if (usesNeuralNetworkModel()) {
+        _LISTEN_EVENT_SOURCE.addEventListener('probabilities', handleClassificationResultEvent);
+    } else {
+        _LISTEN_EVENT_SOURCE.addEventListener('sound_level', handleSoundLevelEvent);
+    }
+}
+function removeLiveResultsEventListener() {
+    if (!_LISTEN_EVENT_SOURCE) {
+        return;
+    }
+    if (usesNeuralNetworkModel()) {
+        _LISTEN_EVENT_SOURCE.removeEventListener('probabilities', handleClassificationResultEvent);
+    } else {
+        _LISTEN_EVENT_SOURCE.removeEventListener('sound_level', handleSoundLevelEvent);
+    }
+    _LAST_EVENT_TIME = null;
+}
+
 function activateLiveResultsMode() {
+    if (_LIVE_RESULTS_MODE_ACTIVE) {
+        return;
+    }
     shrinkListenIcon();
     $('#' + LISTEN_INFO_CARD_ID + ' .' + LISTEN_INFO_CARD_ITEM_CLASS).html('');
     $('#' + LISTEN_INFO_CARD_ID).show();
     $('#' + LISTEN_ANIMATION_CONTAINER_ID).show();
     if (usesNeuralNetworkModel()) {
-        _LISTEN_EVENT_SOURCE.addEventListener('probabilities', handleClassificationResultEvent);
-
         const container = $('#' + LISTEN_ANIMATION_CONTAINER_ID);
         const indicator = $('#' + LISTEN_ANIMATION_INDICATOR_ID);
         indicator.css({
@@ -154,21 +185,21 @@ function activateLiveResultsMode() {
             top: (container.height() - indicator.height() / 2).toFixed() + 'px'
         })
     } else {
-        _LISTEN_EVENT_SOURCE.addEventListener('sound_level', handleSoundLevelEvent);
         $('#' + LISTEN_ANIMATION_CONTEXT_ID).css({ left: foregroundContrastToIndicatorCoordinates(SETTING_MIN_SOUND_CONTRAST).left });
     }
+    addLiveResultsEventListener();
+    _LIVE_RESULTS_MODE_ACTIVE = true;
 }
 
 function deactivateLiveResultsMode() {
+    if (!_LIVE_RESULTS_MODE_ACTIVE) {
+        return;
+    }
     $('#' + LISTEN_INFO_CARD_ID).hide();
     $('#' + LISTEN_ANIMATION_CONTAINER_ID).hide();
     unshrinkListenIcon();
-    if (usesNeuralNetworkModel()) {
-        _LISTEN_EVENT_SOURCE.removeEventListener('probabilities', handleClassificationResultEvent);
-    } else {
-        _LISTEN_EVENT_SOURCE.removeEventListener('sound_level', handleSoundLevelEvent)
-    }
-    _LAST_EVENT_TIME = null;
+    removeLiveResultsEventListener();
+    _LIVE_RESULTS_MODE_ACTIVE = false;
 }
 
 function unsubscribeFromListenMessages() {
@@ -176,7 +207,6 @@ function unsubscribeFromListenMessages() {
         _LISTEN_EVENT_SOURCE.close();
         _LISTEN_EVENT_SOURCE = null;
     }
-    _LAST_EVENT_TIME = null;
 }
 
 function shrinkListenIcon() {
