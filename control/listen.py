@@ -12,7 +12,7 @@ import cv2
 sys.path.append(os.path.join(os.environ['BM_DIR'], 'detection'))
 import features
 import control
-from audiostream import update_gain
+import mic
 
 MODE = 'listen'
 
@@ -204,8 +204,7 @@ def listen_with_settings_sound_level_threshold(config,
     sound_level_file = comm_dir / 'sound_level.dat'
     notification_file = comm_dir / 'notification.txt'
 
-    update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
-                os.environ['BM_SERVER_LOG_PATH'])
+    mic.update_current_mic_volume(100)
 
     feature_provider = create_feature_provider(config, control_dir,
                                                min_sound_contrast)
@@ -331,18 +330,13 @@ def find_probabilities(feature, ambient_probabilities, model):
     return probabilities
 
 
-def set_mic_gain_to_max():
-    update_gain(os.environ['BM_SOUND_CARD_NUMBER'], 100,
-                os.environ['BM_SERVER_LOG_PATH'])
-
-
 def create_model(model_file):
     model = Model(model_file)
     return model
 
 
 def get_audio_device():
-    mic_id = os.environ['BM_MIC_ID']
+    mic_id = mic.get_mic_id()
     audio_device = 'plug{}'.format(mic_id)
     return audio_device
 

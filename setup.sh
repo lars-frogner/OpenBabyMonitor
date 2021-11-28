@@ -130,15 +130,7 @@ touch $BM_ENV_EXPORTS_PATH
 SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
     sudo adduser $BM_USER audio
-
-    BM_MIC_ID=$(arecord -l | perl -n -e'/^card (\d+):.+, device (\d):.+$/ && print "hw:$1,$2"')
-    BM_SOUND_CARD_NUMBER=$(echo $BM_MIC_ID | sed -n 's/^hw:\([0-9]*\),[0.9]*$/\1/p')
-    echo "export BM_MIC_ID='$BM_MIC_ID'" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_SOUND_CARD_NUMBER='$BM_SOUND_CARD_NUMBER'" >> $BM_ENV_EXPORTS_PATH
-
-    # Use max gain for microphone by default
-    amixer -c $BM_SOUND_CARD_NUMBER sset Mic 100%
-
+    $BM_DIR/control/mic.py --select-mic
     sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
 fi
 

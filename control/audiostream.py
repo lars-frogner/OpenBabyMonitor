@@ -3,6 +3,7 @@
 import os
 import subprocess
 import control
+import mic
 
 MODE = 'audiostream'
 
@@ -24,10 +25,9 @@ def stream_audio_with_settings(encrypted=True,
     output_dir = os.environ['BM_AUDIO_STREAM_DIR']
     output_file = os.environ['BM_AUDIO_STREAM_FILE']
     log_path = os.environ['BM_SERVER_LOG_PATH']
-    mic_id = os.environ['BM_MIC_ID']
-    sound_card_number = os.environ['BM_SOUND_CARD_NUMBER']
+    mic_id = mic.get_mic_id()
 
-    update_gain(sound_card_number, gain, log_path)
+    mic.update_current_mic_volume(gain)
 
     input_args = [
         '-f', 'alsa', '-channels', '1', '-sample_rate',
@@ -55,16 +55,6 @@ def stream_audio_with_settings(encrypted=True,
             stdout=subprocess.DEVNULL,
             stderr=log_file,
             cwd=output_dir)
-
-
-def update_gain(sound_card_number, gain, log_path):
-    with open(log_path, 'a') as log_file:
-        subprocess.check_call([
-            'amixer', '-c', '{}'.format(sound_card_number), 'sset', 'Mic',
-            '{}%'.format(gain)
-        ],
-                              stdout=subprocess.DEVNULL,
-                              stderr=log_file)
 
 
 if __name__ == '__main__':
