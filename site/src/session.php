@@ -13,7 +13,9 @@ function tryLogin($database, $password, $destination) {
 }
 
 function isLoggedIn() {
-  session_start();
+  if (!isset($_SESSION)) {
+    session_start();
+  }
   return isset($_SESSION['login']);
 }
 
@@ -30,7 +32,9 @@ function redirectIfLoggedOut($destination, $pass_uri = true) {
 }
 
 function logout($destination, $exit_command = null) {
-  session_start();
+  if (!isset($_SESSION)) {
+    session_start();
+  }
   session_destroy();
   redirectTo($destination, $exit_command);
 }
