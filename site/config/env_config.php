@@ -1,6 +1,5 @@
 <?php
 require_once(__DIR__ . '/path_config.php');
-require_once(SRC_DIR . '/io.php');
 
 $envvars = file(ENV_FILE_PATH, FILE_IGNORE_NEW_LINES);
 
