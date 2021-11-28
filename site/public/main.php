@@ -201,7 +201,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                 </div>
               </div>
             </div>
-            <div class="row justify-content-center mt-" id="audiostream_canvas_box">
+            <div class="row justify-content-center" id="audiostream_canvas_box">
             </div>
             <div class="row justify-content-center mb-3" id="audiostream_player_box">
             </div>
