@@ -3,5 +3,6 @@
     "password": "Passord",
     "sign_in": "Logg inn",
     "wrong_password": "Ugyldig passord",
+    "mic_not_connected": "Ingen tilkoblet mikrofon",
     "was_signed_out": "Du ble logget ut automatisk."
 }

@@ -3,5 +3,6 @@
     "password": "Password",
     "sign_in": "Sign in",
     "wrong_password": "Invalid password",
+    "mic_not_connected": "No microphone connected",
     "was_signed_out": "You were automatically signed out."
 }

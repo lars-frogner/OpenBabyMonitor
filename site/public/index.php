@@ -1,6 +1,9 @@
 <?php
 require_once(dirname(__DIR__) . '/config/site_config.php');
-redirectIfLoggedIn('main.php');
+
+if (MIC_CONNECTED) {
+  redirectIfLoggedIn('main.php');
+}
 
 $target_uri = getURIFromGETRequest();
 $automatically_signed_out = $target_uri != null;
@@ -27,6 +30,13 @@ if (isset($_POST['submit'])) {
   <main id="main_container" class="fillview">
     <div class="container fillview">
       <div class="row h-100 justify-content-center align-items-center">
+        <?php if (!MIC_CONNECTED) { ?>
+          <div class="d-flex flex-row justify-content-center align-self-start mt-3">
+            <div class="d-flex flex-column">
+              <span class="alert alert-danger text-center"><?php echo LANG['mic_not_connected']; ?></span>
+            </div>
+          </div>
+        <?php } ?>
         <?php if ($automatically_signed_out) { ?>
           <div class="d-flex flex-row justify-content-center align-self-start mt-3">
             <div class="d-flex flex-column">
@@ -34,7 +44,7 @@ if (isset($_POST['submit'])) {
             </div>
           </div>
         <?php } ?>
-        <aside class="col-sm-5<?php echo $automatically_signed_out ? ' align-self-start' : '' ?>">
+        <aside class="col-sm-5<?php echo (!MIC_CONNECTED || $automatically_signed_out) ? ' align-self-start' : '' ?>">
           <div class="card">
             <article class="card-body">
               <h3 class="card-title text-center"><?php echo LANG['please_sign_in']; ?></h3>
@@ -48,7 +58,7 @@ if (isset($_POST['submit'])) {
                   <input type="password" name="password" class="form-control" id="password" placeholder="<?php echo LANG['password']; ?>" required>
                 </div>
                 <div class="form-group text-center">
-                  <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['sign_in']; ?></button>
+                  <button type="submit" name="submit" class="btn btn-primary" <?php echo MIC_CONNECTED ? '' : ' disabled'; ?>><?php echo LANG['sign_in']; ?></button>
                 </div>
               </form>
             </article>

@@ -13,11 +13,6 @@ require_once(SRC_DIR . '/control.php');
 require_once(SRC_DIR . '/network.php');
 require_once(__DIR__ . '/language_config.php');
 
-executeAutoSelectionOfMic();
-if (!micIsConnected()) {
-  logout('index.php');
-}
-
 switch (basename($_SERVER['SCRIPT_NAME'])) {
   case 'main.php':
     define('LOCATION', 'main');
@@ -46,6 +41,12 @@ switch (basename($_SERVER['SCRIPT_NAME'])) {
   default:
     define('LOCATION', 'login');
     break;
+}
+
+executeAutoSelectionOfMic();
+define('MIC_CONNECTED', micIsConnected());
+if (!MIC_CONNECTED && LOCATION != 'login') {
+  logout('index.php');
 }
 
 if (isset($_COOKIE['color_scheme'])) {
