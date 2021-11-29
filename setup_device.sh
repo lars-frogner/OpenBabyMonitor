@@ -10,14 +10,14 @@ BM_DIR=$(dirname $(readlink -f $0))
 source $BM_DIR/config/setup_config.env
 
 if [[ "$BM_USER" != "pi" ]]; then
-    echo 'Warning: Only the pi user (and root) can use the Mini USB Microphone'
+    echo 'Warning: Only the pi user (and root) can use the ALSA sound card driver (arecord etc.) and the VideoCore GPU interface'
 fi
 
 BM_LOCALE=en_GB.UTF-8
 
 source <(sed "s/INTERACTIVE=True/INTERACTIVE=False/g" /usr/bin/raspi-config)
 
-do_change_pass
+passwd $USER &&
 
 do_hostname $BM_HOSTNAME
 
