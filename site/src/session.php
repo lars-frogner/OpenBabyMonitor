@@ -32,11 +32,16 @@ function redirectIfLoggedOut($destination, $pass_uri = true) {
 }
 
 function logout($destination, $exit_command = null) {
+  destroySession();
+  redirectTo($destination, $exit_command);
+}
+
+function destroySession() {
   if (!isset($_SESSION)) {
     session_start();
   }
+  session_unset();
   session_destroy();
-  redirectTo($destination, $exit_command);
 }
 
 function redirectTo($destination, $exit_command = null) {
