@@ -28,8 +28,6 @@ echo -e "\nexport LC_ALL=$BM_LOCALE\nexport LANGUAGE=$BM_LOCALE\n" >> /home/$BM_
 
 do_change_timezone $BM_TIMEZONE
 
-if [[ "$BM_USE_CAM" = true ]]; then
-    do_camera 0
-fi
+do_camera 0
 
 reboot
