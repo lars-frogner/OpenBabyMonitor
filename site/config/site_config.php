@@ -13,6 +13,11 @@ require_once(SRC_DIR . '/control.php');
 require_once(SRC_DIR . '/network.php');
 require_once(__DIR__ . '/language_config.php');
 
+executeAutoSelectionOfMic();
+if (!micIsConnected()) {
+  logout('index.php');
+}
+
 switch (basename($_SERVER['SCRIPT_NAME'])) {
   case 'main.php':
     define('LOCATION', 'main');

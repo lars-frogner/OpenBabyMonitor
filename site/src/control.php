@@ -213,6 +213,20 @@ function executeServerControlActionWithResult($action, $arguments = null, $retur
   return $output;
 }
 
+function executeAutoSelectionOfMic() {
+  executeServerControlAction('select_mic');
+}
+
+function micIsConnected() {
+  $output = null;
+  $result_code = null;
+  exec(CONTROL_DIR . '/mic.py --get-mic-id', $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Getting microphone ID failed with error code $result_code:\n" . join("\n", $output));
+  }
+  return $output[0] != 'None';
+}
+
 function readCurrentLanguage($database) {
   return readValuesFromTable($database, 'language', 'current', true);
 }
