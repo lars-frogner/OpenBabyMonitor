@@ -78,15 +78,16 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
 
 7. (Optional) Edit environment variables in `babymonitor/config/setup_config.env`. The default version of the file looks like this:
     ```bash
+    # The name of the Linux user that will control the baby monitor
+    # (this is best left as pi)
+    BM_USER=pi
+
     # This name will be used as the domain name of the baby monitor website and the name of the wireless access point
     BM_HOSTNAME=babymonitor
 
     # The wifi channel to use for the wireless access point
     # (try changing to another channel between 1 and 11 if the connection to the access point is unreasonably unstable)
     BM_AP_CHANNEL=7
-
-    # The name of the Linux user that will control the baby monitor
-    BM_USER=pi
 
     # The country code that will be used for networking
     BM_COUNTRY_CODE=NO
