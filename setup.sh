@@ -58,7 +58,7 @@ fi
 SETUP_SWAPSPACE=true
 if [[ "$SETUP_SWAPSPACE" = true ]]; then
     sudo dphys-swapfile swapoff
-    sudo sed -i "s/CONF_SWAPSIZE=100/CONF_SWAPSIZE=$SWAP_SIZE/g" /etc/dphys-swapfile
+    sudo sed -i "s/CONF_SWAPSIZE=.*/CONF_SWAPSIZE=$SWAP_SIZE/g" /etc/dphys-swapfile
     sudo dphys-swapfile setup
     sudo dphys-swapfile swapon
 fi
