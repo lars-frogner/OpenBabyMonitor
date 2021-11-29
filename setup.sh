@@ -42,6 +42,13 @@ BM_MODE_LOCK_DIR=$BM_DIR/control/.lock
 BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/free
 BM_MODE_COMM_DIR=$BM_DIR/control/.comm
 
+SETUP_AUDIO=true
+if [[ "$SETUP_AUDIO" = true ]]; then
+    $BM_DIR/control/mic.py --select-mic
+    sudo adduser $BM_USER audio
+    sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
+fi
+
 UPDATE=true
 if [[ "$UPDATE" = true ]]; then
     sudo apt -y update
@@ -120,18 +127,11 @@ dtoverlay=disable-bt" | sudo tee -a /boot/config.txt
     sudo systemctl disable bluetooth
 fi
 
-mkdir -p $BM_ENV_DIR
-touch $BM_ENV_EXPORTS_PATH
-
-SETUP_AUDIO=true
-if [[ "$SETUP_AUDIO" = true ]]; then
-    sudo adduser $BM_USER audio
-    $BM_DIR/control/mic.py --select-mic
-    sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
-fi
-
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
+    mkdir -p $BM_ENV_DIR
+    touch $BM_ENV_EXPORTS_PATH
+
     echo "export BM_USER=$BM_USER" >> $BM_ENV_EXPORTS_PATH
     echo "export WEB_USER=$WEB_USER" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_WEB_GROUP=$BM_WEB_GROUP" >> $BM_ENV_EXPORTS_PATH
@@ -144,7 +144,6 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_LINKED_STREAM_DIR=$BM_LINKED_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_AUDIO_STREAM_DIR=$BM_AUDIO_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_AUDIO_STREAM_FILE=$BM_AUDIO_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_USE_CAM=$BM_USE_CAM" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_DIR=$BM_PICAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_DIR=$BM_PICAM_STREAM_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_PICAM_STREAM_FILE=$BM_PICAM_STREAM_FILE" >> $BM_ENV_EXPORTS_PATH
