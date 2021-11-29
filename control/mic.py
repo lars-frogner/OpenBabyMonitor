@@ -30,10 +30,7 @@ def select_mic(auto_choice=False):
 
 
 def select_mic_id(auto_choice=False):
-    with open(os.environ['BM_SERVER_LOG_PATH'], 'a') as log_file:
-        output = subprocess.check_output(['arecord', '-l'],
-                                         text=True,
-                                         stderr=log_file)
+    output = subprocess.check_output(['arecord', '-l'], text=True)
     matches = re.findall('^card (\d+): (.*), device (\d): (.*)$',
                          output,
                          flags=re.MULTILINE)
@@ -85,10 +82,8 @@ def select_mic_volume_control(sound_card_number, auto_choice=False):
         set_mic_volume_control(None)
         return
 
-    with open(os.environ['BM_SERVER_LOG_PATH'], 'a') as log_file:
-        output = subprocess.check_output(['amixer', '-c', sound_card_number],
-                                         text=True,
-                                         stderr=log_file)
+    output = subprocess.check_output(['amixer', '-c', sound_card_number],
+                                     text=True)
 
     matches = re.findall('^.+ \'(.+)\',\d+$\n^  Capabilities: .*c?volume.*$',
                          output,
@@ -124,11 +119,13 @@ def select_mic_volume_control(sound_card_number, auto_choice=False):
 
 
 def set_mic_id(mic_id):
+    file_path = get_mic_id_file_path()
     if mic_id is None:
-        get_mic_id_file_path().unlink(missing_ok=True)
+        if file_path.exists():
+            file_path.unlink()
     else:
         get_mic_dir_path().mkdir(exist_ok=True)
-        with open(get_mic_id_file_path(), 'w') as f:
+        with open(file_path, 'w') as f:
             f.write(mic_id)
 
 
@@ -147,11 +144,13 @@ def get_mic_sound_card_number():
 
 
 def set_manually_selected_mic(manually_selected_mic):
+    file_path = get_manually_selected_mic_file_path()
     if manually_selected_mic is None:
-        get_manually_selected_mic_file_path().unlink(missing_ok=True)
+        if file_path.exists():
+            file_path.unlink()
     else:
         get_mic_dir_path().mkdir(exist_ok=True)
-        with open(get_manually_selected_mic_file_path(), 'w') as f:
+        with open(file_path, 'w') as f:
             f.write(manually_selected_mic)
 
 
@@ -165,11 +164,13 @@ def get_manually_selected_mic():
 
 
 def set_mic_volume_control(volume_control_name):
+    file_path = get_mic_volume_control_file_path()
     if volume_control_name is None:
-        get_mic_volume_control_file_path().unlink(missing_ok=True)
+        if file_path.exists():
+            file_path.unlink()
     else:
         get_mic_dir_path().mkdir(exist_ok=True)
-        with open(get_mic_volume_control_file_path(), 'w') as f:
+        with open(file_path, 'w') as f:
             f.write(volume_control_name)
 
 
