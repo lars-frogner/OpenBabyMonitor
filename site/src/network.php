@@ -1,5 +1,6 @@
 <?php
 require_once(dirname(__DIR__) . '/config/error_config.php');
+require_once(dirname(__DIR__) . '/config/path_config.php');
 require_once(dirname(__DIR__) . '/config/network_config.php');
 require_once(__DIR__ . '/io.php');
 require_once(__DIR__ . '/database.php');
@@ -13,7 +14,7 @@ function obtainWirelessScanResults() {
 function obtainConnectedNetworkSSID() {
   $output = null;
   $result_code = null;
-  exec(GET_CONNECTED_NETWORK_SSID_SCRIPT, $output, $result_code);
+  exec(SERVERCONTROL_DIR . '/get_connected_network_ssid.sh', $output, $result_code);
   if ($result_code == 255) {
     $ssid = null;
   } elseif ($result_code != 0) {

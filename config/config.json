@@ -103,7 +103,6 @@
     "network": {
         "network_query_interval": 1e-1,
         "network_switch_timeout": 300.0,
-        "connected_network_ssid_script_filename": "get_connected_network_ssid.sh",
         "wireless_modes": {
             "access_point": "Master",
             "client": "Managed"
