@@ -451,6 +451,9 @@ _EOF_
     # Create folders where the group has write permissions
     mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_MODE_COMM_DIR
 
+    # Make sure mode lock is initially released
+    touch $BM_MODE_LOCK_FILE
+
     # Make sure files to be watched in the comm directory exist
     touch $BM_MODE_COMM_DIR/{sound_level.dat,probabilities.json,notification.txt}
 
