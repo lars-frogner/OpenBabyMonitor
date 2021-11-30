@@ -107,6 +107,6 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
     You will be prompted to change the password for the `pi` user. During further execution of the script you will be asked to create a couple of new passwords. First for the baby monitor website, and then for the wireless access point. The device will reboot when finished.
 
 After the device has rebooted you will be able to log in using the new hostname (defined by `BM_HOSTNAME` in `babymonitor/config/setup_config.env`) and the password for the `pi` user you entered in the previous step:
-    ```
-    ssh pi@<hostname>
-    ```
+```
+ssh pi@<hostname>
+```
