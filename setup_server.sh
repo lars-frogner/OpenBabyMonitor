@@ -338,7 +338,7 @@ SETUP_SERVICES=true
 if [[ "$SETUP_SERVICES" = true ]]; then
     UNIT_DIR=/lib/systemd/system
     LINKED_UNIT_DIR=$BM_DIR/control/services
-    SYSTEMCTL=/usr/bin/systemctl
+    SYSTEMCTL=$(which systemctl)
 
     mkdir -p $LINKED_UNIT_DIR
 
