@@ -284,8 +284,8 @@ require_once(TEMPLATES_DIR . '/main.php');
 
           <div id="mode_content_error" class="col-auto" style="display: none;">
             <div class="container">
-              <div class="row ">
-                <div class="col-sm-6 text-center">
+              <div class="row justify-content-center">
+                <div class="col-auto text-center">
                   <p id="mode_content_error_message" class="alert alert-danger text-center"></p>
                   <a class="btn btn-secondary" href="main.php"><?php echo LANG['refresh_page']; ?></a>
                 </div>
