@@ -53,7 +53,7 @@ function getWaitForRequirement($mode_name) {
 
 $output = null;
 $result_code = null;
-exec(SERVERCONTROL_DIR . '/camera_connected.sh', $output, $result_code);
+exec(SERVERCONTROL_DIR . '/check_camera_connected.sh', $output, $result_code);
 if ($result_code != 0) {
   bm_error("Check for whether camera is connected failed with error code $result_code:\n" . join("\n", $output));
 }

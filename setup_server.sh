@@ -385,7 +385,7 @@ WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
 
     sudo systemctl enable $STARTUP_SERVICE_FILENAME
 
-    CMD_ALIAS='Cmnd_Alias BM_MODES = /usr/bin/vcgencmd get_camera, /usr/bin/vcgencmd get_throttled, /usr/bin/vcgencmd measure_temp,'
+    CMD_ALIAS='Cmnd_Alias BM_MODES = /usr/bin/vcgencmd get_throttled, /usr/bin/vcgencmd measure_temp,'
 
     for SERVICE in standby listen audiostream videostream
     do
