@@ -217,14 +217,28 @@ function executeAutoSelectionOfMic() {
   executeServerControlAction('select_mic');
 }
 
-function micIsConnected() {
+function microphoneIsConnected() {
   $output = null;
   $result_code = null;
-  exec(CONTROL_DIR . '/mic.py --get-mic-id', $output, $result_code);
+  exec(SERVERCONTROL_DIR . '/check_microphone_connected.sh', $output, $result_code);
   if ($result_code != 0) {
-    bm_error("Getting microphone ID failed with error code $result_code:\n" . join("\n", $output));
+    bm_error("Checking whether microphone is connected failed with error code $result_code:\n" . join("\n", $output));
   }
-  return $output[0] != 'None';
+  return $output[0] == '1';
+}
+
+function cameraIsConnected() {
+  $output = null;
+  $result_code = null;
+  exec(SERVERCONTROL_DIR . '/check_camera_connected.sh', $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Checking whether camera is connected failed with error code $result_code:\n" . join("\n", $output));
+  }
+  return $output[0] == '1';
+}
+
+function executeSettingOfNewDevicePassword($password) {
+  executeServerControlAction('set_device_password', $password);
 }
 
 function readCurrentLanguage($database) {

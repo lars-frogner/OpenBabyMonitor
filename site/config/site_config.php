@@ -44,10 +44,13 @@ switch (basename($_SERVER['SCRIPT_NAME'])) {
 }
 
 executeAutoSelectionOfMic();
-define('MIC_CONNECTED', micIsConnected());
+
+define('MIC_CONNECTED', microphoneIsConnected());
 if (!MIC_CONNECTED && LOCATION != 'login') {
   logout('index.php');
 }
+
+define('USES_CAMERA', cameraIsConnected());
 
 if (isset($_COOKIE['color_scheme'])) {
   define('COLOR_SCHEME', $_COOKIE['color_scheme']);

@@ -1,6 +1,5 @@
 <?php
 require_once(__DIR__ . '/error_config.php');
-require_once(__DIR__ . '/path_config.php');
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/env_config.php');
 
@@ -51,18 +50,7 @@ function getWaitForRequirement($mode_name) {
   });
 }
 
-$output = null;
-$result_code = null;
-exec(SERVERCONTROL_DIR . '/check_camera_connected.sh', $output, $result_code);
-if ($result_code != 0) {
-  bm_error("Check for whether camera is connected failed with error code $result_code:\n" . join("\n", $output));
-}
-define('USES_CAMERA', $output[0] == '1');
-
 $mode_values = getModeAttributes('value');
-if (!USES_CAMERA) {
-  unset($mode_values['videostream']);
-}
 define('MODE_VALUES', $mode_values);
 define('MODE_NAMES', array_flip(MODE_VALUES));
 
