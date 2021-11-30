@@ -78,6 +78,9 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     # Install Apache, PHP and MySQL (MariaDB)
     sudo apt -y install apache2 mariadb-server php php-dev php-pear php-mysql libapache2-mod-php
     sudo apt -y install libzip-dev # Requirement for zip
+
+    # Install PHP extensions
+    sudo pecl channel-update pecl.php.net
     sudo pecl install inotify zip
 
     # Install dependencies for picam
