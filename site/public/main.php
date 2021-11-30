@@ -330,7 +330,7 @@ require_once(TEMPLATES_DIR . '/main.php');
     const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
     const LISTEN_MODE = <?php echo MODE_VALUES['listen']; ?>;
     const AUDIOSTREAM_MODE = <?php echo MODE_VALUES['audiostream']; ?>;
-    const VIDEOSTREAM_MODE = <?php echo (USES_CAMERA) ? MODE_VALUES['videostream'] : null; ?>;
+    const VIDEOSTREAM_MODE = <?php echo (USES_CAMERA) ? MODE_VALUES['videostream'] : 'null'; ?>;
     const INITIAL_MODE = <?php echo $mode; ?>;
 
     const SETTING_MODEL = '<?php echo INFERENCE_MODEL; ?>';
