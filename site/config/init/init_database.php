@@ -2,7 +2,6 @@
 include_once(dirname(__DIR__) . '/error_config.php');
 require_once(dirname(__DIR__) . '/env_config.php');
 require_once(dirname(__DIR__) . '/config.php');
-require_once(dirname(__DIR__) . '/control_config.php');
 require_once(SRC_DIR . '/database.php');
 require_once(SRC_DIR . '/security.php');
 
@@ -46,10 +45,7 @@ echo "Storing password hash in database $db_name\n";
 createPasswordTableIfMissing($database, strlen($hashed_password));
 storeHashedPassword($database, $hashed_password);
 
-$table_names = array('modes', 'language', 'listen_settings', 'audiostream_settings', 'system_settings');
-if (USES_CAMERA) {
-  $table_names[] = 'videostream_settings';
-}
+$table_names = array('modes', 'language', 'listen_settings', 'audiostream_settings', 'system_settings', 'videostream_settings');
 foreach ($table_names as $table_name) {
   echo "Creating table $table_name in database $db_name\n";
   createTableIfMissing($database, $table_name, readTableColumnsFromConfig($table_name));
