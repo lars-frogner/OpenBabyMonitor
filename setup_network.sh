@@ -46,13 +46,13 @@ fi
 
 while : ; do
     stty -echo
-    printf "New access point password (8-63 characters): "
+    printf "New wireless access point password (8-63 characters): "
     read PASSWORD
     stty echo
     printf '\n'
 
     stty -echo
-    printf "Repeat password: "
+    printf "Repeat new password: "
     read PASSWORD_REPEAT
     stty echo
     printf '\n'
@@ -161,4 +161,3 @@ net.ipv6.conf.all.disable_ipv6=1
 # Check connection every 10 minutes
 (crontab -l 2> /dev/null; echo "*/10 * * * * $BM_SERVERCONTROL_DIR/ensure_connection.sh") | crontab -
 
-sudo reboot

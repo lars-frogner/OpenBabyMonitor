@@ -5,13 +5,13 @@ SCRIPT_DIR=$(dirname $(readlink -f $0))
 
 while : ; do
     stty -echo
-    printf "New site password: "
+    printf "New website password: "
     read PASSWORD
     stty echo
     printf '\n'
 
     stty -echo
-    printf "Repeat password: "
+    printf "Repeat new password: "
     read PASSWORD_REPEAT
     stty echo
     printf '\n'

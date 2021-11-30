@@ -116,10 +116,4 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
     ```
     babymonitor/setup.sh
     ```
-    You will be asked to enter a new password for the baby monitor website. The device will reboot when finished.
-
-11. Log back in (as in step 9) and run the network configuration script:
-    ```
-    babymonitor/setup_network.sh
-    ```
-    You will be asked to enter a new password for the baby monitor wireless access point. The device will reboot when finished.
+    You will be asked to enter the device password that you created in step 8. You will also be asked to create a new password for the baby monitor website. Finally, you will be asked to create a new password for the baby monitor wireless access point. The device will reboot when finished.
