@@ -40,7 +40,8 @@ BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
 BM_SERVER_ACTION_RESULT_FILE=$BM_SERVER_ACTION_DIR/result
 BM_MODE_LOCK_DIR=$BM_DIR/control/.lock
 BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/free
-BM_MODE_COMM_DIR=$BM_DIR/control/.comm
+BM_LISTEN_COMM_DIR=$BM_DIR/control/.comm
+BM_LISTEN_COMM_DIR=$BM_DIR/control/.comm
 
 SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
@@ -449,13 +450,13 @@ _EOF_
     sudo adduser $BM_USER $BM_WEB_GROUP
 
     # Create folders where the group has write permissions
-    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_MODE_COMM_DIR
+    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_LISTEN_COMM_DIR
 
     # Make sure mode lock is initially released
     touch $BM_MODE_LOCK_FILE
 
     # Make sure files to be watched in the comm directory exist
-    touch $BM_MODE_COMM_DIR/{sound_level.dat,probabilities.json,notification.txt}
+    touch $BM_LISTEN_COMM_DIR/{sound_level.dat,probabilities.json,notification.txt}
 
     # Ensure permissions are correct in project folder
     sudo chmod -R $BM_READ_PERMISSIONS $BM_DIR
@@ -464,7 +465,7 @@ _EOF_
     # Set write permissions
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
     sudo chmod $BM_WRITE_PERMISSIONS $BM_MODE_LOCK_DIR
-    sudo chmod $BM_WRITE_PERMISSIONS $BM_MODE_COMM_DIR
+    sudo chmod $BM_WRITE_PERMISSIONS $BM_LISTEN_COMM_DIR
     sudo chmod $BM_WRITE_PERMISSIONS $BM_PHPSYSINFO_CONFIG_FILE $(dirname $BM_PHPSYSINFO_CONFIG_FILE)
 
     sudo mkdir -p $SERVER_LOG_DIR
