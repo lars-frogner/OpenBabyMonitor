@@ -124,7 +124,6 @@ def set_mic_id(mic_id):
         if file_path.exists():
             file_path.unlink()
     else:
-        get_mic_dir_path().mkdir(exist_ok=True)
         with open(file_path, 'w') as f:
             f.write(mic_id)
 
@@ -149,7 +148,6 @@ def set_manually_selected_mic(manually_selected_mic):
         if file_path.exists():
             file_path.unlink()
     else:
-        get_mic_dir_path().mkdir(exist_ok=True)
         with open(file_path, 'w') as f:
             f.write(manually_selected_mic)
 
@@ -169,7 +167,6 @@ def set_mic_volume_control(volume_control_name):
         if file_path.exists():
             file_path.unlink()
     else:
-        get_mic_dir_path().mkdir(exist_ok=True)
         with open(file_path, 'w') as f:
             f.write(volume_control_name)
 
