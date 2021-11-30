@@ -187,12 +187,6 @@ function executeServerControlAction($action, $arguments = null) {
   }
   $output = null;
   $result_code = null;
-  exec('rm -f ' . SERVER_ACTION_RESULT_FILE, $output, $result_code);
-  if ($result_code != 0) {
-    bm_error("Deletion of action result file failed with error code $result_code:\n" . join("\n", $output));
-  }
-  $output = null;
-  $result_code = null;
   exec(ENVVAR_ASSIGNMENT . SERVER_ACTION_COMMANDS[$action] . $arguments, $output, $result_code);
   if ($result_code != 0) {
     bm_error("Initiation of server action command $action failed with error code $result_code:\n" . join("\n", $output));
@@ -200,6 +194,12 @@ function executeServerControlAction($action, $arguments = null) {
 }
 
 function executeServerControlActionWithResult($action, $arguments = null, $return_result_code = false) {
+  $output = null;
+  $result_code = null;
+  exec('rm -f ' . SERVER_ACTION_RESULT_FILE, $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Deletion of action result file failed with error code $result_code:\n" . join("\n", $output));
+  }
   executeServerControlAction($action, $arguments);
   waitForFileToExist(SERVER_ACTION_RESULT_FILE, NETWORK_QUERY_INTERVAL, NETWORK_SWITCH_TIMEOUT);
   $result = file(SERVER_ACTION_RESULT_FILE, FILE_IGNORE_NEW_LINES);
