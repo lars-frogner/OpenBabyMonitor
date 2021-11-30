@@ -30,4 +30,3 @@ do_change_timezone $BM_TIMEZONE
 
 do_camera 0
 
-reboot
