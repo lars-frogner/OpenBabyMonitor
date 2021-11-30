@@ -1,4 +1,6 @@
 <?php
+require_once(__DIR__ . '/env_config.php');
+
 if (getenv('BM_DEBUG') == '1') {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);
