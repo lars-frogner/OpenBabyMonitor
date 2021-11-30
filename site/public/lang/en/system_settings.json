@@ -3,6 +3,7 @@
     "submit": "Confirm",
     "undo": "Undo",
     "reset": "Reset",
+    "cancel": "Cancel",
     "ask_secure_redirect": "Suggest switching to secure site",
     "show_unsupported_message": "Show message when unsupported",
     "ask_notification_permission": "Ask for permission",
@@ -18,5 +19,10 @@
     "blocked": "Blocked",
     "allowed": "Allowed",
     "not_allowed": "Not allowed",
-    "grant_permission": "Grant permission"
+    "grant_permission": "Grant permission",
+    "new_password": "New password",
+    "change": "Change",
+    "change_device_password": "Change device password",
+    "sure_want_to_change_device_password": "Are you sure you want to change the device password?",
+    "device_password_changed": "The device password was successfully changed."
 }

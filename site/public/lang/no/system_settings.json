@@ -3,6 +3,7 @@
     "submit": "Bekreft",
     "undo": "Angre",
     "reset": "Tilbakestill",
+    "cancel": "Avbryt",
     "ask_secure_redirect": "Foreslå å bytte til sikker side",
     "show_unsupported_message": "Vis beskjed om manglende støtte",
     "ask_notification_permission": "Spør om tillatelse",
@@ -18,5 +19,10 @@
     "blocked": "Blokkert",
     "allowed": "Tillatt",
     "not_allowed": "Ikke tillatt",
-    "grant_permission": "Gi tillatelse"
+    "grant_permission": "Gi tillatelse",
+    "new_password": "Nytt passord",
+    "change": "Bytt",
+    "change_device_password": "Bytt passord for enheten",
+    "sure_want_to_change_device_password": "Er du sikker på at du vil bytte passordet for enheten?",
+    "device_password_changed": "Nytt passord ble satt for enheten."
 }

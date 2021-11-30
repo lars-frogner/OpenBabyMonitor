@@ -10,6 +10,7 @@ WIRELESS_SCAN_FLAG=scan_wireless_networks
 CONNECT_FLAG=connect_to_network
 REMOVE_NETWORK_FLAG=remove_network
 SET_AP_PASSWORD_FLAG=set_ap_password
+SET_DEVICE_PASSWORD_FLAG=set_device_password
 SELECT_MIC_FLAG=select_mic
 
 if [[ ! -f "$BM_SERVER_ACTION_FILE" ]]; then
@@ -69,6 +70,10 @@ case $FLAG in
 
   $SET_AP_PASSWORD_FLAG)
     $BM_SERVERCONTROL_DIR/set_ap_password.sh "${ARGUMENTS[@]:1}" 1>&3 2>&4
+    ;;
+
+  $SET_DEVICE_PASSWORD_FLAG)
+    $BM_SERVERCONTROL_DIR/set_device_password.sh "${ARGUMENTS[@]:1}" 1>&3 2>&4
     ;;
 
   $SELECT_MIC_FLAG)

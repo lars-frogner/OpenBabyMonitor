@@ -5,6 +5,13 @@ require_once(SRC_DIR . '/settings.php');
 
 $mode = readCurrentMode($_DATABASE);
 
+if (isset($_POST['change_device_password'])) {
+  executeSettingOfNewDevicePassword($_POST['device_password']);
+  $password_changed = true;
+} else {
+  $password_changed = false;
+}
+
 $setting_type = 'system';
 $table_name = $setting_type . '_settings';
 if (isset($_POST['submit'])) {
@@ -42,6 +49,15 @@ require_once(TEMPLATES_DIR . '/settings.php');
   </header>
 
   <main id="main_container" style="display: none;">
+    <?php if ($password_changed === true) { ?>
+      <div id="device_password_changed_msg">
+        <div class="d-flex flex-row justify-content-center mt-3">
+          <div class="d-flex flex-column">
+            <span class="alert alert-success text-center"><?php echo LANG['device_password_changed']; ?></span>
+          </div>
+        </div>
+      </div>
+    <?php } ?>
     <div class="container">
       <h1 class="my-4"><?php echo LANG['system_settings']; ?></h1>
       <form id="system_settings_form" action="" method="post">
@@ -55,6 +71,21 @@ require_once(TEMPLATES_DIR . '/settings.php');
           <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['submit']; ?></button>
           <button name="undo" class="btn btn-secondary" onclick="$('#system_settings_form').trigger('reset');"><?php echo LANG['undo']; ?></button>
           <button type="submit" name="reset" class="btn btn-secondary"><?php echo LANG['reset']; ?></button>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-auto px-3">
+            <label class="form-label h3 mb-3"><?php echo LANG['change_device_password']; ?></label>
+            <div class="form-floating">
+              <input type="password" name="device_password" class="form-control" id="device_password_input" placeholder="">
+              <label class="text-bm" for="device_password_input">
+                <?php echo LANG['new_password']; ?>
+              </label>
+            </div>
+            <div class="form-group my-3">
+              <button type="submit" name="change_device_password" style="display: none;" id="change_device_password_submit_button" disabled></button><button class="btn btn-secondary" id="change_device_password_button" disabled><?php echo LANG['change']; ?></button>
+            </div>
+          </div>
         </div>
       </form>
     </div>
