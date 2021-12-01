@@ -43,8 +43,6 @@ switch (basename($_SERVER['SCRIPT_NAME'])) {
     break;
 }
 
-executeAutoSelectionOfMic();
-
 define('MIC_CONNECTED', microphoneIsConnected());
 if (!MIC_CONNECTED && LOCATION != 'login') {
   logout('index.php');
