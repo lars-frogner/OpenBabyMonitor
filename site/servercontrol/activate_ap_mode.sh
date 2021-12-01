@@ -13,7 +13,7 @@ sudo ln -s {$BM_NW_AP_DIR,}/etc/dhcpcd.conf
 sudo ln -s {$BM_NW_AP_DIR,}/etc/hosts
 sudo systemctl daemon-reload 1>&3 2>&4
 sudo service dhcpcd restart 1>&3 2>&4
-sudo systemctl enable dnsmasq 1>&3 2>&4
 sudo systemctl enable hostapd 1>&3 2>&4
-sudo systemctl start dnsmasq 1>&3 2>&4
+sudo systemctl enable dnsmasq 1>&3 2>&4
 sudo systemctl start hostapd 1>&3 2>&4
+sudo systemctl start dnsmasq 1>&3 2>&4
