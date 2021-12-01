@@ -51,9 +51,13 @@ require_once(TEMPLATES_DIR . '/settings.php');
   <main id="main_container" style="display: none;">
     <?php if ($password_changed === true) { ?>
       <div id="device_password_changed_msg">
-        <div class="d-flex flex-row justify-content-center mt-3">
-          <div class="d-flex flex-column">
-            <span class="alert alert-success text-center"><?php echo LANG['device_password_changed']; ?></span>
+        <div class="d-flex flex-row justify-content-center mx-3 mt-3">
+          <div class="d-flex align-items-center justify-content-between alert alert-success">
+            <div style="width: 1rem;"></div>
+            <div class="mx-3 text-center"><?php echo LANG['device_password_changed']; ?></div>
+            <svg class="bi" style="width: 1rem; height: 1rem;" fill="currentColor" onclick="$('#device_password_changed_msg').hide();">
+              <use href="media/bootstrap-icons.svg#x-lg" />
+            </svg>
           </div>
         </div>
       </div>

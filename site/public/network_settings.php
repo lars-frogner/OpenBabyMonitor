@@ -52,36 +52,50 @@ $connected_network = obtainConnectedNetworkSSID();
 
   <main id="main_container" style="display: none;">
     <?php if ($connection_succeeded === true) { ?>
-      <div class="network-status-msg">
-        <div class="d-flex flex-row justify-content-center mt-3">
-          <div class="d-flex flex-column">
-            <span class="alert alert-success text-center"><?php echo LANG['connection_succeeded']; ?></span>
+      <div id="connection_succeeded_msg" class="network-status-msg">
+        <div class="d-flex flex-row justify-content-center mx-3 mt-3">
+          <div class="d-flex align-items-center justify-content-between alert alert-success">
+            <div style="width: 1rem;"></div>
+            <div class="mx-3 text-center"><?php echo LANG['connection_succeeded']; ?></div>
+            <svg class="bi" style="width: 1rem; height: 1rem;" fill="currentColor" onclick="$('#connection_succeeded_msg').hide();">
+              <use href="media/bootstrap-icons.svg#x-lg" />
+            </svg>
           </div>
         </div>
       </div>
     <?php } ?>
     <?php if ($connection_succeeded === false) { ?>
-      <div class="network-status-msg">
-        <div class="d-flex flex-row justify-content-center mt-3">
-          <div class="d-flex flex-column">
-            <span class="alert alert-danger text-center"><?php echo LANG['connection_failed']; ?></span>
+      <div id="connection_failed_msg" class="network-status-msg">
+        <div class="d-flex flex-row justify-content-center mx-3 mt-3">
+          <div class="d-flex align-items-center justify-content-between alert alert-danger">
+            <div style="width: 1rem;"></div>
+            <div class="mx-3 text-center"><?php echo LANG['connection_failed']; ?></div>
+            <svg class="bi" style="width: 1rem; height: 1rem;" fill="currentColor" onclick="$('#connection_failed_msg').hide();">
+              <use href="media/bootstrap-icons.svg#x-lg" />
+            </svg>
           </div>
         </div>
       </div>
     <?php } ?>
     <div style="display: none;" id="switching_network_info">
-      <div class="d-flex flex-row justify-content-center mt-3">
-        <div class="d-flex flex-column text-center">
-          <span class="alert alert-warning"><?php echo LANG['switching_network']; ?></span>
+      <div class="d-flex flex-row align-items-center justify-content-center h-100">
+        <div class="d-flex flex-column mx-3">
+          <div class="d-flex align-items-center justify-content-center alert alert-warning">
+            <div class="text-center"><?php echo LANG['switching_network']; ?></div>
+          </div>
           <a class="btn btn-secondary" href="network_settings.php"><?php echo LANG['refresh']; ?></a>
         </div>
       </div>
     </div>
     <?php if ($password_changed === true) { ?>
-      <div class="network-status-msg">
-        <div class="d-flex flex-row justify-content-center mt-3">
-          <div class="d-flex flex-column">
-            <span class="alert alert-success text-center"><?php echo LANG[$which_password . '_password_changed']; ?></span>
+      <div id="password_changed_msg" class="network-status-msg">
+        <div class="d-flex flex-row justify-content-center mx-3 mt-3">
+          <div class="d-flex align-items-center justify-content-between alert alert-success">
+            <div style="width: 1rem;"></div>
+            <div class="text-center"><?php echo LANG[$which_password . '_password_changed']; ?></div>
+            <svg class="bi" style="width: 1rem; height: 1rem;" fill="currentColor" onclick="$('#password_changed_msg').hide();">
+              <use href="media/bootstrap-icons.svg#x-lg" />
+            </svg>
           </div>
         </div>
       </div>

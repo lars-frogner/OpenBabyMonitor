@@ -31,20 +31,26 @@ if (isset($_POST['submit'])) {
     <div class="container fillview">
       <div class="row h-100 justify-content-center align-items-center">
         <?php if (!MIC_CONNECTED) { ?>
-          <div class="d-flex flex-row justify-content-center align-self-start mt-3">
-            <div class="d-flex flex-column">
-              <span class="alert alert-danger text-center"><?php echo LANG['mic_not_connected']; ?></span>
+          <div class="d-flex flex-row justify-content-center align-self-start mx-3 mt-3">
+            <div class="d-flex align-items-center justify-content-center alert alert-danger">
+              <div class="text-center"><?php echo LANG['mic_not_connected']; ?></div>
             </div>
           </div>
         <?php } ?>
         <?php if ($automatically_signed_out) { ?>
-          <div class="d-flex flex-row justify-content-center align-self-start mt-3">
-            <div class="d-flex flex-column">
-              <span class="alert alert-warning text-center"><?php echo LANG['was_signed_out']; ?></span>
+          <div id="signed_out_warning">
+            <div class="d-flex flex-row justify-content-center align-self-start mx-3 mt-3">
+              <div class="d-flex align-items-center justify-content-between alert alert-warning">
+                <div style="width: 1rem;"></div>
+                <div class="mx-3 text-center"><?php echo LANG['was_signed_out']; ?></div>
+                <svg class="bi" style="width: 1rem; height: 1rem;" fill="currentColor" onclick="$('#signed_out_warning').hide(); $('#signin_aside').removeClass('align-self-start');">
+                  <use href="media/bootstrap-icons.svg#x-lg" />
+                </svg>
+              </div>
             </div>
           </div>
         <?php } ?>
-        <aside class="col-sm-5<?php echo (!MIC_CONNECTED || $automatically_signed_out) ? ' align-self-start' : '' ?>">
+        <aside id="signin_aside" class="col-sm-5<?php echo (!MIC_CONNECTED || $automatically_signed_out) ? ' align-self-start' : '' ?>">
           <div class="card">
             <article class="card-body">
               <h3 class="card-title text-center"><?php echo LANG['please_sign_in']; ?></h3>
