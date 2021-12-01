@@ -13,7 +13,7 @@ BM_ENV_EXPORTS_PATH=$BM_DIR/env/envvar_exports
 BM_ENV_PATH=$BM_DIR/env/envvars
 
 if [[ ! -f "$BM_ENV_EXPORTS_PATH" ]]; then
-    echo 'Error: setup.sh must be run before this script'
+    echo 'Error: setup_server.sh must be run before this script'
     exit 1
 fi
 
