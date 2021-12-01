@@ -23,6 +23,12 @@ The purpose of this project is to make use of the great flexibility and availabi
 
 ## Installation
 
+Description to come.
+
+## Usage
+
+When up and running, the device hosts the website `https://babymonitor`.
+
 ## Power consumption
 
 Below are measured values of the power consumption of a Pi Zero baby monitor in different modes of operation.
