@@ -451,6 +451,9 @@ _EOF_
     APACHE_CONF_PATH=/etc/apache2/apache2.conf
     echo -e "\nDirectoryIndex index.php" | sudo tee -a $APACHE_CONF_PATH
 
+    # Set Apache log level
+    sed -i 's/^LogLevel .*$/LogLevel error/g' $APACHE_CONF_PATH
+
     # Add main user to www-data group
     sudo adduser $BM_USER $BM_WEB_GROUP
 
