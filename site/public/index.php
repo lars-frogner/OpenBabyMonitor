@@ -45,7 +45,7 @@ if (isset($_POST['submit'])) {
               <?php if ($automatically_signed_out) { ?>
                 <div id="signed_out_warning">
                   <div class="d-flex flex-row justify-content-center align-self-start mx-3 mt-3">
-                    <div class="d-flex align-items-center justify-content-between alert alert-warning">
+                    <div class="d-flex align-items-center justify-content-between alert alert-info">
                       <div style="width: 1rem;"></div>
                       <div class="mx-3 text-center"><?php echo LANG['was_signed_out']; ?></div>
                       <svg class="bi" style="width: 1rem; height: 1rem;" fill="currentColor" onclick="$('#signed_out_warning').hide(); $('#signin_aside').removeClass('align-self-start');">

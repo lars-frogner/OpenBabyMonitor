@@ -85,7 +85,7 @@ $connected_network = obtainConnectedNetworkSSID();
         <div style="display: none;" id="switching_network_info" class="fillview">
           <div class="d-flex flex-row align-items-center justify-content-center h-100">
             <div class="d-flex flex-column mx-3">
-              <div class="d-flex align-items-center justify-content-center alert alert-warning">
+              <div class="d-flex align-items-center justify-content-center alert alert-info">
                 <div class="text-center"><?php echo LANG['switching_network']; ?></div>
               </div>
               <a class="btn btn-secondary" href="network_settings.php"><?php echo LANG['refresh']; ?></a>
