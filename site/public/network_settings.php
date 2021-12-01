@@ -123,7 +123,7 @@ $connected_network = obtainConnectedNetworkSSID();
                       </label>
                     </div>
                   </div>
-                  <div class="col-auto">
+                  <div class="col-auto my-2">
                     <div class="form-check">
                       <input type="checkbox" name="remember" class="form-check-input" id="remember_check" disabled>
                       <label class="form-check-label" for="remember_check"><?php echo LANG['remember']; ?></label>
