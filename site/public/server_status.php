@@ -7,6 +7,8 @@ setPHPSysInfoDefaultTemplate((COLOR_SCHEME === 'dark') ? 'dark' : 'phpsysinfo');
 
 <link href="css/fill.css" rel="stylesheet">
 
+<link href="css/fill.css" rel="stylesheet">
+
 <!DOCTYPE html>
 <html class="fillview">
 
@@ -16,7 +18,7 @@ setPHPSysInfoDefaultTemplate((COLOR_SCHEME === 'dark') ? 'dark' : 'phpsysinfo');
   ?>
 </head>
 
-<body class="fillview">
+<body class="fillview" style="overflow: hidden;">
   <div class="d-flex flex-column fillview">
     <header>
       <?php
@@ -30,6 +32,7 @@ setPHPSysInfoDefaultTemplate((COLOR_SCHEME === 'dark') ? 'dark' : 'phpsysinfo');
       <span id="server_status_busy_spinner" class="spinner-border" style="display: none;"></span>
     </main>
   </div>
+  <div style="position: relative; top: 100%; left: 0; width: 100%; height: 10vh; overflow: hidden;"></div>
 </body>
 
 <?php

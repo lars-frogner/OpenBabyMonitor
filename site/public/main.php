@@ -34,7 +34,7 @@ require_once(TEMPLATES_DIR . '/main.php');
   <script src="js/sync_time.js"></script>
 </head>
 
-<body class="fillview">
+<body class="fillview" style="overflow: hidden;">
   <div class="d-flex flex-column fillview">
     <header>
       <?php
@@ -356,6 +356,7 @@ require_once(TEMPLATES_DIR . '/main.php');
   <script src="js/main.js"></script>
   <script src="js/network.js"></script>
 
+  <div style="position: relative; top: 100%; left: 0; width: 100%; height: 10vh; overflow: hidden;"></div>
 </body>
 
 </html>

@@ -24,8 +24,10 @@ $grouped_values = groupSettingValues($setting_type, $values);
 require_once(TEMPLATES_DIR . '/settings.php');
 ?>
 
+<link href="css/fill.css" rel="stylesheet">
+
 <!DOCTYPE html>
-<html>
+<html class="fillview">
 
 <head>
   <?php
@@ -33,29 +35,34 @@ require_once(TEMPLATES_DIR . '/settings.php');
   ?>
 </head>
 
-<body>
-  <header>
-    <?php
-    require_once(TEMPLATES_DIR . '/navbar.php');
-    require_once(TEMPLATES_DIR . '/confirmation_modal.php');
-    ?>
-  </header>
+<body class="fillview" style="overflow: hidden;">
+  <div class="d-flex flex-column fillview">
+    <header>
+      <?php
+      require_once(TEMPLATES_DIR . '/navbar.php');
+      require_once(TEMPLATES_DIR . '/confirmation_modal.php');
+      ?>
+    </header>
 
-  <main id="main_container" style="display: none;">
-    <div class="container">
-      <h1 class="my-4"><?php echo LANG['audio_settings']; ?></h1>
-      <form id="audiostream_settings_form" action="" method="post">
-        <div class="row">
-          <?php generateInputs($setting_type, $grouped_values, [], []); ?>
+    <div class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
+      <main id="main_container" class="fillview" style="display: none;">
+        <div class="container">
+          <h1 class="my-4"><?php echo LANG['audio_settings']; ?></h1>
+          <form id="audiostream_settings_form" action="" method="post">
+            <div class="row">
+              <?php generateInputs($setting_type, $grouped_values, [], []); ?>
+            </div>
+            <div class="my-4">
+              <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['submit']; ?></button>
+              <button name="undo" class="btn btn-secondary" onclick="$('#audiostream_settings_form').trigger('reset');"><?php echo LANG['undo']; ?></button>
+              <button type="submit" name="reset" class="btn btn-secondary"><?php echo LANG['reset']; ?></button>
+            </div>
+          </form>
         </div>
-        <div class="my-4">
-          <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['submit']; ?></button>
-          <button name="undo" class="btn btn-secondary" onclick="$('#audiostream_settings_form').trigger('reset');"><?php echo LANG['undo']; ?></button>
-          <button type="submit" name="reset" class="btn btn-secondary"><?php echo LANG['reset']; ?></button>
-        </div>
-      </form>
+      </main>
     </div>
-  </main>
+  </div>
+  <div style="position: relative; top: 100%; left: 0; width: 100%; height: 10vh; overflow: hidden;"></div>
 </body>
 
 <?php
