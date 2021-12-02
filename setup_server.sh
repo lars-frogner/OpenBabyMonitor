@@ -104,14 +104,14 @@ fi
 SETUP_BASH_CONFIG=true
 if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     # Enable convenient ls aliases
-    sed -i "s/#alias ll='ls -l'/alias ll='ls -lh'/g" /home/$BM_USER/.bashrc
-    sed -i "s/#alias la='ls -A'/alias la='ls -A'/g" /home/$BM_USER/.bashrc
-    sed -i "s/#alias l='ls -CF'/alias l='ls -Alh'/g" /home/$BM_USER/.bashrc
+    sed -i "s/#*alias ll=.*$/alias ll='ls -lh'/g" /home/$BM_USER/.bashrc
+    sed -i "s/#*alias la=.*$/alias la='ls -A'/g" /home/$BM_USER/.bashrc
+    sed -i "s/#*alias l=.*$/alias l='ls -Alh'/g" /home/$BM_USER/.bashrc
 
     # Enable arrow up/down history search
     cp /etc/inputrc /home/$BM_USER/.inputrc
-    sed -i 's/# "\\e\[B": history-search-forward/"\\e[B": history-search-forward/g' /home/$BM_USER/.inputrc
-    sed -i 's/# "\\e\[A": history-search-backward/"\\e[A": history-search-backward/g' /home/$BM_USER/.inputrc
+    sed -i 's/#*[[:space:]]*"\\e\[B":.*$/"\\e[B": history-search-forward/g' /home/$BM_USER/.inputrc
+    sed -i 's/#*[[:space:]]*"\\e\[A":.*$/"\\e[A": history-search-backward/g' /home/$BM_USER/.inputrc
 
     # Set default editor
     echo -e "EDITOR=nano\n" >> /home/$BM_USER/.bashrc
@@ -119,7 +119,7 @@ if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     echo -e "source $BM_ENV_EXPORTS_PATH\n" >> /home/$BM_USER/.bashrc
 
     if [[ "$BM_USER" == "pi" ]]; then
-        sudo sed -i 's/pi ALL=(ALL) NOPASSWD: ALL/pi ALL=(ALL) PASSWD: ALL/g' /etc/sudoers.d/010_pi-nopasswd
+        sudo sed -i 's/^pi .*$/pi ALL=(ALL) PASSWD: ALL/g' /etc/sudoers.d/010_pi-nopasswd
     fi
 fi
 
