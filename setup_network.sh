@@ -29,14 +29,15 @@ BM_NW_CLIENT_DIR=/home/$BM_USER/.netconf_client # Directory for configurations f
 BM_NW_ORIG_DIR=/home/$BM_USER/.netconf_orig # For backup of original configuration files
 BM_NW_AP_IP_ROOT=192.168.4
 BM_NW_INTERFACE=wlan0
-BM_NW_SSID=$BM_HOSTNAME
+BM_NW_AP_SSID=$BM_HOSTNAME
 BM_NW_COUNTRY_CODE=$BM_COUNTRY_CODE
 
 SETUP_ENV=true
 if [[ "$SETUP_ENV" = true ]]; then
+    echo "export BM_HOSTNAME=$BM_HOSTNAME" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_NW_AP_DIR=$BM_NW_AP_DIR" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_NW_CLIENT_DIR=$BM_NW_CLIENT_DIR" >> $BM_ENV_EXPORTS_PATH
-    echo "export BM_NW_SSID=$BM_NW_SSID" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_NW_AP_SSID=$BM_NW_AP_SSID" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_NW_INTERFACE=$BM_NW_INTERFACE" >> $BM_ENV_EXPORTS_PATH
 
     # Copy environment variables (without 'export') into environment file for services and PHP
@@ -131,11 +132,11 @@ mkdir $BM_NW_AP_DIR/etc/hostapd
 # Configure hostapd
 
 # Obtain password hash
-PSK=$($BM_SERVERCONTROL_DIR/get_network_psk.sh "$BM_NW_SSID" "$PASSWORD")
+PSK=$($BM_SERVERCONTROL_DIR/get_network_psk.sh "$BM_NW_AP_SSID" "$PASSWORD")
 
 echo "country_code=$BM_NW_COUNTRY_CODE
 interface=$BM_NW_INTERFACE
-ssid=$BM_NW_SSID
+ssid=$BM_NW_AP_SSID
 hw_mode=g
 channel=$BM_AP_CHANNEL
 macaddr_acl=0
