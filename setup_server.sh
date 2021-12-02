@@ -499,35 +499,9 @@ _EOF_
     # Enable SSL module
     sudo a2enmod ssl
 
-    echo "[req]
-default_bits  = 2048
-distinguished_name = req_distinguished_name
-req_extensions = req_ext
-x509_extensions = v3_req
-prompt = no
-
-[req_distinguished_name]
-commonName = $BM_HOSTNAME.local: Self-signed certificate
-
-[req_ext]
-subjectAltName = @alt_names
-
-[v3_req]
-subjectAltName = @alt_names
-
-[alt_names]
-DNS.1 = $BM_HOSTNAME.local
-DNS.2 = $BM_HOSTNAME.home
-DNS.3 = $BM_HOSTNAME.lan
-" > $BM_HOSTNAME.cnf
-
-    SSL_KEY_PATH=/etc/ssl/private/$BM_HOSTNAME.key
-    SSL_CERT_PATH=/etc/ssl/certs/$BM_HOSTNAME.crt
-    sudo openssl req -x509 -nodes -days 36524 -newkey rsa:2048 -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH -config $BM_HOSTNAME.cnf
-    rm $BM_HOSTNAME.cnf
+    $BM_SERVERCONTROL_DIR/create_ssl_key.sh "$BM_HOSTNAME"
 
     # Setup new site
-    SITE_NAME=$(basename $BM_SITE_DIR)
     echo "<VirtualHost *:80>
     DocumentRoot $BM_SITE_DIR
     ErrorLog $BM_APACHE_LOG_PATH
@@ -564,11 +538,11 @@ DNS.3 = $BM_HOSTNAME.lan
     <Directory \"$BM_SITE_DIR/audiostream\">
         AllowOverride All
     </Directory>
-</VirtualHost>" | sudo tee /etc/apache2/sites-available/$SITE_NAME.conf
-    sudo a2ensite $SITE_NAME
+</VirtualHost>" | sudo tee /etc/apache2/sites-available/babymonitor.conf
+    sudo a2ensite babymonitor
 
     # Configure rotation of Apache log
-    sudo sed -i "s/create .*/create $BM_WRITE_PERMISSIONS $BM_USER $BM_WEB_GROUP/g" /etc/logrotate.d/apache2
+    sudo sed -i "s/create .*$/create $BM_WRITE_PERMISSIONS $BM_USER $BM_WEB_GROUP/g" /etc/logrotate.d/apache2
 
     # Configure rotation of babymonitor log
     echo "$BM_SERVER_LOG_PATH {
