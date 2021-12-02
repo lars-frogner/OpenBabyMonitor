@@ -6,7 +6,7 @@ SAVE_NETWORK=0
 while (( $# )); do
   case $1 in
     -s|--save)  SAVE_NETWORK=1 ;;
-    -*)         printf 'Unknown option: %q\n\n' "$1"
+    -*)         printf 'Unknown option: %q\n\n' "$1" 1>&4
                 exit 1 ;;
     *)          args+=( "$1" ) ;;
   esac
@@ -18,7 +18,7 @@ SSID="$1"
 PASSWORD="$2"
 
 if [[ -z "$SSID" ]]; then
-    echo 'No SSID provided'
+    echo 'No SSID provided' 1>&4
     $BM_SERVERCONTROL_DIR/write_result.sh 1
     exit 1
 fi
@@ -67,7 +67,6 @@ RETRY_INTERVAL=0.2
 MAX_TIME=10
 for i in $(seq 0 $RETRY_INTERVAL $MAX_TIME); do
     STATUS="$(sudo wpa_cli -i $BM_NW_INTERFACE status)"
-    echo "$STATUS"
     if [[ ! -z "$(echo "$STATUS" | grep 'wpa_state=COMPLETED')" ]]; then
         CONNECTED_SSID=$(echo "$STATUS" | sed -n "s/^ssid=\(.*\)$/\1/p")
         if [[ "$CONNECTED_SSID" = "$SSID" ]]; then

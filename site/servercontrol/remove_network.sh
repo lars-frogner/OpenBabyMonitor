@@ -4,7 +4,7 @@ source $BM_SERVERCONTROL_DIR/redirection.sh
 SSID="$1"
 
 if [[ -z "$SSID" ]]; then
-    echo 'No SSID provided'
+    echo 'No SSID provided' 1>&4
     $BM_SERVERCONTROL_DIR/write_result.sh 1
     exit 1
 fi

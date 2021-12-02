@@ -2,7 +2,7 @@
 SSID="$1"
 
 if [[ -z "$SSID" ]]; then
-    echo 'No SSID provided'
+    echo 'No SSID provided' 1>&2
     exit 1
 fi
 

@@ -3,7 +3,7 @@ SSID="$1"
 PASSWORD="$2"
 
 if [[ -z "$SSID" || -z "$PASSWORD" ]]; then
-    echo 'Missing SSID or password'
+    echo 'Missing SSID or password' 1>&2
     exit 1
 fi
 

@@ -46,7 +46,7 @@ case $FLAG in
     if [[ ! -z "$TIMESTAMP" ]]; then
         case $TIMESTAMP in
         ''|*[!0-9]*)
-            echo "Invalid timestamp $TIMESTAMP" 1>&2
+            echo "Invalid timestamp $TIMESTAMP" 1>&4
             exit 1
             ;;
         *)
@@ -81,7 +81,7 @@ case $FLAG in
     ;;
 
   *)
-    echo "Invalid flag $FLAG" 1>&2
+    echo "Invalid flag $FLAG" 1>&4
     exit 1
     ;;
 esac
