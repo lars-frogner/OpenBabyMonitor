@@ -139,6 +139,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     mkdir -p $BM_ENV_DIR
     touch $BM_ENV_EXPORTS_PATH
 
+    echo "export BM_TIMEZONE=$BM_TIMEZONE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_USER=$BM_USER" >> $BM_ENV_EXPORTS_PATH
     echo "export WEB_USER=$WEB_USER" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_WEB_GROUP=$BM_WEB_GROUP" >> $BM_ENV_EXPORTS_PATH
@@ -433,7 +434,6 @@ _EOF_
     # Configure PHP
     PHP_INI_CLI_PATH=$(php -i | grep /.+/php.ini -oE)
     PHP_DIR=$(dirname $(dirname $PHP_INI_CLI_PATH))
-    PHP_INI_APACHE_PATH=$PHP_DIR/apache2/php.ini
 
     # Make sure inotify PHP extension is loaded
     echo 'extension=inotify.so' | sudo tee $PHP_DIR/mods-available/inotify.ini
@@ -444,8 +444,7 @@ _EOF_
     sudo phpenmod zip
 
     # Set time zone
-    sudo sed -i "s/;date.timezone =/date.timezone = ${BM_TIMEZONE/'/'/'\/'}/g" $PHP_INI_CLI_PATH
-    sudo sed -i "s/;date.timezone =/date.timezone = ${BM_TIMEZONE/'/'/'\/'}/g" $PHP_INI_APACHE_PATH
+    $BM_SERVERCONTROL_DIR/set_php_timezone.sh "$BM_TIMEZONE"
 
     # Use index.php as index file
     APACHE_CONF_PATH=/etc/apache2/apache2.conf
