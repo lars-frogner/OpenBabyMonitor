@@ -115,7 +115,7 @@
         </li>
       </ul>
       </li>
-      <li class="nav-item dropdown me-auto">
+      <li class="nav-item dropdown pe-auto">
         <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
           <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
             <use href="media/bootstrap-icons.svg#chat-text" />
