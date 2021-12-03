@@ -16,7 +16,8 @@
     "nav_debugging": "Feilsøking",
     "nav_access_point": "Tilgangspunkt",
     "nav_continue": "Fortsett",
-    "nav_cancel": "Avbryt",
+    "cancel": "Avbryt",
+    "reset": "Tilbakestill",
     "nav_want_to_leave_site": "Er du sikker på at du vil forlate siden?",
     "nav_want_to_sign_out": "Er du sikker på at du vil logge ut?",
     "nav_want_to_reboot": "Er du sikker på at du vil restarte enheten?",
@@ -48,5 +49,6 @@
     "under_voltage_warning": "Advarsel om lav spenning!",
     "under_voltage_warning_text": "Strømforsyningen har for lav spenning. Vennligst slå av enheten og utbedre dette. Hvis enheten drives av et batteri trenger dette å lades opp igjen. Hvis ikke er det mulig at strømforsyningen er defekt.",
     "overheat_warning": "Advarsel om overoppheting!",
-    "overheat_warning_text": "Enheten blir for varm. Prosessoren har blitt sakket ned for å begrense ytterligere oppvarming. Vennligst påse at enheten har tilstrekkelig ventilasjon, og begrens bruken av video- eller lydstrømming."
+    "overheat_warning_text": "Enheten blir for varm. Prosessoren har blitt sakket ned for å begrense ytterligere oppvarming. Vennligst påse at enheten har tilstrekkelig ventilasjon, og begrens bruken av video- eller lydstrømming.",
+    "sure_want_to_reset": "Er du sikker på at du vil tilbakestille innstillingene til deres standardverdier?"
 }

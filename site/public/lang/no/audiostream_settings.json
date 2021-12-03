@@ -1,8 +1,6 @@
 {
     "audio_settings": "Lydinnstillinger",
     "submit": "Bekreft",
-    "undo": "Angre",
-    "reset": "Tilbakestill",
     "encrypted": "Kryptert",
     "gain": "Mikrofonforsterkning (%)",
     "volume": "Volumjustering",

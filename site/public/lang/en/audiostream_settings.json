@@ -1,8 +1,6 @@
 {
     "audio_settings": "Audio settings",
     "submit": "Confirm",
-    "undo": "Undo",
-    "reset": "Reset",
     "encrypted": "Encrypted",
     "gain": "Microphone amplification (%)",
     "volume": "Volume adjustment",

@@ -1,8 +1,6 @@
 {
     "video_settings": "Video settings",
     "submit": "Confirm",
-    "undo": "Undo",
-    "reset": "Reset",
     "vertical_resolution": "Vertical resolution",
     "encrypted": "Encrypted",
     "use_variable_framerate": "Variable frame rate",

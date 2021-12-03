@@ -1,8 +1,6 @@
 {
     "video_settings": "Videoinnstillinger",
     "submit": "Bekreft",
-    "undo": "Angre",
-    "reset": "Tilbakestill",
     "vertical_resolution": "Vertikal oppløsning",
     "encrypted": "Kryptert",
     "use_variable_framerate": "Variabel bildefrekvens",

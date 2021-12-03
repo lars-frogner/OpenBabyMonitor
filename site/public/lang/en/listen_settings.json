@@ -1,8 +1,6 @@
 {
     "listen_settings": "Notification settings",
     "submit": "Confirm",
-    "undo": "Undo",
-    "reset": "Reset",
     "notify_on_crying": "Crying",
     "and": "and",
     "or": "or",

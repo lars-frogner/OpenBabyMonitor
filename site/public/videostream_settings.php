@@ -54,8 +54,7 @@ require_once(TEMPLATES_DIR . '/settings.php');
             </div>
             <div class="my-4">
               <button type="submit" name="submit" class="btn btn-primary"><?php echo LANG['submit']; ?></button>
-              <button name="undo" class="btn btn-secondary" onclick="$('#videostream_settings_form').trigger('reset');"><?php echo LANG['undo']; ?></button>
-              <button type="submit" name="reset" class="btn btn-secondary"><?php echo LANG['reset']; ?></button>
+              <button type="submit" name="reset" style="display: none;" id="reset_submit_button" disabled></button><input type="button" class="btn btn-warning ms-2" id="reset_button" value="<?php echo LANG['reset']; ?>" />
             </div>
           </form>
         </div>

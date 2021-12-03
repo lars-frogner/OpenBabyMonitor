@@ -1,9 +1,6 @@
 {
     "system_settings": "System settings",
     "submit": "Confirm",
-    "undo": "Undo",
-    "reset": "Reset",
-    "cancel": "Cancel",
     "ask_secure_redirect": "Suggest switching to secure site",
     "show_unsupported_message": "Show message when unsupported",
     "ask_notification_permission": "Ask for permission",

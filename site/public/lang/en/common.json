@@ -16,7 +16,7 @@
     "nav_debugging": "Debugging",
     "nav_access_point": "Access point",
     "nav_continue": "Continue",
-    "nav_cancel": "Cancel",
+    "cancel": "Cancel",
     "nav_want_to_leave_site": "Are you sure you want to leave the site?",
     "nav_want_to_sign_out": "Are you sure you want to sign out?",
     "nav_want_to_reboot": "Are you sure you want to reboot the device?",
@@ -48,5 +48,6 @@
     "under_voltage_warning": "Low voltage warning!",
     "under_voltage_warning_text": "The power supply voltage is too low. Please shut down the unit and address this. If the unit is powered by a battery, it needs to be recharged. Otherwise, the power supply may be malfunctioning.",
     "overheat_warning": "Overheat warning!",
-    "overheat_warning_text": "The unit is becoming too hot. The CPU has been slowed down to limit further heating. Please ensure that the unit has proper ventilation, and limit the use of video or audio streaming."
+    "overheat_warning_text": "The unit is becoming too hot. The CPU has been slowed down to limit further heating. Please ensure that the unit has proper ventilation, and limit the use of video or audio streaming.",
+    "sure_want_to_reset": "Are you sure you want to reset the settings to their default values?"
 }

@@ -1,9 +1,6 @@
 {
     "system_settings": "Systeminnstillinger",
     "submit": "Bekreft",
-    "undo": "Angre",
-    "reset": "Tilbakestill",
-    "cancel": "Avbryt",
     "ask_secure_redirect": "Foreslå å bytte til sikker side",
     "show_unsupported_message": "Vis beskjed om manglende støtte",
     "ask_notification_permission": "Spør om tillatelse",

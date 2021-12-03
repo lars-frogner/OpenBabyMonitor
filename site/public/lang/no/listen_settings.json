@@ -1,8 +1,6 @@
 {
     "listen_settings": "Varselinnstillinger",
     "submit": "Bekreft",
-    "undo": "Angre",
-    "reset": "Tilbakestill",
     "notify_on_crying": "Gråt",
     "and": "og",
     "or": "eller",
