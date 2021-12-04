@@ -234,7 +234,8 @@ class AudioFeatureExtractor:
     def compute_feature_and_loudness(self, waveform):
         mel_spectrogram, spectrogram = self.compute_mel_spectrogram_python_speech_features(
             waveform, return_spectrogram=True)
-        return mel_spectrogram, self.compute_loudness(spectrogram)
+        return self.take_log_of_mel_spectrogram(
+            mel_spectrogram), self.compute_loudness(spectrogram)
 
     def compute_loudness(self, spectrogram):
         return librosa_destilled.spectrogram_rms(
