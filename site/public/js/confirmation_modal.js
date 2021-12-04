@@ -64,21 +64,18 @@ function setConfirmationModalProperties(properties) {
         $('#' + MODAL_CONFIRM_CHECKBOX_ID).hide();
     }
     var useConfirm = false;
-    if (properties.hasOwnProperty('confirmElement') && properties['confirmElement'] == 'button') {
+    if (properties.hasOwnProperty('href')) {
         useConfirm = true;
-        confirmId = MODAL_CONFIRM_BUTTON_ID;
-        $('#' + MODAL_CONFIRM_LINK_ID).hide();
-    } else {
         confirmId = MODAL_CONFIRM_LINK_ID;
         $('#' + MODAL_CONFIRM_BUTTON_ID).hide();
+        $('#' + confirmId).prop('href', properties['href']);
+    } else {
+        confirmId = MODAL_CONFIRM_BUTTON_ID;
+        $('#' + MODAL_CONFIRM_LINK_ID).hide();
     }
     if (properties.hasOwnProperty('confirm')) {
         useConfirm = true;
         $('#' + confirmId).html(properties['confirm']);
-    }
-    if (properties.hasOwnProperty('href')) {
-        useConfirm = true;
-        $('#' + confirmId).prop('href', properties['href']);
     }
     if (properties.hasOwnProperty('confirmName')) {
         useConfirm = true;
