@@ -237,6 +237,14 @@ function cameraIsConnected() {
   return $output[0] == '1';
 }
 
+function executeSettingOfNewTimezone($timezone) {
+  executeServerControlAction('set_timezone', $timezone);
+}
+
+function executeSettingOfNewHostname($hostname) {
+  executeServerControlAction('set_hostname', $hostname);
+}
+
 function executeSettingOfNewDevicePassword($password) {
   executeServerControlAction('set_device_password', $password);
 }
@@ -266,4 +274,24 @@ function setPHPSysInfoDefaultTemplate($new_template) {
   if ($result_code != 0) {
     bm_error("Setting default template for phpSysInfo failed with error code $result_code:\n" . join("\n", $output));
   }
+}
+
+function getValidTimezones() {
+  $output = null;
+  $result_code = null;
+  exec('timedatectl list-timezones', $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Obtaining valid time zones failed with error code $result_code:\n" . join("\n", $output));
+  }
+  return $output;
+}
+
+function getValidCountryCodes() {
+  $output = null;
+  $result_code = null;
+  exec(SERVERCONTROL_DIR . '/get_country_codes.sh', $output, $result_code);
+  if ($result_code != 0) {
+    bm_error("Obtaining valid country codes failed with error code $result_code:\n" . join("\n", $output));
+  }
+  return $output;
 }

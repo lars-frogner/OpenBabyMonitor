@@ -55,8 +55,20 @@ function executeRemovalOfKnownNetwork($ssid) {
   return true;
 }
 
+function executeSettingOfNewAPChannel($ap_channel) {
+  executeServerControlAction('set_ap_channel', $ap_channel);
+}
+
+function executeSettingOfNewAPSSIDAndPassword($ssid, $password) {
+  executeServerControlAction('set_ap_ssid_password', array($ssid, $password));
+}
+
 function executeSettingOfNewAPPassword($password) {
   executeServerControlAction('set_ap_password', $password);
+}
+
+function executeSettingOfNewCountryCode($country_code) {
+  executeServerControlAction('set_country_code', $country_code);
 }
 
 function anyKnownNetworks($database) {
