@@ -26,5 +26,5 @@ DNS.3 = $HOSTNAME.lan
 
 SSL_KEY_PATH=/etc/ssl/private/$HOSTNAME.key
 SSL_CERT_PATH=/etc/ssl/certs/$HOSTNAME.crt
-sudo openssl req -x509 -nodes -days 36524 -newkey rsa:2048 -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH -config $HOSTNAME.cnf
+sudo openssl req -x509 -nodes -days 36524 -newkey rsa:2048 -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH -config /tmp/$HOSTNAME.cnf
 rm /tmp/$HOSTNAME.cnf

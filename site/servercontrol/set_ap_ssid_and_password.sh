@@ -29,4 +29,4 @@ fi
 ESCAPED_SSID=$(printf '%s\n' "$NEW_SSID" | sed -e 's/[\/&]/\\&/g')
 sed -i "s/ssid=.*$/ssid=$ESCAPED_SSID/g" $CONF_FILE
 
-$BM_SERVERCONTROL_DIR/set_env_variable BM_NW_AP_SSID $NEW_SSID
+$BM_SERVERCONTROL_DIR/set_env_variable.sh BM_NW_AP_SSID $NEW_SSID

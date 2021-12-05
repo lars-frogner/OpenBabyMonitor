@@ -19,4 +19,4 @@ $BM_SERVERCONTROL_DIR/set_php_timezone.sh "$NEW_TIMEZONE"
 
 sudo raspi-config nonint do_change_timezone "$NEW_TIMEZONE"
 
-$BM_SERVERCONTROL_DIR/set_env_variable BM_TIMEZONE $NEW_TIMEZONE
+$BM_SERVERCONTROL_DIR/set_env_variable.sh BM_TIMEZONE $NEW_TIMEZONE

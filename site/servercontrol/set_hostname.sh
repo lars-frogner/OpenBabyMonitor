@@ -22,6 +22,6 @@ $BM_SERVERCONTROL_DIR/set_apache_site_hostname.sh $NEW_HOSTNAME 1>&3 2>&4
 
 sed -i "s/[[:space:]][[:space:]]*$OLD_HOSTNAME$/     $NEW_HOSTNAME/g" $BM_NW_AP_DIR/etc/hosts
 
-sudo raspi-config nonint set_hostname $NEW_HOSTNAME 1>&3 2>&4
+sudo raspi-config nonint do_hostname $NEW_HOSTNAME 1>&3 2>&4
 
-$BM_SERVERCONTROL_DIR/set_env_variable BM_HOSTNAME $NEW_HOSTNAME
+$BM_SERVERCONTROL_DIR/set_env_variable.sh BM_HOSTNAME $NEW_HOSTNAME
