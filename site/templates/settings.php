@@ -134,7 +134,7 @@ function generateRange($setting, $setting_name, $initial_value) {
   line('    <div class="col-auto">');
   line("      <input type=\"range\" name=\"$setting_name\" class=\"form-range\" value=\"$initial_value\" min=\"$min\" max=\"$max\" step=\"$step\" id=\"$id\" oninput=\"$('#' + '$value_id').prop('value', this.value);\">");
   line('    </div>');
-  line('    <div class="col-auto px-0" style="min-width: ' . $n_output_chars . 'em;">');
+  line('    <div class="col-auto px-0" style="min-width: ' . $n_output_chars . 'rem;">');
   line("      <output id=\"$value_id\">$initial_value</output>");
   line('    </div>');
   line('  </div>');
