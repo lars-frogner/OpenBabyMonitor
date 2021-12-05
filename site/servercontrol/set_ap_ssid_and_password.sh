@@ -20,12 +20,6 @@ CONF_FILE=$BM_NW_AP_DIR/etc/hostapd/hostapd.conf
 NEW_PSK=$($BM_SERVERCONTROL_DIR/get_network_psk.sh "$NEW_SSID" "$NEW_PASSWORD")
 sed -i "s/wpa_psk=.*$/wpa_psk=$NEW_PSK/g" $CONF_FILE
 
-OLD_SSID=$BM_NW_AP_SSID
-
-if [[ "$NEW_SSID" = "$OLD_SSID" ]]; then
-    exit
-fi
-
 ESCAPED_SSID=$(printf '%s\n' "$NEW_SSID" | sed -e 's/[\/&]/\\&/g')
 sed -i "s/ssid=.*$/ssid=$ESCAPED_SSID/g" $CONF_FILE
 
