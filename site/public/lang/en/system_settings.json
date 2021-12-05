@@ -18,8 +18,16 @@
     "not_allowed": "Not allowed",
     "grant_permission": "Grant permission",
     "new_password": "New password",
+    "hostname": "Hostname",
+    "timezone": "Time zone",
+    "hostname_invalid": "Invalid hostname<br>(valid characters are a-z, 0-9 and -)",
     "change": "Change",
-    "change_device_password": "Change device password",
-    "sure_want_to_change_device_password": "Are you sure you want to change the device password?",
-    "device_password_changed": "The device password was successfully changed."
+    "server_properties": "Server properties",
+    "sure_want_to_change_timezone": "Are you sure you want to change the server time zone?",
+    "sure_want_to_change_hostname": "Are you sure you want to change the server hostname?",
+    "sure_want_to_change_device_password": "Are you sure you want to change the server password?",
+    "timezone_changed": "The server time zone was successfully changed.",
+    "hostname_changed": "The server hostname was successfully changed.",
+    "device_password_changed": "The server password was successfully changed.",
+    "will_change_url": "Note that this website will get a new URL with the new hostname."
 }

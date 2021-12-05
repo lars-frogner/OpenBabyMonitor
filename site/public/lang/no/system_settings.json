@@ -18,8 +18,16 @@
     "not_allowed": "Ikke tillatt",
     "grant_permission": "Gi tillatelse",
     "new_password": "Nytt passord",
+    "hostname": "Vertsnavn",
+    "timezone": "Tidssone",
+    "hostname_invalid": "Ugyldig vertsnavn<br>(gyldige tegn er a-z, 0-9 og -)",
     "change": "Bytt",
-    "change_device_password": "Bytt passord for enheten",
-    "sure_want_to_change_device_password": "Er du sikker på at du vil bytte passordet for enheten?",
-    "device_password_changed": "Nytt passord ble satt for enheten."
+    "server_properties": "Serveregenskaper",
+    "sure_want_to_change_timezone": "Er du sikker på at du vil bytte tidssonen til serveren?",
+    "sure_want_to_change_hostname": "Er du sikker på at du vil bytte vertsnavnet til serveren?",
+    "sure_want_to_change_device_password": "Er du sikker på at du vil bytte passordet til serveren?",
+    "timezone_changed": "Ny tidssone ble satt for serveren.",
+    "hostname_changed": "Nytt vertsnavn ble satt for serveren.",
+    "device_password_changed": "Nytt passord ble satt for serveren.",
+    "will_change_url": "Merk at dette nettstedet vil få en ny URL med det nye vertsnavnet."
 }

@@ -1,5 +1,5 @@
 const MAIN_CONTAINER_ID = 'main_container';
-const SETTINGS_FORM_CONTAINER_ID = 'network_settings_form_container';
+const SETTINGS_FORM_CONTAINER_CLASS = 'network-settings-form-container';
 const SWITCHING_INFO_ID = 'switching_network_info';
 const NETWORK_STATUS_MSG_CLASS = 'network-status-msg';
 const NETWORK_PASSWORD_INPUT_ID = 'network_password_input';
@@ -10,20 +10,27 @@ const DISCONNECT_SUBMIT_BUTTON_ID = 'disconnect_submit_button';
 const DISCONNECT_BUTTON_ID = 'disconnect_button';
 const FORGET_SUBMIT_BUTTON_ID = 'forget_submit_button';
 const FORGET_BUTTON_ID = 'forget_button';
+const AP_CHANNEL_RANGE_ID = 'ap_channel_range';
+const AP_CHANNEL_RANGE_OUTPUT_ID = 'ap_channel_range_output';
+const CHANGE_AP_CHANNEL_SUBMIT_BUTTON_ID = 'change_ap_channel_submit_button';
+const CHANGE_AP_CHANNEL_BUTTON_ID = 'change_ap_channel_button';
+const AP_SSID_INPUT_ID = 'ap_ssid_input';
+const AP_SSID_REQUIRES_PASSWORD_MSG_ID = 'ap_ssid_requires_password_msg';
+const AP_PASSWORD_INPUT_ID = 'ap_password_input';
+const CHANGE_AP_SSID_PASSWORD_SUBMIT_BUTTON_ID = 'change_ap_ssid_password_submit_button';
+const CHANGE_AP_SSID_PASSWORD_BUTTON_ID = 'change_ap_ssid_password_button';
 const SITE_PASSWORD_INPUT_ID = 'site_password_input';
 const CHANGE_SITE_PASSWORD_SUBMIT_BUTTON_ID = 'change_site_password_submit_button';
 const CHANGE_SITE_PASSWORD_BUTTON_ID = 'change_site_password_button';
-const AP_PASSWORD_INPUT_ID = 'ap_password_input';
-const CHANGE_AP_PASSWORD_SUBMIT_BUTTON_ID = 'change_ap_password_submit_button';
-const CHANGE_AP_PASSWORD_BUTTON_ID = 'change_ap_password_button';
+const COUNTRY_CODE_SELECT_ID = 'country_code_select';
+const CHANGE_COUNTRY_CODE_SUBMIT_BUTTON_ID = 'change_country_code_submit_button';
+const CHANGE_COUNTRY_CODE_BUTTON_ID = 'change_country_code_button';
 
 const DISABLED_BUTTON_CLASS = 'btn btn-secondary';
-const BUTTON_CLASSES = {};
-BUTTON_CLASSES[CONNECT_BUTTON_ID] = 'btn btn-success';
-BUTTON_CLASSES[DISCONNECT_BUTTON_ID] = 'btn btn-danger';
-BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-warning';
-BUTTON_CLASSES[CHANGE_SITE_PASSWORD_BUTTON_ID] = 'btn btn-primary';
-BUTTON_CLASSES[CHANGE_AP_PASSWORD_BUTTON_ID] = 'btn btn-primary';
+const NETWORK_BUTTON_CLASSES = {};
+NETWORK_BUTTON_CLASSES[CONNECT_BUTTON_ID] = 'btn btn-success';
+NETWORK_BUTTON_CLASSES[DISCONNECT_BUTTON_ID] = 'btn btn-danger';
+NETWORK_BUTTON_CLASSES[FORGET_BUTTON_ID] = 'btn btn-warning';
 
 const ICON_UNSELECTED_BACKGROUND_COLOR = 'DimGray';
 const ICON_SELECTED_BACKGROUND_COLOR = 'ForestGreen';
@@ -35,11 +42,13 @@ $(function () {
     setupAvailableNetworksSelect();
     setupKnownNetworksSelect();
 
-    connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmClass: BUTTON_CLASSES[CONNECT_BUTTON_ID], confirmOnclick: () => { performPreSwitchingPostActions(); enabled($('#' + CONNECT_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
-    connectModalToLink(DISCONNECT_BUTTON_ID, { header: LANG['sure_want_to_disconnect'], confirm: LANG['disconnect'], dismiss: LANG['cancel'], confirmClass: BUTTON_CLASSES[DISCONNECT_BUTTON_ID], confirmOnclick: () => { performPreSwitchingPostActions(); enabled($('#' + DISCONNECT_SUBMIT_BUTTON_ID))[0].click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_access_point'], showText: () => { return true; } });
-    connectModalToLink(FORGET_BUTTON_ID, { header: LANG['sure_want_to_forget'], confirm: LANG['forget'], dismiss: LANG['cancel'], confirmClass: BUTTON_CLASSES[FORGET_BUTTON_ID], confirmOnclick: () => { enabled($('#' + FORGET_SUBMIT_BUTTON_ID)).click(); } }, null);
+    connectModalToLink(CONNECT_BUTTON_ID, { header: LANG['sure_want_to_connect'], confirm: LANG['connect'], dismiss: LANG['cancel'], confirmClass: NETWORK_BUTTON_CLASSES[CONNECT_BUTTON_ID], confirmOnclick: () => { performPreSwitchingPostActions(); enabled($('#' + CONNECT_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_new_network'], showText: () => { return true; } });
+    connectModalToLink(DISCONNECT_BUTTON_ID, { header: LANG['sure_want_to_disconnect'], confirm: LANG['disconnect'], dismiss: LANG['cancel'], confirmClass: NETWORK_BUTTON_CLASSES[DISCONNECT_BUTTON_ID], confirmOnclick: () => { performPreSwitchingPostActions(); enabled($('#' + DISCONNECT_SUBMIT_BUTTON_ID))[0].click(); } }, { text: LANG['will_be_disconnected'] + ' ' + LANG['until_access_point'], showText: () => { return true; } });
+    connectModalToLink(FORGET_BUTTON_ID, { header: LANG['sure_want_to_forget'], confirm: LANG['forget'], dismiss: LANG['cancel'], confirmClass: NETWORK_BUTTON_CLASSES[FORGET_BUTTON_ID], confirmOnclick: () => { enabled($('#' + FORGET_SUBMIT_BUTTON_ID)).click(); } }, null);
+    connectModalToLink(CHANGE_AP_CHANNEL_BUTTON_ID, { header: LANG['sure_want_to_change_ap_channel'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_AP_CHANNEL_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['must_reboot_for_changes'], showText: () => { return ACCESS_POINT_ACTIVE; } });
+    connectModalToLink(CHANGE_AP_SSID_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_ap_ssid_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_AP_SSID_PASSWORD_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['must_reboot_for_changes'], showText: () => { return ACCESS_POINT_ACTIVE; } });
     connectModalToLink(CHANGE_SITE_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_site_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_SITE_PASSWORD_SUBMIT_BUTTON_ID)).click(); } }, null);
-    connectModalToLink(CHANGE_AP_PASSWORD_BUTTON_ID, { header: LANG['sure_want_to_change_ap_password'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_AP_PASSWORD_SUBMIT_BUTTON_ID)).click(); } }, null);
+    connectModalToLink(CHANGE_COUNTRY_CODE_BUTTON_ID, { header: LANG['sure_want_to_change_country_code'], confirm: LANG['change'], dismiss: LANG['cancel'], confirmClass: 'btn btn-primary', confirmOnclick: () => { enabled($('#' + CHANGE_COUNTRY_CODE_SUBMIT_BUTTON_ID)).click(); } }, { text: LANG['must_reboot_for_changes'], showText: () => { return true; } });
     $('#' + MAIN_CONTAINER_ID).show();
 });
 
@@ -227,15 +236,15 @@ function enabled(button) {
     return button;
 }
 
-function disableButton(button) {
+function disableNetworkButton(button) {
     button.prop('disabled', true);
     button.removeClass();
     button.addClass(DISABLED_BUTTON_CLASS);
 }
 
-function enableButton(button) {
+function enableNetworkButton(button) {
     button.removeClass();
-    button.addClass(BUTTON_CLASSES[button.prop('id')]);
+    button.addClass(NETWORK_BUTTON_CLASSES[button.prop('id')]);
     button.prop('disabled', false);
 }
 
@@ -255,58 +264,83 @@ function enablePasswordInput(focus) {
 
 function selectNetwork(networkMeta) {
     if (networkMeta.isConnected) {
-        disableButton($('#' + CONNECT_BUTTON_ID));
+        disableNetworkButton($('#' + CONNECT_BUTTON_ID));
         disablePasswordInput();
         $('#' + REMEMBER_CHECK_ID).prop('disabled', true);
-        enableButton($('#' + DISCONNECT_BUTTON_ID));
+        enableNetworkButton($('#' + DISCONNECT_BUTTON_ID));
     } else {
-        disableButton($('#' + DISCONNECT_BUTTON_ID));
+        disableNetworkButton($('#' + DISCONNECT_BUTTON_ID));
         if (networkMeta.isAvailable && networkMeta.requiresPassword && !networkMeta.isKnown) {
-            disableButton($('#' + CONNECT_BUTTON_ID));
+            disableNetworkButton($('#' + CONNECT_BUTTON_ID));
             enablePasswordInput(true);
         } else {
             disablePasswordInput();
-            enableButton($('#' + CONNECT_BUTTON_ID));
+            enableNetworkButton($('#' + CONNECT_BUTTON_ID));
         }
         $('#' + REMEMBER_CHECK_ID).prop('disabled', false);
     }
     if (networkMeta.isKnown) {
         disablePasswordInput();
         $('#' + REMEMBER_CHECK_ID).prop('disabled', true);
-        enableButton($('#' + FORGET_BUTTON_ID));
+        enableNetworkButton($('#' + FORGET_BUTTON_ID));
     } else {
-        disableButton($('#' + FORGET_BUTTON_ID));
+        disableNetworkButton($('#' + FORGET_BUTTON_ID));
     }
 }
 
 function performPreSwitchingPostActions() {
     setDisabledForNavbar(true);
-    $('#' + SETTINGS_FORM_CONTAINER_ID).find('*').hide();
+    $('.' + SETTINGS_FORM_CONTAINER_CLASS).find('*').hide();
     $('.' + NETWORK_STATUS_MSG_CLASS).hide();
     $('#' + SWITCHING_INFO_ID).show();
     $('#' + MODAL_ID).modal('hide');
 }
 
-$('#' + NETWORK_PASSWORD_INPUT_ID).on('input', function () {
-    if (this.value.length < 8 || this.value.length > 63) {
-        disableButton($('#' + CONNECT_BUTTON_ID));
+function networkSSIDIsValid(ssid) {
+    return ssid.length > 0 && ssid.length <= 32;
+}
+
+function networkPasswordIsValid(password) {
+    return password.length >= 8 && password.length < 64;
+}
+
+function handleAPSSIDOrPasswordInput(ssid, password) {
+    const SSIDDifferent = ssid != AP_SSID;
+    const SSIDdValid = networkSSIDIsValid(ssid);
+    const passwordValid = networkPasswordIsValid(password);
+    $('#' + CHANGE_AP_SSID_PASSWORD_BUTTON_ID).prop('disabled', !passwordValid || !SSIDdValid);
+    if (passwordValid || !SSIDDifferent) {
+        $('#' + AP_SSID_REQUIRES_PASSWORD_MSG_ID).hide();
     } else {
+        $('#' + AP_SSID_REQUIRES_PASSWORD_MSG_ID).show();
+    }
+}
+
+$('#' + NETWORK_PASSWORD_INPUT_ID).on('input', function () {
+    if (networkPasswordIsValid(this.value)) {
         enableButton($('#' + CONNECT_BUTTON_ID));
+    } else {
+        disableButton($('#' + CONNECT_BUTTON_ID));
     }
 });
 
-$('#' + SITE_PASSWORD_INPUT_ID).on('input', function () {
-    if (this.value.length < 4) {
-        disableButton($('#' + CHANGE_SITE_PASSWORD_BUTTON_ID));
-    } else {
-        enableButton($('#' + CHANGE_SITE_PASSWORD_BUTTON_ID));
-    }
+$('#' + AP_CHANNEL_RANGE_ID).on('input', function () {
+    $('#' + AP_CHANNEL_RANGE_OUTPUT_ID).prop('value', this.value);
+    $('#' + CHANGE_AP_CHANNEL_BUTTON_ID).prop('disabled', this.value == AP_CHANNEL);
+});
+
+$('#' + AP_SSID_INPUT_ID).on('input', function () {
+    handleAPSSIDOrPasswordInput(this.value, $('#' + AP_PASSWORD_INPUT_ID).val());
 });
 
 $('#' + AP_PASSWORD_INPUT_ID).on('input', function () {
-    if (this.value.length < 8 || this.value.length > 63) {
-        disableButton($('#' + CHANGE_AP_PASSWORD_BUTTON_ID));
-    } else {
-        enableButton($('#' + CHANGE_AP_PASSWORD_BUTTON_ID));
-    }
+    handleAPSSIDOrPasswordInput($('#' + AP_SSID_INPUT_ID).val(), this.value);
+});
+
+$('#' + SITE_PASSWORD_INPUT_ID).on('input', function () {
+    $('#' + CHANGE_SITE_PASSWORD_BUTTON_ID).prop('disabled', this.value.length < 4);
+});
+
+$('#' + COUNTRY_CODE_SELECT_ID).on('change', function () {
+    $('#' + CHANGE_COUNTRY_CODE_BUTTON_ID).prop('disabled', this.value == COUNTRY_CODE);
 });

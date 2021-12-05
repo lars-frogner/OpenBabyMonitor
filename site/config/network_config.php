@@ -21,7 +21,10 @@ define('CONNECTED_TO_EXTERNAL_NETWORK', $output[0] == $_NETWORK_INFO['wireless_m
 
 define('KNOWN_NETWORKS_TABLE_NAME', 'known_networks');
 
-define('SERVER_IP', trim(`hostname -I`));
+define('SERVER_HOSTNAME', getenv('BM_HOSTNAME'));
+define('AP_SSID', getenv('BM_NW_AP_SSID'));
+define('AP_CHANNEL', getenv('BM_NW_AP_CHANNEL'));
+define('COUNTRY_CODE', getenv('BM_NW_COUNTRY_CODE'));
 
 define('IS_CLI', http_response_code() === false);
 

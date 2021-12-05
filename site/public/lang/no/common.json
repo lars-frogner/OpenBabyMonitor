@@ -50,5 +50,7 @@
     "under_voltage_warning_text": "Strømforsyningen har for lav spenning. Vennligst slå av enheten og utbedre dette. Hvis enheten drives av et batteri trenger dette å lades opp igjen. Hvis ikke er det mulig at strømforsyningen er defekt.",
     "overheat_warning": "Advarsel om overoppheting!",
     "overheat_warning_text": "Enheten blir for varm. Prosessoren har blitt sakket ned for å begrense ytterligere oppvarming. Vennligst påse at enheten har tilstrekkelig ventilasjon, og begrens bruken av video- eller lydstrømming.",
-    "sure_want_to_reset": "Er du sikker på at du vil tilbakestille innstillingene til deres standardverdier?"
+    "sure_want_to_reset": "Er du sikker på at du vil tilbakestille innstillingene til deres standardverdier?",
+    "will_reboot": "Enheten vil restarte automatisk.",
+    "must_reboot_for_changes": "Endringen vil ikke tre i kraft før enheten restartes."
 }
