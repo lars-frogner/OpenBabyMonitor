@@ -24,7 +24,7 @@ DNS.2 = $HOSTNAME.home
 DNS.3 = $HOSTNAME.lan
 " > /tmp/$HOSTNAME.cnf
 
-SSL_KEY_PATH=/etc/ssl/private/$HOSTNAME.key
-SSL_CERT_PATH=/etc/ssl/certs/$HOSTNAME.crt
+SSL_KEY_PATH=/etc/ssl/private/babymonitor.key
+SSL_CERT_PATH=/etc/ssl/certs/babymonitor.crt
 sudo openssl req -x509 -nodes -days 36524 -newkey rsa:2048 -keyout $SSL_KEY_PATH -out $SSL_CERT_PATH -config /tmp/$HOSTNAME.cnf
 rm /tmp/$HOSTNAME.cnf
