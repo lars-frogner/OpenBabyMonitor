@@ -13,4 +13,4 @@ sed -i "s/country_code=.*$/country_code=$NEW_COUNTRY_CODE/g" $BM_NW_AP_DIR/etc/h
 
 sudo raspi-config nonint do_wifi_country $NEW_COUNTRY_CODE
 
-$BM_SERVERCONTROL_DIR/set_env_variable BM_NW_COUNTRY_CODE $NEW_COUNTRY_CODE
+$BM_SERVERCONTROL_DIR/set_env_variable.sh BM_NW_COUNTRY_CODE $NEW_COUNTRY_CODE
