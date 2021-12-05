@@ -290,7 +290,7 @@ function selectNetwork(networkMeta) {
 
 function performPreSwitchingPostActions() {
     setDisabledForNavbar(true);
-    $('.' + SETTINGS_FORM_CONTAINER_CLASS).find('*').hide();
+    $('.' + SETTINGS_FORM_CONTAINER_CLASS).hide();
     $('.' + NETWORK_STATUS_MSG_CLASS).hide();
     $('#' + SWITCHING_INFO_ID).show();
     $('#' + MODAL_ID).modal('hide');
