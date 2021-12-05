@@ -20,3 +20,5 @@ sed -i "s/[[:space:]][[:space:]]*$OLD_HOSTNAME$/     $NEW_HOSTNAME/g" $BM_NW_AP_
 sudo raspi-config nonint do_hostname $NEW_HOSTNAME 1>&3 2>&4
 
 $BM_SERVERCONTROL_DIR/set_env_variable.sh BM_HOSTNAME $NEW_HOSTNAME
+
+sudo reboot
