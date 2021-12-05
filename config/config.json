@@ -76,8 +76,13 @@
                 "scan_wireless_networks": "$BM_SERVERCONTROL_DIR/perform_action.sh scan_wireless_networks",
                 "connect_to_network": "$BM_SERVERCONTROL_DIR/perform_action.sh connect_to_network",
                 "remove_network": "$BM_SERVERCONTROL_DIR/perform_action.sh remove_network",
-                "set_ap_password": "$BM_SERVERCONTROL_DIR/perform_action.sh set_ap_password",
+                "set_timezone": "$BM_SERVERCONTROL_DIR/perform_action.sh set_timezone",
+                "set_hostname": "$BM_SERVERCONTROL_DIR/perform_action.sh set_hostname",
                 "set_device_password": "$BM_SERVERCONTROL_DIR/perform_action.sh set_device_password",
+                "set_ap_channel": "$BM_SERVERCONTROL_DIR/perform_action.sh set_ap_channel",
+                "set_ap_ssid_password": "$BM_SERVERCONTROL_DIR/perform_action.sh set_ap_ssid_password",
+                "set_ap_password": "$BM_SERVERCONTROL_DIR/perform_action.sh set_ap_password",
+                "set_country_code": "$BM_SERVERCONTROL_DIR/perform_action.sh set_country_code",
                 "select_mic": "$BM_SERVERCONTROL_DIR/perform_action.sh select_mic"
             }
         },
