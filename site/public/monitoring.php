@@ -10,7 +10,7 @@ sendSSEHeaders();
 function measureTemperature() {
   $output = null;
   $result_code = null;
-  exec('sudo /usr/bin/vcgencmd measure_temp', $output, $result_code);
+  exec('sudo vcgencmd measure_temp', $output, $result_code);
   if ($result_code != 0) {
     $msg = "Measuring temperature failed with error code $result_code:\n" . join("\n", $output);
     sendSSEMessage('error', $msg);
@@ -22,7 +22,7 @@ function measureTemperature() {
 function getThrottled() {
   $output = null;
   $result_code = null;
-  exec('sudo /usr/bin/vcgencmd get_throttled', $output, $result_code);
+  exec('sudo vcgencmd get_throttled', $output, $result_code);
   if ($result_code != 0) {
     $msg = "Getting throttled status failed with error code $result_code:\n" . join("\n", $output);
     sendSSEMessage('error', $msg);

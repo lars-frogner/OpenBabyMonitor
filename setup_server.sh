@@ -346,6 +346,7 @@ if [[ "$SETUP_SERVICES" = true ]]; then
     UNIT_DIR=/lib/systemd/system
     LINKED_UNIT_DIR=$BM_DIR/control/services
     SYSTEMCTL=$(which systemctl)
+    VCGENCMD=$(which vcgencmd)
 
     mkdir -p $LINKED_UNIT_DIR
 
@@ -386,7 +387,7 @@ WantedBy=multi-user.target" > $LINKED_UNIT_DIR/$STARTUP_SERVICE_FILENAME
 
     sudo systemctl enable $STARTUP_SERVICE_FILENAME
 
-    CMD_ALIAS='Cmnd_Alias BM_MODES = /usr/bin/vcgencmd get_throttled, /usr/bin/vcgencmd measure_temp,'
+    CMD_ALIAS="Cmnd_Alias BM_MODES = $VCGENCMD get_throttled, $VCGENCMD measure_temp,"
 
     for SERVICE in standby listen audiostream videostream
     do
