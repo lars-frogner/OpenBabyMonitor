@@ -1,7 +1,9 @@
 const MAIN_CONTAINER_ID = 'main_container';
 const FOOTER_CONTAINER_ID = 'footer_container';
 
-var radioIds = ['mode_radio_standby', 'mode_radio_listen', 'mode_radio_audiostream'];
+const MODE_RADIO_STANDBY_ID = 'mode_radio_standby';
+
+var radioIds = [MODE_RADIO_STANDBY_ID, 'mode_radio_listen', 'mode_radio_audiostream'];
 var contentIds = ['mode_content_standby', MODE_CONTENT_LISTEN_ID, MODE_CONTENT_AUDIO_ID];
 if (USES_CAMERA) {
     radioIds.push('mode_radio_videostream');
@@ -22,6 +24,7 @@ $(function () {
     setDisabledForRelevantElements(false);
     $('#' + MAIN_CONTAINER_ID).show();
     $('#' + FOOTER_CONTAINER_ID).show();
+    setAllowSessionTimeout(INITIAL_MODE == STANDBY_MODE);
 });
 
 function setCurrentMode(mode) {
@@ -85,6 +88,7 @@ function handleModeChangeResponse(checkedRadioId, checkedRadioValue, responseTex
             setCurrentMode(checkedRadioValue);
             setVisibleContent(getContentIdByRadioId(checkedRadioId));
             setDisabledForRelevantElements(false);
+            setAllowSessionTimeout(checkedRadioId == MODE_RADIO_STANDBY_ID);
             break;
         case '-1':
             logout();
@@ -95,6 +99,7 @@ function handleModeChangeResponse(checkedRadioId, checkedRadioValue, responseTex
             }
             $('#' + ERROR_CONTENT_MESSAGE_ID).html(responseText);
             setVisibleContent(ERROR_CONTENT_ID);
+            allowSessionTimeout();
             break;
     }
 }
