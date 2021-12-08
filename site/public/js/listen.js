@@ -148,7 +148,7 @@ function handleListenErrorEvent(event) {
             _LISTEN_EVENT_SOURCE = null;
             break
         default:
-            console.error("SSE stream failed:", error);
+            console.error('SSE stream failed:', event.data);
             _LISTEN_EVENT_SOURCE.close();
             _LISTEN_EVENT_SOURCE = null;
     }
