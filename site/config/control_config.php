@@ -58,11 +58,10 @@ define('ACTION_OK', 0);
 define('ACTION_TIMED_OUT', 1);
 
 $_CONTROL_INFO = $_CONFIG['control'];
+define('MODE_LOCK_FILE', getenv('BM_MODE_LOCK_FILE'));
 define('FILE_QUERY_INTERVAL', intval($_CONTROL_INFO['file_query_interval'] * 1e6)); // In microseconds
 define('SOCKET_QUERY_INTERVAL', intval($_CONTROL_INFO['socket_query_interval'] * 1e6));
 define('MODE_SWITCH_TIMEOUT', intval($_CONTROL_INFO['mode_switch_timeout'] * 1e6));
 
 define('SERVER_ACTION_RESULT_FILE', getenv('BM_SERVER_ACTION_RESULT_FILE'));
 define('SERVER_ACTION_COMMANDS', $_CONTROL_INFO['server_actions']['commands']);
-
-define('SERVER_LOCK_COMMANDS', $_CONTROL_INFO['lock_commands']);

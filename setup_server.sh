@@ -40,7 +40,7 @@ BM_SERVER_ACTION_FILE=$BM_SERVER_ACTION_DIR/flag
 BM_SERVER_ACTION_LOCK_FILE=$BM_SERVER_ACTION_DIR/lock
 BM_SERVER_ACTION_RESULT_FILE=$BM_SERVER_ACTION_DIR/result
 BM_MODE_LOCK_DIR=$BM_DIR/control/.lock
-BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/free
+BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/lock
 BM_LISTEN_COMM_DIR=$BM_DIR/control/.comm
 BM_CONTROL_MIC_DIR=$BM_DIR/control/.mic
 BM_CONTROL_MIC_ID_FILE=$BM_CONTROL_MIC_DIR/id
@@ -462,7 +462,7 @@ _EOF_
     # Create folders where the group has write permissions
     mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_LISTEN_COMM_DIR $BM_CONTROL_MIC_DIR $BM_CONTROL_CAM_DIR
 
-    # Make sure mode lock is initially released
+    # Make sure mode lock file exists
     touch $BM_MODE_LOCK_FILE
 
     # Make sure files to be watched in the comm directory exist

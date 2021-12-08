@@ -10,81 +10,95 @@ function readCurrentMode($database) {
 }
 
 function acquireModeLock() {
-  waitForModeLock();
-  $output = null;
-  $result_code = null;
-  exec(ENVVAR_ASSIGNMENT . SERVER_LOCK_COMMANDS['acquire'], $output, $result_code);
-  if ($result_code != 0) {
-    bm_error("Lock acquisition command failed with error code $result_code:\n" . join("\n", $output));
+  bm_warning('Opening lock file');
+  $lock = fopen(MODE_LOCK_FILE, 'r');
+  bm_warning('Opened lock file');
+  if ($lock === false) {
+    bm_error('Could not open lock file ' . MODE_LOCK_FILE);
   }
+  bm_warning('Acquiring lock');
+  $success = flock($lock, LOCK_EX);
+  bm_warning('Acquired lock');
+  if (!$success) {
+    bm_error('Lock acquisition with flock on ' . MODE_LOCK_FILE . ' failed');
+  }
+  return $lock;
 }
 
-function releaseModeLock() {
-  $output = null;
-  $result_code = null;
-  exec(ENVVAR_ASSIGNMENT . SERVER_LOCK_COMMANDS['release'], $output, $result_code);
-  if ($result_code != 0) {
-    bm_error("Lock release command failed with error code $result_code:\n" . join("\n", $output));
+function releaseModeLock($lock) {
+  bm_warning('Releasing lock');
+  $success = flock($lock, LOCK_UN);
+  bm_warning('Released lock');
+  if (!$success) {
+    bm_error('Lock release with flock on ' . MODE_LOCK_FILE . ' failed');
+  }
+  bm_warning('Closing lock file');
+  $success = fclose($lock);
+  bm_warning('Closed lock file');
+  if (!$success) {
+    bm_error('Could not close lock file ' . MODE_LOCK_FILE);
   }
 }
 
 function waitForModeLock() {
-  $result = waitForFileToExist(getenv('BM_MODE_LOCK_FILE'), FILE_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
-  if ($result == ACTION_TIMED_OUT) {
-    releaseModeLock();
-  }
+  $lock = acquireModeLock();
+  releaseModeLock($lock);
 }
 
-function startMode($mode) {
+function startMode($lock, $mode) {
   $mode_start_command = getModeAttributes('start_command', MODE_NAMES[$mode]);
   if (!is_null($mode_start_command)) {
     $output = null;
     $result_code = null;
+    bm_warning($mode_start_command);
     exec($mode_start_command, $output, $result_code);
     if ($result_code != 0) {
-      releaseModeLock();
+      releaseModeLock($lock);
       bm_error("Request for mode start failed with error code $result_code:\n" . join("\n", $output));
     }
   }
 }
 
-function stopMode($mode) {
+function stopMode($lock, $mode) {
   $mode_stop_command = getModeAttributes('stop_command', MODE_NAMES[$mode]);
   if (!is_null($mode_stop_command)) {
     $output = null;
     $result_code = null;
+    bm_warning($mode_stop_command);
     exec($mode_stop_command, $output, $result_code);
     if ($result_code != 0) {
-      releaseModeLock();
+      releaseModeLock($lock);
       bm_error("Request for mode stop failed with error code $result_code:\n" . join("\n", $output));
     }
   }
 }
 
-function restartMode($mode) {
+function restartMode($lock, $mode) {
   $mode_restart_command = getModeAttributes('restart_command', MODE_NAMES[$mode]);
   if (!is_null($mode_restart_command)) {
     $output = null;
     $result_code = null;
     exec($mode_restart_command, $output, $result_code);
     if ($result_code != 0) {
-      releaseModeLock();
+      releaseModeLock($lock);
       bm_error("Request for mode restart failed with error code $result_code:\n" . join("\n", $output));
     }
   }
 }
 
-function waitForModeSwitch($database, $new_mode) {
+function waitForModeSwitch($database, $lock, $new_mode) {
   $elapsed_time = 0;
+  bm_warning("Waiting for mode switch to $new_mode");
   while (readCurrentMode($database) != $new_mode) {
     usleep(FILE_QUERY_INTERVAL);
     $elapsed_time += FILE_QUERY_INTERVAL;
     if ($elapsed_time > MODE_SWITCH_TIMEOUT) {
       updateCurrentMode($database, MODE_VALUES['standby']);
-      releaseModeLock();
+      releaseModeLock($lock);
       bm_error('Request for mode switch timed out');
     }
   }
+  bm_warning("Mode has switched to $new_mode");
 }
 
 function updateCurrentMode($database, $new_mode) {
@@ -105,6 +119,7 @@ function waitForFileToExist($file_path, $interval, $timeout) {
 }
 
 function waitForFileUpdate($file_path, $interval, $timeout) {
+  bm_warning("Waiting for file $file_path to update");
   $initial_timestamp = time();
   $elapsed_time = 0;
   while (!file_exists($file_path) || filemtime($file_path) <= $initial_timestamp) {
@@ -115,6 +130,7 @@ function waitForFileUpdate($file_path, $interval, $timeout) {
       return ACTION_TIMED_OUT;
     }
   }
+  bm_warning("File $file_path updated");
   return ACTION_OK;
 }
 
@@ -142,15 +158,15 @@ function waitForSocketToOpen($hostname, $port, $interval, $timeout) {
 }
 
 function switchMode($database, $new_mode, $skip_if_same = true) {
+  $lock = acquireModeLock();
   $current_mode = readCurrentMode($database);
   if ($current_mode == $new_mode && ($skip_if_same || $current_mode == MODE_VALUES['standby'])) {
+    releaseModeLock($lock);
     return ACTION_OK;
   }
-  acquireModeLock();
-  stopMode($current_mode);
-  waitForModeSwitch($database, MODE_VALUES['standby']);
-  startMode($new_mode);
-  waitForModeSwitch($database, $new_mode);
+  stopMode($lock, $current_mode);
+  startMode($lock, $new_mode);
+  waitForModeSwitch($database, $lock, $new_mode);
   $requirement = getWaitForRequirement(MODE_NAMES[$new_mode]);
   if (!is_null($requirement)) {
     $type = $requirement['type'];
@@ -166,7 +182,7 @@ function switchMode($database, $new_mode, $skip_if_same = true) {
         break;
     }
   }
-  releaseModeLock();
+  releaseModeLock($lock);
   return ACTION_OK;
 }
 
