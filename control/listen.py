@@ -199,8 +199,6 @@ def listen_with_settings_sound_level_threshold(
         consecutive_recordings=5,
         min_notification_interval=180,
         **kwargs):
-    control.register_shutdown_handler()
-
     control_dir = pathlib.Path(os.environ['BM_DIR']) / 'control'
     comm_dir = control_dir / '.comm'
     sound_level_file = comm_dir / 'sound_level.dat'
@@ -261,10 +259,6 @@ def listen_with_settings_network(config,
              notify_on_babbling=notify_on_babbling))
 
     with worker as task_queue:
-        # Register shutdown handlers after starting worker to
-        # prevent it from inheriting the handlers
-        control.register_shutdown_handler()
-
         mic.update_current_mic_volume(100)
 
         feature_provider = create_feature_provider(

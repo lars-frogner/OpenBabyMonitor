@@ -10,7 +10,6 @@ HORIZONTAL_RESOLUTIONS = {480: 640, 720: 1280, 1080: 1920}
 
 
 def stream_video():
-    control.register_shutdown_handler()
     control.enter_mode(
         MODE, lambda mode, config, database: stream_video_with_settings(
             **control.read_settings(mode, config, database),
