@@ -42,7 +42,7 @@ $sound_level_descriptor = inotify_add_watch($inotify_instance, $sound_level_file
 $probabilities_descriptor = inotify_add_watch($inotify_instance, $probabilities_file, IN_CLOSE_WRITE);
 $notification_descriptor = inotify_add_watch($inotify_instance, $notification_file, IN_CLOSE_WRITE);
 
-while (!connection_aborted()) {
+while (!connection_aborted()) { // Checking connection_aborted() is really only needed if ignore_user_abort(true)
   $events = inotify_read($inotify_instance);
   foreach ($events as $event) {
     if ($event['wd'] == $sound_level_descriptor) {
