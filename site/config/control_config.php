@@ -18,9 +18,15 @@ function getModeAttributes($attribute_name, $mode_name = null, $converter = null
   }
 }
 
+define('MODE_SIGNAL_FILE_STEM', getenv('BM_MODE_SIGNAL_FILE_STEM'));
+
 function getWaitForRequirement($mode_name) {
-  return getModeAttributes('wait_for', $mode_name, function ($wait_for) {
+  return getModeAttributes('wait_for', $mode_name, function ($wait_for) use ($mode_name) {
     if (!is_null($wait_for)) {
+      if ($wait_for == 'signal') {
+        $file_path = MODE_SIGNAL_FILE_STEM . ".$mode_name";
+        return array('type' => 'file', 'file_path' => $file_path);
+      }
       $split = explode('=', $wait_for, 2);
       if (empty($split)) {
         bm_error("Invalid wait_for entry: $wait_for");
@@ -28,6 +34,7 @@ function getWaitForRequirement($mode_name) {
       $type = $split[0];
       $content = $split[1];
       switch ($type) {
+        case 'stream':
         case 'file':
           $file_path = getenv($content) ? getenv($content) : $content;
           return array('type' => $type, 'file_path' => $file_path);

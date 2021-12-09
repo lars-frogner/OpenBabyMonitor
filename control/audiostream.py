@@ -47,6 +47,8 @@ def stream_audio_with_settings(encrypted=True,
     encryption_args = ['-hls_key_info_file', 'stream.keyinfo'
                        ] if encrypted else []
 
+    control.signal_mode_started(MODE)
+
     with open(log_path, 'a') as log_file:
         subprocess.check_call(
             ['ffmpeg', '-hide_banner', '-loglevel', 'fatal'] + input_args +

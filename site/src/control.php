@@ -47,6 +47,7 @@ function waitForModeLock() {
 
 function startMode($lock, $mode) {
   $mode_start_command = getModeAttributes('start_command', MODE_NAMES[$mode]);
+  $start_time = time();
   if (!is_null($mode_start_command)) {
     $output = null;
     $result_code = null;
@@ -57,6 +58,7 @@ function startMode($lock, $mode) {
       bm_error("Request for mode start failed with error code $result_code:\n" . join("\n", $output));
     }
   }
+  return $start_time;
 }
 
 function stopMode($lock, $mode) {
@@ -118,11 +120,10 @@ function waitForFileToExist($file_path, $interval, $timeout) {
   return ACTION_OK;
 }
 
-function waitForFileUpdate($file_path, $interval, $timeout) {
-  bm_warning("Waiting for file $file_path to update");
-  $initial_timestamp = time();
+function waitForFileUpdate($file_path, $start_time, $interval, $timeout) {
   $elapsed_time = 0;
-  while (!file_exists($file_path) || filemtime($file_path) <= $initial_timestamp) {
+  while (!file_exists($file_path) || filemtime($file_path) <= $start_time) {
+    clearstatcache(true, $file_path);
     usleep($interval);
     $elapsed_time += $interval;
     if ($elapsed_time > $timeout) {
@@ -165,14 +166,14 @@ function switchMode($database, $new_mode, $skip_if_same = true) {
     return ACTION_OK;
   }
   stopMode($lock, $current_mode);
-  startMode($lock, $new_mode);
-  waitForModeSwitch($database, $lock, $new_mode);
+  $start_time = startMode($lock, $new_mode);
   $requirement = getWaitForRequirement(MODE_NAMES[$new_mode]);
   if (!is_null($requirement)) {
     $type = $requirement['type'];
     switch ($type) {
+      case 'stream':
       case 'file':
-        waitForFileUpdate($requirement['file_path'], FILE_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
+        waitForFileUpdate($requirement['file_path'], $start_time, FILE_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
         break;
       case 'socket':
         waitForSocketToOpen($requirement['hostname'], $requirement['port'], SOCKET_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
@@ -182,7 +183,17 @@ function switchMode($database, $new_mode, $skip_if_same = true) {
         break;
     }
   }
+  waitForModeSwitch($database, $lock, $new_mode);
   releaseModeLock($lock);
+  return ACTION_OK;
+}
+
+function waitForModeStream($mode) {
+  $start_time = time();
+  $requirement = getWaitForRequirement(MODE_NAMES[$mode]);
+  if (!is_null($requirement) && $requirement['type'] == 'stream') {
+    waitForFileUpdate($requirement['file_path'], $start_time, FILE_QUERY_INTERVAL, MODE_SWITCH_TIMEOUT);
+  }
   return ACTION_OK;
 }
 

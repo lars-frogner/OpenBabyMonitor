@@ -1,3 +1,4 @@
+import os
 import sys
 import six
 import signal
@@ -70,3 +71,7 @@ def enter_mode(mode, run_mode):
         with database as open_database:
             update_mode_in_database(DEFAULT_MODE, config, open_database)
         six.reraise(*exc_info)
+
+
+def signal_mode_started(mode):
+    os.utime(f'{os.environ["BM_MODE_SIGNAL_FILE_STEM"]}.{mode}')

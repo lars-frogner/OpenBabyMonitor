@@ -42,6 +42,7 @@ BM_SERVER_ACTION_RESULT_FILE=$BM_SERVER_ACTION_DIR/result
 BM_MODE_LOCK_DIR=$BM_DIR/control/.lock
 BM_MODE_LOCK_FILE=$BM_MODE_LOCK_DIR/lock
 BM_LISTEN_COMM_DIR=$BM_DIR/control/.comm
+BM_MODE_SIGNAL_FILE_STEM=$BM_LISTEN_COMM_DIR/signal
 BM_CONTROL_MIC_DIR=$BM_DIR/control/.mic
 BM_CONTROL_MIC_ID_FILE=$BM_CONTROL_MIC_DIR/id
 BM_CONTROL_CAM_DIR=$BM_DIR/control/.cam
@@ -163,6 +164,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_SERVER_ACTION_LOCK_FILE=$BM_SERVER_ACTION_LOCK_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_SERVER_ACTION_RESULT_FILE=$BM_SERVER_ACTION_RESULT_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_MODE_LOCK_FILE=$BM_MODE_LOCK_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_MODE_SIGNAL_FILE_STEM=$BM_MODE_SIGNAL_FILE_STEM" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_CONTROL_MIC_ID_FILE=$BM_CONTROL_MIC_ID_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_CONTROL_CAM_CONNECTED_FILE=$BM_CONTROL_CAM_CONNECTED_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_DEBUG=$BM_DEBUG" >> $BM_ENV_EXPORTS_PATH
@@ -464,6 +466,14 @@ _EOF_
 
     # Make sure mode lock file exists
     touch $BM_MODE_LOCK_FILE
+
+    # Make sure signal files exist
+    for MODE in standby listen audiostream videostream
+    do
+        SIGNAL_FILE="$BM_MODE_SIGNAL_FILE_STEM.$MODE"
+        touch $SIGNAL_FILE
+        chmod $BM_WRITE_PERMISSIONS $SIGNAL_FILE
+    done
 
     # Make sure files to be watched in the comm directory exist
     touch $BM_LISTEN_COMM_DIR/{sound_level.dat,probabilities.json,notification.txt}

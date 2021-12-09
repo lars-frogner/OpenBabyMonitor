@@ -216,6 +216,8 @@ def listen_with_settings_sound_level_threshold(
         consecutive_recordings=consecutive_recordings,
         min_notification_interval=min_notification_interval)
 
+    control.signal_mode_started(MODE)
+
     while True:
         last_start_time = time.time()
         _, bg_sound_level, signal_sound_level, record_time = feature_provider()
@@ -268,6 +270,8 @@ def listen_with_settings_network(config,
             background_loudness_level_offset,
             amplification=amplification,
             standardize=True)
+
+        control.signal_mode_started(MODE)
 
         while True:
             last_start_time = time.time()

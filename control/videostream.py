@@ -91,6 +91,8 @@ def stream_video_with_settings(encrypted=True,
 
     output_args = ['--hlsdir', output_dir]
 
+    control.signal_mode_started(MODE)
+
     with open(log_path, 'a') as log_file:
         subprocess.check_call([os.path.join(picam_dir, 'picam')] +
                               output_args + encryption_args + resolution_args +

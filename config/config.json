@@ -36,28 +36,28 @@
                     "start_command": "sudo systemctl start bm_standby",
                     "stop_command": null,
                     "restart_command": null,
-                    "wait_for": null
+                    "wait_for": "signal"
                 },
                 "listen": {
                     "value": 1,
                     "start_command": "sudo systemctl start bm_listen",
                     "stop_command": "sudo systemctl stop bm_listen",
                     "restart_command": "sudo systemctl restart bm_listen",
-                    "wait_for": null
+                    "wait_for": "signal"
                 },
                 "audiostream": {
                     "value": 2,
                     "start_command": "sudo systemctl start bm_audiostream",
                     "stop_command": "sudo systemctl stop bm_audiostream",
                     "restart_command": "sudo systemctl restart bm_audiostream",
-                    "wait_for": "file=BM_AUDIO_STREAM_FILE"
+                    "wait_for": "stream=BM_AUDIO_STREAM_FILE"
                 },
                 "videostream": {
                     "value": 3,
                     "start_command": "sudo systemctl start bm_videostream",
                     "stop_command": "sudo systemctl stop bm_videostream",
                     "restart_command": "sudo systemctl restart bm_videostream",
-                    "wait_for": "file=BM_PICAM_STREAM_FILE"
+                    "wait_for": "stream=BM_PICAM_STREAM_FILE"
                 }
             }
         }
