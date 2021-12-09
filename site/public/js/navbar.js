@@ -37,8 +37,6 @@ const NAV_TOGGLER = $('#navbar_toggler');
 var _TOGGLER_WAS_VISIBLE;
 
 $(function () {
-    setupTemperatureBehavior();
-
     $('.nav-link').on('click', '.disabled', function (event) {
         event.preventDefault();
         return false;
@@ -57,6 +55,8 @@ $(function () {
     });
 
     $('#' + NAVBAR_ID).show();
+
+    setupTemperatureBehavior();
 });
 
 function setupTemperatureBehavior() {
