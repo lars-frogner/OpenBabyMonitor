@@ -50,6 +50,7 @@ BM_CONTROL_CAM_CONNECTED_FILE=$BM_CONTROL_CAM_DIR/connected
 
 SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
+    mkdir -p $BM_CONTROL_MIC_DIR
     $BM_DIR/control/mic.py --select-mic
     sudo adduser $BM_USER audio
     sudo ln -sfn $BM_SHAREDMEM_DIR $BM_LINKED_STREAM_DIR
@@ -462,7 +463,7 @@ _EOF_
     sudo adduser $BM_USER $BM_WEB_GROUP
 
     # Create folders where the group has write permissions
-    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_LISTEN_COMM_DIR $BM_CONTROL_MIC_DIR $BM_CONTROL_CAM_DIR
+    mkdir -p $BM_SERVER_ACTION_DIR $BM_MODE_LOCK_DIR $BM_LISTEN_COMM_DIR $BM_CONTROL_CAM_DIR
 
     # Make sure mode lock file exists
     touch $BM_MODE_LOCK_FILE
