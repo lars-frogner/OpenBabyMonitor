@@ -114,7 +114,7 @@
               </a></li>
           </ul>
         </li>
-        <li class="nav-item dropdown pe-auto">
+        <li class="nav-item dropdown me-auto">
           <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
               <use href="media/bootstrap-icons.svg#chat-text" />
@@ -139,6 +139,9 @@
         <?php if (MEASURE_TEMPERATURE) { ?>
           <li class="nav-item d-flex align-items-center text-bm">
             <div class="d-flex align-items-center py-2">
+              <svg class="bi me-1" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                <use href="media/bootstrap-icons.svg#motherboard" />
+              </svg>
               <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
                 <use href="media/bootstrap-icons.svg#thermometer-half" />
               </svg>
