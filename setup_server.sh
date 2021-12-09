@@ -513,6 +513,7 @@ _EOF_
     sudo a2enmod ssl
 
     $BM_SERVERCONTROL_DIR/create_ssl_key.sh "$BM_HOSTNAME"
+    source $BM_SERVERCONTROL_DIR/ssl_cert_key_paths.env
 
     # Setup new site
     echo "<VirtualHost *:80>
