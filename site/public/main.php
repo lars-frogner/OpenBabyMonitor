@@ -300,12 +300,12 @@ require_once(TEMPLATES_DIR . '/main.php');
     <footer class="d-flex flex-grow-0 flex-shrink-1 justify-content-center">
       <div id="footer_container" class="btn-group" data-toggle="buttons" style="display: none;">
         <?php
+        createModeRadioButton($mode, 'standby', LANG['standby'], 'moon');
         createModeRadioButton($mode, 'listen', LANG['notify'], 'bell');
         createModeRadioButton($mode, 'audiostream', LANG['listen'], 'mic');
         if (USES_CAMERA) {
           createModeRadioButton($mode, 'videostream', LANG['observe'], 'camera-video');
         }
-        createModeRadioButton($mode, 'standby', LANG['standby'], 'moon');
         ?>
       </div>
     </footer>
