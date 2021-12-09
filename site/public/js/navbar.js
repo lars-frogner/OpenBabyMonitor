@@ -32,11 +32,18 @@ var _AP_MODE_MODAL_TRIGGER = {};
 var _CLIENT_MODE_NO_NETWORK_MODAL_TRIGGER = {};
 var _CLIENT_MODE_MODAL_TRIGGER = {};
 
+const NAV_TOGGLER = $('#navbar_toggler');
+
+var _TOGGLER_WAS_VISIBLE;
+
 $(function () {
+    setupTemperatureBehavior();
+
     $('.nav-link').on('click', '.disabled', function (event) {
         event.preventDefault();
         return false;
-    })
+    });
+
     $('#' + AP_MODE_SWITCH_ID).change(function () {
         if (this.checked) {
             _AP_MODE_MODAL_TRIGGER.triggerModal();
@@ -48,8 +55,35 @@ $(function () {
             }
         }
     });
+
     $('#' + NAVBAR_ID).show();
 });
+
+function setupTemperatureBehavior() {
+    const tempNavItem = $('#temperature_nav_item');
+
+    if (tempNavItem.length > 0) {
+        _TOGGLER_WAS_VISIBLE = togglerIsVisible();
+        if (!_TOGGLER_WAS_VISIBLE) {
+            tempNavItem.addClass('ms-auto');
+        }
+
+        $(window).resize(function () {
+            const visible = togglerIsVisible();
+            if (visible && !_TOGGLER_WAS_VISIBLE) {
+                tempNavItem.removeClass('ms-auto');
+                _TOGGLER_WAS_VISIBLE = true;
+            } else if (!visible && _TOGGLER_WAS_VISIBLE) {
+                tempNavItem.addClass('ms-auto');
+                _TOGGLER_WAS_VISIBLE = false;
+            }
+        });
+    }
+}
+
+function togglerIsVisible() {
+    return NAV_TOGGLER.is(':visible');
+}
 
 function setDisabledForNavbar(isDisabled) {
     if (isDisabled) {

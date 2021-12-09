@@ -1,7 +1,7 @@
 <nav id="navbar" class="navbar navbar-expand-lg navbar-<?php echo COLOR_SCHEME; ?>" style="display: none;">
   <div class="container-fluid">
     <a id="title_nav_link" class="navbar-brand" href="main.php"><?php echo LANG['nav_title']; ?></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_entries">
+    <button id="navbar_toggler" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_entries">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbar_entries">
@@ -64,17 +64,19 @@
             <?php echo LANG['nav_server']; ?>
           </a>
           <ul class="dropdown-menu" style="min-width: 1em;">
-            <div class="pe-0 dropdown-item d-flex align-items-center">
-              <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
-                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-                  <use href="media/bootstrap-icons.svg#broadcast-pin" />
-                </svg>
-                <?php echo LANG['nav_access_point']; ?>
+            <li>
+              <div class="pe-2 dropdown-item d-flex align-items-center">
+                <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
+                  <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                    <use href="media/bootstrap-icons.svg#broadcast-pin" />
+                  </svg>
+                  <?php echo LANG['nav_access_point']; ?>
+                </div>
+                <div class="form-check form-switch my-0 ms-2">
+                  <input id="ap_mode_switch" class="form-check-input" type="checkbox" role="button" <?php echo ACCESS_POINT_ACTIVE ? 'checked' : ''; ?>>
+                </div>
               </div>
-              <div class="form-check form-switch my-0 ms-2">
-                <input id="ap_mode_switch" class="form-check-input" type="checkbox" role="button" <?php echo ACCESS_POINT_ACTIVE ? 'checked' : ''; ?>>
-              </div>
-            </div>
+            </li>
             <li>
               <hr class="dropdown-divider">
             </li>
@@ -114,7 +116,7 @@
               </a></li>
           </ul>
         </li>
-        <li class="nav-item dropdown me-auto">
+        <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
               <use href="media/bootstrap-icons.svg#chat-text" />
@@ -137,7 +139,7 @@
           </ul>
         </li>
         <?php if (MEASURE_TEMPERATURE) { ?>
-          <li class="nav-item d-flex align-items-center text-bm">
+          <li id="temperature_nav_item" class="nav-item d-flex align-items-center text-bm">
             <div class="d-flex align-items-center py-2">
               <svg class="bi me-1" style="height: 1.1em; width: 1.1em;" fill="currentColor">
                 <use href="media/bootstrap-icons.svg#motherboard" />
