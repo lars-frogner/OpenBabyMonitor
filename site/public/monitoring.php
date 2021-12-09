@@ -86,7 +86,7 @@ while (!connection_aborted()) {
   }
   usleep(MODE_QUERY_INTERVAL_MICROSEC);
 
-  if (microtime(true) - $last_vitals_query_time >= VITALS_QUERY_INTERVAL) {
+  if (microtime(true) - $last_vitals_query_time >= $_VITALS_QUERY_INTERVAL) {
     $last_vitals_query_time = queryVitals();
   }
   if (microtime(true) - $last_ping_time >= PING_INTERVAL) {

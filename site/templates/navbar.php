@@ -138,7 +138,7 @@
             </li>
           </ul>
         </li>
-        <?php if (MEASURE_TEMPERATURE) { ?>
+        <?php if ($_MEASURE_TEMPERATURE) { ?>
           <li id="temperature_nav_item" class="nav-item d-flex align-items-center text-bm">
             <div class="d-flex align-items-center py-2">
               <svg class="bi me-1" style="height: 1.1em; width: 1.1em;" fill="currentColor">

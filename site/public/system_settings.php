@@ -45,6 +45,10 @@ if (isset($_POST['submit'])) {
 }
 $grouped_values = groupSettingValues($setting_type, $values);
 require_once(TEMPLATES_DIR . '/settings.php');
+
+if ($settings_edited) {
+  readMonitoringSettings();
+}
 ?>
 
 <link href="css/fill.css" rel="stylesheet">
