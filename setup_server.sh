@@ -558,6 +558,9 @@ _EOF_
     # Configure rotation of Apache log
     sudo sed -i "s/create .*$/create $BM_WRITE_PERMISSIONS $BM_USER $BM_WEB_GROUP/g" /etc/logrotate.d/apache2
 
+    # Make Apache log dir available for web user
+    sudo chmod o+x $APACHE_LOG_DIR
+
     # Configure rotation of babymonitor log
     echo "$BM_SERVER_LOG_PATH {
     daily
