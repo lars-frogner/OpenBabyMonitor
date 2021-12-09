@@ -219,7 +219,7 @@ require_once(TEMPLATES_DIR . '/main.php');
           <?php } ?>
 
           <div id="mode_content_standby" class="col-auto text-center" <?php echo ($mode != MODE_VALUES['standby']) ? HIDDEN_STYLE : ''; ?>>
-            <svg class="bi mb-5 mt-3 text-bm" style="width: 25vh; height: 25vh;" fill="currentColor">
+            <svg class="bi mb-4 mt-3 text-bm" style="width: 20vh; height: 20vh;" fill="currentColor">
               <use href="media/bootstrap-icons.svg#moon-fill" />
             </svg>
             <p class="mb-5 text-bm"><?php echo LANG['device_in_standby']; ?></p>
