@@ -112,41 +112,40 @@
                 </svg>
                 <?php echo LANG['nav_debugging']; ?>
               </a></li>
+          </ul>
         </li>
-      </ul>
-      </li>
-      <li class="nav-item dropdown pe-auto">
-        <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
-          <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-            <use href="media/bootstrap-icons.svg#chat-text" />
-          </svg>
-          <?php echo LANG['nav_language']; ?>
-        </a>
-        <ul class="dropdown-menu" style="min-width: 1em;">
-          <li>
-            <a id="language_en_nav_link" class="dropdown-item<?php echo LANGUAGE == 'en' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=en"'; ?>">
-              <span class="me-2 flag-icon flag-icon-gb" style="height: 1.1em; width: 1.1em;"></span>
-              English
-            </a>
-          </li>
-          <li>
-            <a id="language_no_nav_link" class="dropdown-item<?php echo LANGUAGE == 'no' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=no"'; ?>">
-              <span class="me-2 flag-icon flag-icon-no" style="height: 1.1em; width: 1.1em;"></span>
-              Norsk
-            </a>
-          </li>
-        </ul>
-      </li>
-      <?php if (MEASURE_TEMPERATURE) { ?>
-        <li class="nav-item d-flex align-items-center text-bm">
-          <div class="d-flex align-items-center py-2">
+        <li class="nav-item dropdown pe-auto">
+          <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
-              <use href="media/bootstrap-icons.svg#thermometer-half" />
+              <use href="media/bootstrap-icons.svg#chat-text" />
             </svg>
-            <div id="temperature_label"></div>
-          </div>
+            <?php echo LANG['nav_language']; ?>
+          </a>
+          <ul class="dropdown-menu" style="min-width: 1em;">
+            <li>
+              <a id="language_en_nav_link" class="dropdown-item<?php echo LANGUAGE == 'en' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=en"'; ?>">
+                <span class="me-2 flag-icon flag-icon-gb" style="height: 1.1em; width: 1.1em;"></span>
+                English
+              </a>
+            </li>
+            <li>
+              <a id="language_no_nav_link" class="dropdown-item<?php echo LANGUAGE == 'no' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=no"'; ?>">
+                <span class="me-2 flag-icon flag-icon-no" style="height: 1.1em; width: 1.1em;"></span>
+                Norsk
+              </a>
+            </li>
+          </ul>
         </li>
-      <?php } ?>
+        <?php if (MEASURE_TEMPERATURE) { ?>
+          <li class="nav-item d-flex align-items-center text-bm">
+            <div class="d-flex align-items-center py-2">
+              <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                <use href="media/bootstrap-icons.svg#thermometer-half" />
+              </svg>
+              <div id="temperature_label"></div>
+            </div>
+          </li>
+        <?php } ?>
       </ul>
     </div>
   </div>
