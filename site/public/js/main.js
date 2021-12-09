@@ -172,10 +172,12 @@ function setVisibleContent(visibleContentId) {
     } else {
         waitingContent.hide();
     }
-    if (USES_CAMERA && visibleContentId == MODE_CONTENT_VIDEO_ID) {
-        enableVideoStreamPlayer();
-    } else {
-        disableVideoStreamPlayer();
+    if (USES_CAMERA) {
+        if (visibleContentId == MODE_CONTENT_VIDEO_ID) {
+            enableVideoStreamPlayer();
+        } else {
+            disableVideoStreamPlayer();
+        }
     }
     MODE_CONTENT_IDS.forEach(contentId => {
         var content = $('#' + contentId);
