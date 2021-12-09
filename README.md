@@ -31,20 +31,20 @@ When up and running, the device hosts the website `https://babymonitor`.
 
 ## Power consumption
 
-Below are measured values of the power consumption of a Pi Zero baby monitor in different modes of operation.
+Below are measured values of the power consumption of a Pi Zero baby monitor in different modes of operation (with default settings).
 
-| Mode                             | Power (W) |
-| -------------------------------- | --------: |
-| Standby                          |      0.50 |
-| Cry detection (threshold)        |      0.55 |
-| Cry detection (small neural net) |    < 0.60 |
-| Cry detection (large neural net) |    < 0.75 |
-| Audio streaming                  |      0.60 |
-| Video streaming (480p)           |      1.30 |
-| Video streaming (720p)           |      1.45 |
-| Video streaming (1080p)          |      1.65 |
+| Mode                             |   Power (W) |
+| -------------------------------- | ----------: |
+| Standby                          |        0.55 |
+| Cry detection (threshold)        |        0.60 |
+| Cry detection (small neural net) | 0.60 - 0.70 |
+| Cry detection (large neural net) | 0.60 - 0.85 |
+| Audio streaming                  |        0.70 |
+| Video streaming (480p)           |        1.25 |
+| Video streaming (720p)           |        1.55 |
+| Video streaming (1080p)          |        1.70 |
 
-Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last between 15 hours (if continuously streaming full HD video) and 50 hours (if in standby) on a single charge.
+Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last between 15 hours (if continuously streaming full HD video) and 45 hours (if in standby) on a single charge.
 
 ## Manual setup
 
