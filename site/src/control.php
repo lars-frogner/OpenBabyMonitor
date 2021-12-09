@@ -10,15 +10,11 @@ function readCurrentMode($database) {
 }
 
 function acquireModeLock() {
-  bm_warning('Opening lock file');
   $lock = fopen(MODE_LOCK_FILE, 'r');
-  bm_warning('Opened lock file');
   if ($lock === false) {
     bm_error('Could not open lock file ' . MODE_LOCK_FILE);
   }
-  bm_warning('Acquiring lock');
   $success = flock($lock, LOCK_EX);
-  bm_warning('Acquired lock');
   if (!$success) {
     bm_error('Lock acquisition with flock on ' . MODE_LOCK_FILE . ' failed');
   }
@@ -26,15 +22,11 @@ function acquireModeLock() {
 }
 
 function releaseModeLock($lock) {
-  bm_warning('Releasing lock');
   $success = flock($lock, LOCK_UN);
-  bm_warning('Released lock');
   if (!$success) {
     bm_error('Lock release with flock on ' . MODE_LOCK_FILE . ' failed');
   }
-  bm_warning('Closing lock file');
   $success = fclose($lock);
-  bm_warning('Closed lock file');
   if (!$success) {
     bm_error('Could not close lock file ' . MODE_LOCK_FILE);
   }
@@ -51,7 +43,6 @@ function startMode($lock, $mode) {
   if (!is_null($mode_start_command)) {
     $output = null;
     $result_code = null;
-    bm_warning($mode_start_command);
     exec($mode_start_command, $output, $result_code);
     if ($result_code != 0) {
       releaseModeLock($lock);
@@ -66,7 +57,6 @@ function stopMode($lock, $mode) {
   if (!is_null($mode_stop_command)) {
     $output = null;
     $result_code = null;
-    bm_warning($mode_stop_command);
     exec($mode_stop_command, $output, $result_code);
     if ($result_code != 0) {
       releaseModeLock($lock);
@@ -90,7 +80,6 @@ function restartMode($lock, $mode) {
 
 function waitForModeSwitch($database, $lock, $new_mode) {
   $elapsed_time = 0;
-  bm_warning("Waiting for mode switch to $new_mode");
   while (readCurrentMode($database) != $new_mode) {
     usleep(FILE_QUERY_INTERVAL);
     $elapsed_time += FILE_QUERY_INTERVAL;
@@ -100,7 +89,6 @@ function waitForModeSwitch($database, $lock, $new_mode) {
       bm_error('Request for mode switch timed out');
     }
   }
-  bm_warning("Mode has switched to $new_mode");
 }
 
 function updateCurrentMode($database, $new_mode) {
@@ -131,7 +119,6 @@ function waitForFileUpdate($file_path, $start_time, $interval, $timeout) {
       return ACTION_TIMED_OUT;
     }
   }
-  bm_warning("File $file_path updated");
   return ACTION_OK;
 }
 
