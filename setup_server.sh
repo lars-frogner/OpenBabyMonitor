@@ -468,20 +468,20 @@ _EOF_
     # Make sure mode lock file exists
     touch $BM_MODE_LOCK_FILE
 
-    # Make sure signal files exist
-    for MODE in standby listen audiostream videostream
-    do
-        SIGNAL_FILE="$BM_MODE_SIGNAL_FILE_STEM.$MODE"
-        touch $SIGNAL_FILE
-        chmod $BM_WRITE_PERMISSIONS $SIGNAL_FILE
-    done
-
     # Make sure files to be watched in the comm directory exist
     touch $BM_LISTEN_COMM_DIR/{sound_level.dat,probabilities.json,notification.txt}
 
     # Ensure permissions are correct in project folder
     sudo chmod -R $BM_READ_PERMISSIONS $BM_DIR
     sudo chown -R $BM_USER:$BM_WEB_GROUP $BM_DIR
+
+    # Make sure signal files exist and are writable
+    for MODE in standby listen audiostream videostream
+    do
+        SIGNAL_FILE="$BM_MODE_SIGNAL_FILE_STEM.$MODE"
+        touch $SIGNAL_FILE
+        chmod $BM_WRITE_PERMISSIONS $SIGNAL_FILE
+    done
 
     # Set write permissions
     sudo chmod $BM_WRITE_PERMISSIONS $BM_SERVER_ACTION_DIR
