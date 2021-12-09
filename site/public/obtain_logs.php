@@ -33,7 +33,7 @@ $error_code = $zip->open($zip_path, ZIPARCHIVE::CREATE | ZipArchive::OVERWRITE);
 if ($error_code !== true) {
   bm_error("Creating archive for logs at $zip_path failed with error code $error_code");
 }
-if ($zip->addFromString('apache2.log', readLog('/var/log/apache2/error.log')) === false) {
+if ($zip->addFromString('apache2.log', readLog(getenv('BM_APACHE_LOG_PATH'))) === false) {
   bm_error('Adding apache2 log file to zip archive failed');
 }
 if ($zip->addFromString('babymonitor.log', readLog(getenv('BM_SERVER_LOG_PATH'))) === false) {
