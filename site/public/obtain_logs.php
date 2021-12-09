@@ -21,7 +21,7 @@ function readLog($log_file_path) {
     }
     $log = $log . $text;
   } else {
-    bm_error("Log file $log_file_path does not exist");
+    bm_warning("Log file $log_file_path does not exist");
   }
   return $log;
 }
