@@ -14,7 +14,7 @@ function readLog($log_file_path) {
     }
     $log = "$text\n";
   }
-  if (file_exists($rotated_log_file_path)) {
+  if (file_exists($log_file_path)) {
     $text = file_get_contents($log_file_path);
     if ($text === false) {
       bm_error("Could not read log file $log_file_path");
