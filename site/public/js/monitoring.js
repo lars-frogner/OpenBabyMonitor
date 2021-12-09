@@ -15,10 +15,16 @@ $(function () {
     subscribeToMonitoringMessages();
 });
 
-function subscribeToMonitoringMessages() {
-    if (STREAM_MONITORING_EVENTS) {
+function createMonitoringEventSource() {
+    if (!_MONITORING_EVENT_SOURCE) {
         _MONITORING_EVENT_SOURCE = new EventSource('monitoring.php');
         _MONITORING_EVENT_SOURCE.onerror = handleMonitoringErrorEvent;
+    }
+}
+
+function subscribeToMonitoringMessages() {
+    if (STREAM_MONITORING_EVENTS) {
+        createMonitoringEventSource();
     }
     if (SETTING_MEASURE_TEMPERATURE) {
         _MONITORING_EVENT_SOURCE.addEventListener('temperature', handleTemperatureEvent);
@@ -36,6 +42,11 @@ function unsubscribeFromMonitoringMessages() {
         _MONITORING_EVENT_SOURCE.close();
         _MONITORING_EVENT_SOURCE = null;
     }
+}
+
+function addModeMonitoringEventListener(handleModeChangeEvent) {
+    createMonitoringEventSource();
+    _MONITORING_EVENT_SOURCE.addEventListener('mode', handleModeChangeEvent);
 }
 
 function underVoltageModalCallback(onCompletion) {

@@ -18,6 +18,8 @@ const ERROR_CONTENT_ID = 'mode_content_error';
 const ERROR_CONTENT_MESSAGE_ID = 'mode_content_error_message';
 
 var _CURRENT_MODE = INITIAL_MODE;
+var _IS_SWITCHING_MODE = false;
+var _ONLY_WAIT_FOR_STREAM = false;
 
 $(function () {
     registerModeChangeHandler();
@@ -25,6 +27,15 @@ $(function () {
     $('#' + MAIN_CONTAINER_ID).show();
     $('#' + FOOTER_CONTAINER_ID).show();
     setAllowSessionTimeout(INITIAL_MODE == STANDBY_MODE);
+
+    addModeMonitoringEventListener(function (event) {
+        if (!isSwitchingMode()) {
+            const newModeName = event.data;
+            _ONLY_WAIT_FOR_STREAM = true;
+            changeModeTo(newModeName);
+            _ONLY_WAIT_FOR_STREAM = false;
+        }
+    });
 });
 
 function setCurrentMode(mode) {
@@ -33,6 +44,18 @@ function setCurrentMode(mode) {
 
 function getCurrentMode() {
     return _CURRENT_MODE;
+}
+
+function isSwitchingMode() {
+    return _IS_SWITCHING_MODE;
+}
+
+function onlyWaitForStream() {
+    return _ONLY_WAIT_FOR_STREAM;
+}
+
+function getModeRadio(modeName) {
+    return $('#mode_radio_' + modeName);
 }
 
 function registerModeChangeHandler() {
@@ -45,8 +68,8 @@ function registerModeChangeHandler() {
     });
 }
 
-function changeModeTo(modeName) {
-    $('#mode_radio_' + modeName).click();
+function changeModeTo(newModeName) {
+    getModeRadio(newModeName).click();
 }
 
 function swapRadio(radio) {
@@ -61,15 +84,20 @@ function swapRadio(radio) {
 }
 
 function requestModeChange(radio) {
+    _IS_SWITCHING_MODE = true;
+
+    const checkedRadioId = radio.prop('id');
+    const newMode = radio.prop('value');
+
     var data = new URLSearchParams();
-    data.append('requested_mode', radio.prop('value'));
+    data.append(onlyWaitForStream() ? 'wait_for_mode_stream' : 'requested_mode', newMode);
 
     fetch('change_mode.php', {
         method: 'post',
         body: data
     })
         .then(response => response.text())
-        .then(responseText => { handleModeChangeResponse(radio.prop('id'), radio.prop('value'), responseText); })
+        .then(responseText => { handleModeChangeResponse(checkedRadioId, newMode, responseText); })
         .catch(error => {
             console.error(error)
         });
@@ -82,26 +110,36 @@ function indicateWaiting() {
     setVisibleContent(WAITING_CONTENT_ID);
 }
 
-function handleModeChangeResponse(checkedRadioId, checkedRadioValue, responseText) {
+function handleModeChangeResponse(checkedRadioId, newMode, responseText) {
     switch (responseText) {
         case '0':
-            setCurrentMode(checkedRadioValue);
-            setVisibleContent(getContentIdByRadioId(checkedRadioId));
-            setDisabledForRelevantElements(false);
-            setAllowSessionTimeout(checkedRadioId == MODE_RADIO_STANDBY_ID);
+            handleSuccessfulModeChangeResponse(checkedRadioId, newMode);
             break;
         case '-1':
             logout();
             break;
         default:
-            if (!responseText) {
-                responseText = LANG['server_error']
-            }
-            $('#' + ERROR_CONTENT_MESSAGE_ID).html(responseText);
-            setVisibleContent(ERROR_CONTENT_ID);
-            allowSessionTimeout();
+            handleFailedModeChangeResponse(responseText);
             break;
     }
+}
+
+function handleSuccessfulModeChangeResponse(checkedRadioId, newMode) {
+    setCurrentMode(newMode);
+    setVisibleContent(getContentIdByRadioId(checkedRadioId));
+    setDisabledForRelevantElements(false);
+    setAllowSessionTimeout(checkedRadioId == MODE_RADIO_STANDBY_ID);
+    _IS_SWITCHING_MODE = false;
+}
+
+function handleFailedModeChangeResponse(responseText) {
+    if (!responseText) {
+        responseText = LANG['server_error']
+    }
+    $('#' + ERROR_CONTENT_MESSAGE_ID).html(responseText);
+    setVisibleContent(ERROR_CONTENT_ID);
+    allowSessionTimeout();
+    _IS_SWITCHING_MODE = false;
 }
 
 function setDisabledForModeRadios(isDisabled) {
