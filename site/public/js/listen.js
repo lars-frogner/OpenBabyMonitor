@@ -20,6 +20,8 @@ const MAX_FOREGROUND_CONTRAST = 40;
 const LISTEN_NOTIFICATION_HEADERS = { sound: LANG['sound_alert'], bad: LANG['crying_alert'], good: LANG['babbling_alert'], bad_and_good: LANG['crying_and_babbling_alert'], bad_or_good: LANG['crying_or_babbling_alert'] };
 const LISTEN_NOTIFICATION_TEXTS = { sound: LANG['significant_sound'], bad: LANG['child_crying'], good: LANG['child_babbling'], bad_and_good: LANG['child_crying_and_babbling'], bad_or_good: LANG['child_crying_or_babbling'] };
 
+const MAX_PING_INTERVAL = 30000; // [ms]
+
 var _LISTEN_EVENT_SOURCE;
 var _LISTEN_NOTIFICATION_MODAL_TRIGGER = {};
 var _LISTEN_BROWSER_NOTIFICATION;
@@ -29,8 +31,15 @@ var _LIVE_RESULTS_MODE_ACTIVE = false;
 
 var _LAST_EVENT_TIME;
 
+var _CONNECTION_LOST_INTERVAL_HANDLE;
+var _CONNECTION_LOST_MODAL_TRIGGER = {};
+var _CONNECTION_LOST_MODAL_IS_OPEN = false;
+var _CONNECTION_LOST_BROWSER_NOTIFICATION;
+var _LAST_PING_TIME;
+
 $(function () {
     connectModalToObject(_LISTEN_NOTIFICATION_MODAL_TRIGGER, { icon: 'exclamation-circle', noHeaderHiding: true, noBodyHiding: true, confirmOnclick: function () { hideModalWithoutDismissCallback(); changeModeTo('audiostream'); }, confirm: 'Begynn lydavspilling', dismiss: 'Lukk' });
+    connectModalToObject(_CONNECTION_LOST_MODAL_TRIGGER, { icon: 'wifi-off', header: LANG['connection_lost'], href: 'main.php', confirm: LANG['refresh_page'], dismiss: LANG['close'], dismissOnclick: function () { _CONNECTION_LOST_MODAL_IS_OPEN = false; } }, { text: LANG[ACCESS_POINT_ACTIVE ? 'connection_lost_ap_text' : 'connection_lost_client_text'], showText: () => { return true; } });
 
     if (INITIAL_MODE == LISTEN_MODE) {
         initializeListenMode();
@@ -39,6 +48,7 @@ $(function () {
     document.addEventListener('visibilitychange', function () {
         if (document.visibilityState === 'visible') {
             removeListenBrowserNotification();
+            removeConnectionLostBrowserNotification();
         }
     });
 });
@@ -58,6 +68,7 @@ function initializeListenMode() {
     if (_LIVE_RESULTS_MODE_ACTIVE) {
         addLiveResultsEventListener();
     }
+    setupConnectionChecker();
 
     $('#' + LISTEN_NONE_RADIO_ID).prop('disabled', false);
     $('#' + LISTEN_LIVE_RADIO_ID).prop('disabled', false);
@@ -67,9 +78,11 @@ function initializeListenMode() {
 
 function deactivateListenMode() {
     removeListenBrowserNotification();
+    removeConnectionLostBrowserNotification();
     if (_LIVE_RESULTS_MODE_ACTIVE) {
         removeLiveResultsEventListener();
     }
+    removeConnectionChecker();
     unsubscribeFromListenMessages();
 }
 
@@ -102,6 +115,18 @@ function removeListenBrowserNotification() {
     if (_LISTEN_BROWSER_NOTIFICATION) {
         _LISTEN_BROWSER_NOTIFICATION.close();
         _LISTEN_BROWSER_NOTIFICATION = null;
+    }
+}
+
+function createConnectionLostBrowserNotification() {
+    removeConnectionLostBrowserNotification();
+    _CONNECTION_LOST_BROWSER_NOTIFICATION = createBrowserNotification(LANG['connection_lost'], LANG[ACCESS_POINT_ACTIVE ? 'connection_lost_ap_text' : 'connection_lost_client_text'], 'connection_lost');
+}
+
+function removeConnectionLostBrowserNotification() {
+    if (_CONNECTION_LOST_BROWSER_NOTIFICATION) {
+        _CONNECTION_LOST_BROWSER_NOTIFICATION.close();
+        _CONNECTION_LOST_BROWSER_NOTIFICATION = null;
     }
 }
 
@@ -276,4 +301,35 @@ function moveIndicatorTo(coordinates) {
         easing: 'easeInOutQuart'
     };
     anime(Object.assign(params, coordinates));
+}
+
+function handlePingEvent(event) {
+    _LAST_PING_TIME = Date.now();
+}
+
+function setupConnectionChecker() {
+    addPingEventListener(handlePingEvent);
+
+    _CONNECTION_LOST_INTERVAL_HANDLE = setInterval(() => {
+        $now = Date.now();
+        if (_LAST_PING_TIME && $now - _LAST_PING_TIME > MAX_PING_INTERVAL) {
+            if (browserNotificationsAllowed()) {
+                createConnectionLostBrowserNotification();
+            } else {
+                playNotificationSound();
+            }
+            _CONNECTION_LOST_MODAL_TRIGGER.triggerModal();
+            _CONNECTION_LOST_MODAL_IS_OPEN = true;
+        }
+    }, MAX_PING_INTERVAL);
+}
+
+function removeConnectionChecker() {
+    if (_CONNECTION_LOST_INTERVAL_HANDLE) {
+        clearInterval(_CONNECTION_LOST_INTERVAL_HANDLE);
+        _CONNECTION_LOST_INTERVAL_HANDLE = null;
+    }
+
+    removePingEventListener(handlePingEvent);
+    _LAST_PING_TIME = null;
 }

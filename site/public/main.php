@@ -327,6 +327,7 @@ require_once(TEMPLATES_DIR . '/main.php');
 
   <script>
     const USES_CAMERA = <?php echo USES_CAMERA ? 'true' : 'false'; ?>;
+    const ACCESS_POINT_ACTIVE = <?php echo ACCESS_POINT_ACTIVE ? 'true' : 'false'; ?>;
     const STANDBY_MODE = <?php echo MODE_VALUES['standby']; ?>;
     const LISTEN_MODE = <?php echo MODE_VALUES['listen']; ?>;
     const AUDIOSTREAM_MODE = <?php echo MODE_VALUES['audiostream']; ?>;

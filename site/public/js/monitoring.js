@@ -49,6 +49,17 @@ function addModeMonitoringEventListener(handleModeChangeEvent) {
     _MONITORING_EVENT_SOURCE.addEventListener('mode', handleModeChangeEvent);
 }
 
+function addPingEventListener(handlePingEvent) {
+    createMonitoringEventSource();
+    _MONITORING_EVENT_SOURCE.addEventListener('ping', handlePingEvent);
+}
+
+function removePingEventListener(handlePingEvent) {
+    if (_MONITORING_EVENT_SOURCE) {
+        _MONITORING_EVENT_SOURCE.removeEventListener('ping', handlePingEvent);
+    }
+}
+
 function underVoltageModalCallback(onCompletion) {
     const showAgain = !$('#' + MODAL_CONFIRM_CHECKBOX_ID).prop('checked');
     if (!showAgain) {

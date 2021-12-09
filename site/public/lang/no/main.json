@@ -30,5 +30,8 @@
     "crying_or_babbling_alert": "Varsel om gråt eller babling",
     "child_crying_or_babbling": "Barnet lager lyder, men det er ikke tydelig om det er gråt eller babling.",
     "listening_for_activity": "Lytter etter aktivitet",
-    "server_error": "Det oppstod en feil på serveren"
+    "server_error": "Det oppstod en feil på serveren (se i loggen for detaljer)",
+    "connection_lost": "Ingen forbindelse med enheten",
+    "connection_lost_ap_text": "Vennligst sjekk at enheten har strøm og at du fortsatt er tilkoblet tilgangspunktet.",
+    "connection_lost_client_text": "Vennligst sjekk at enheten har strøm og WiFi-dekning og at dere er koblet til det samme nettverket."
 }
