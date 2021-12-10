@@ -3,6 +3,7 @@ include_once(dirname(__DIR__) . '/error_config.php');
 require_once(dirname(__DIR__) . '/env_config.php');
 require_once(dirname(__DIR__) . '/config.php');
 require_once(SRC_DIR . '/database.php');
+require_once(SRC_DIR . '/network.php');
 require_once(SRC_DIR . '/security.php');
 
 if (count($argv) < 2) {
@@ -56,6 +57,9 @@ foreach ($table_names as $table_name) {
 foreach (array('known_networks') as $table_name) {
   echo "Creating table $table_name in database $db_name\n";
   createTableIfMissing($database, $table_name, readTableColumnsFromConfig($table_name, false));
+  foreach (obtainKnownNetworkSSIDs() as $ssid) {
+    insertValuesIntoTable($database, $table_name, array('ssid' => $ssid));
+  }
 }
 
 echo "Closing connection to database $db_name\n";
