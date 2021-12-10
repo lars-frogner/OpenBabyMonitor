@@ -3,8 +3,11 @@ import re
 import json
 
 
-def parse(iwlist_output):
+def parse(iwlist_output, max_frequency=3.0):
     SSIDs = re.findall(r'^\s*ESSID:"(.+)"$', iwlist_output, flags=re.MULTILINE)
+    frequencies = re.findall(r'^\s*Frequency:(\d+\.?\d*) GHz \(Channel \d+\)$',
+                             iwlist_output,
+                             flags=re.MULTILINE)
     auth = re.findall(r'^\s*Encryption key:(\w+)$',
                       iwlist_output,
                       flags=re.MULTILINE)
@@ -16,8 +19,9 @@ def parse(iwlist_output):
     qualities = list(map(eval, qualities))
 
     return {
-        SSID: dict(zip(['authentication', 'quality'], data))
-        for SSID, data in zip(SSIDs, zip(auth, qualities))
+        SSID: dict(zip(['frequency', 'authentication', 'quality'], data))
+        for SSID, data in zip(SSIDs, zip(frequencies, auth, qualities))
+        if float(data[0]) <= max_frequency
     }
 
 
