@@ -512,7 +512,7 @@ _EOF_
     # Enable SSL module
     sudo a2enmod ssl
 
-    $BM_SERVERCONTROL_DIR/create_ssl_key.sh "$BM_HOSTNAME"
+    BM_SERVERCONTROL_DIR=$BM_SERVERCONTROL_DIR $BM_SERVERCONTROL_DIR/create_ssl_key.sh "$BM_HOSTNAME"
     source $BM_SERVERCONTROL_DIR/ssl_cert_key_paths.env
 
     # Setup new site
