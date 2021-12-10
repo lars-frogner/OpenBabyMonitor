@@ -14,6 +14,4 @@ sudo rm -f /etc/dhcpcd.conf /etc/hosts
 sudo ln -s {$BM_NW_CLIENT_DIR,}/etc/dhcpcd.conf
 sudo ln -s {$BM_NW_CLIENT_DIR,}/etc/hosts
 sudo systemctl daemon-reload 1>&3 2>&4
-#sudo systemctl enable wpa_supplicant 1>&3 2>&4
-#sudo systemctl start wpa_supplicant 1>&3 2>&4
 sudo service dhcpcd restart 1>&3 2>&4
