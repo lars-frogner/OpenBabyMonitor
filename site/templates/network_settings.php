@@ -1,8 +1,4 @@
 <?php
-require_once(dirname(__DIR__) . '/config/path_config.php');
-require_once(dirname(__DIR__) . '/config/network_config.php');
-require_once(SRC_DIR . '/database.php');
-require_once(SRC_DIR . '/control.php');
 
 function line($string) {
   echo $string . "\n";

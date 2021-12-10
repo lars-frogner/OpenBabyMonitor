@@ -5,7 +5,7 @@ require_once(__DIR__ . '/config.php');
 include_once(__DIR__ . '/network_config.php');
 require_once(SRC_DIR . '/io.php');
 require_once(SRC_DIR . '/database.php');
-require_once(SRC_DIR . '/control.php');
+require_once(SRC_DIR . '/language.php');
 
 define('VALID_LANGUAGES', $_CONFIG['language']['current']['values']);
 
