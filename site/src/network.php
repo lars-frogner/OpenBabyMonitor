@@ -11,16 +11,6 @@ function obtainWirelessScanResults() {
   return parseJSON(join("\n", $output));
 }
 
-function obtainKnownNetworkSSIDs() {
-  $output = null;
-  $result_code = null;
-  exec(SERVERCONTROL_DIR . '/get_known_network_ssids.sh', $output, $result_code);
-  if ($result_code != 0) {
-    bm_error("Obtaining known network SSIDs failed with error code $result_code:\n" . join("\n", $output));
-  }
-  return $output;
-}
-
 function obtainConnectedNetworkSSID() {
   $output = null;
   $result_code = null;

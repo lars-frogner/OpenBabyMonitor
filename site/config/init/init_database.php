@@ -3,7 +3,7 @@ include_once(dirname(__DIR__) . '/error_config.php');
 require_once(dirname(__DIR__) . '/env_config.php');
 require_once(dirname(__DIR__) . '/config.php');
 require_once(SRC_DIR . '/database.php');
-require_once(SRC_DIR . '/network.php');
+require_once(SRC_DIR . '/control.php');
 require_once(SRC_DIR . '/security.php');
 
 if (count($argv) < 2) {
