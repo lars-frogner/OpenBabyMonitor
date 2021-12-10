@@ -318,9 +318,9 @@ function handleAPSSIDOrPasswordInput(ssid, password) {
 
 $('#' + NETWORK_PASSWORD_INPUT_ID).on('input', function () {
     if (networkPasswordIsValid(this.value)) {
-        enableButton($('#' + CONNECT_BUTTON_ID));
+        enableNetworkButton($('#' + CONNECT_BUTTON_ID));
     } else {
-        disableButton($('#' + CONNECT_BUTTON_ID));
+        disableNetworkButton($('#' + CONNECT_BUTTON_ID));
     }
 });
 
