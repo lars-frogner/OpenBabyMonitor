@@ -11,6 +11,7 @@ source $BM_SERVERCONTROL_DIR/redirection.sh
 sudo rm -f /etc/dhcpcd.conf /etc/hosts
 sudo ln -s {$BM_NW_AP_DIR,}/etc/dhcpcd.conf
 sudo ln -s {$BM_NW_AP_DIR,}/etc/hosts
+sudo ip addr flush dev $BM_NW_INTERFACE
 sudo systemctl daemon-reload 1>&3 2>&4
 sudo service dhcpcd restart 1>&3 2>&4
 sudo systemctl enable hostapd 1>&3 2>&4
