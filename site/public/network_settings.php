@@ -173,7 +173,7 @@ $connected_network = obtainConnectedNetworkSSID();
                       <button type="submit" name="forget" style="display: none;" id="forget_submit_button" disabled></button><button class="btn btn-secondary" id="forget_button" disabled><?php echo LANG['forget']; ?></button>
                     </div>
                   </div>
-                  <div class="col-auto px-3 my-2" style="min-width: 26rem; max-width: 26rem;">
+                  <div class="col-auto px-3 my-2" style="min-width: 22rem; max-width: 22rem;">
                     <h2><?php echo LANG['access_point']; ?></h2>
                     <div class="row align-items-center mb-3">
                       <label class="form-label mb-0" for="ap_channel_range">
