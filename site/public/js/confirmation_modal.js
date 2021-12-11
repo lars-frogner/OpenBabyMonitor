@@ -177,7 +177,7 @@ function connectModalToObject(object, modalProperties, bodySetters) {
             }
             bodySetters.forEach(setter => {
                 if (setter.showText && setter.showText()) {
-                    modalProperties['body'].push($('<p></p>').text(setter.text));
+                    modalProperties['body'].push($('<p></p>').html(setter.text));
                 }
             });
             setConfirmationModalProperties(modalProperties);
