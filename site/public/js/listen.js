@@ -161,7 +161,7 @@ function updateInfoLabel(backgroundSoundLevel, foregroundContrast, recordTime) {
     _LAST_EVENT_TIME = now;
     $('#' + LISTEN_INFO_CARD_ID + '_contrast').html(foregroundContrast.toFixed(1) + ' dB');
     $('#' + LISTEN_INFO_CARD_ID + '_bg_sound_level').html(backgroundSoundLevel.toFixed(1) + ' dB');
-    $('#' + LISTEN_INFO_CARD_ID + '_delay').html(delay.toFixed(1) + ' s');
+    $('#' + LISTEN_INFO_CARD_ID + '_delay').html(ACCESS_POINT_ACTIVE ? 'N/A' : (delay.toFixed(1) + ' s'));
     $('#' + LISTEN_INFO_CARD_ID + '_interval').html(interval.toFixed(1) + ' s');
 }
 
