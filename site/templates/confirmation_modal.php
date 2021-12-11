@@ -6,7 +6,7 @@
           <use id="confirmation_modal_icon_src" />
         </svg>
         <h5 class="modal-title" id="confirmation_modal_header"></h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <button type="button" class="btn-close ms-3" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" id="confirmation_modal_body">
       </div>
