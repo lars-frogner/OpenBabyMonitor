@@ -3,7 +3,7 @@ import re
 import json
 
 
-def parse(iwlist_output, max_frequency=3.0):
+def parse(iwlist_output, max_frequency=6.0):
     SSIDs = re.findall(r'^\s*ESSID:"(.+)"$', iwlist_output, flags=re.MULTILINE)
     frequencies = re.findall(r'^\s*Frequency:(\d+\.?\d*) GHz \(Channel \d+\)$',
                              iwlist_output,
