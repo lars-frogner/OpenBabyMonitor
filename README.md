@@ -1,8 +1,8 @@
 # Raspberry Pi baby monitor
 
-<details open style="text-align: right; margin-bottom: 1%;">
+<details open align="right" style="margin-bottom: 1%;">
 <summary>Click to toggle animation</summary>
-<img src="media/babymonitor_demo.gif" style="float: right; width: 40%; margin-left: 3%;  margin-top: 2%; margin-bottom: 3%;">
+<img src="media/babymonitor_demo.gif" align="right" style="width: 40%; margin-left: 3%;  margin-top: 2%; margin-bottom: 3%;">
 </details>
 
 The purpose of this project is to make use of the great flexibility and availability of the [Raspberry Pi](https://www.raspberrypi.org/) mini-computer to create a user friendly and capable yet inexpensive baby monitor or babycall. Equipped with a small microphone and optionally an integrated camera, the device is controlled through a local web site accessible with a phone or computer on a wireless network. The device can then provide a live feed of audio or video to this web site, or listen passively and give a notification once the baby is crying.
