@@ -5,7 +5,7 @@
 <img src="media/babymonitor_demo.gif" align="right" style="width: 40%; margin-left: 3%;  margin-top: 2%; margin-bottom: 3%;">
 </details>
 
-The purpose of this project is to make use of the great flexibility and availability of the [Raspberry Pi](https://www.raspberrypi.org/) mini-computer to create a user friendly and capable yet inexpensive baby monitor or babycall. Equipped with a small microphone and optionally an integrated camera, the device is controlled through a local web site accessible with a phone or computer on a wireless network. The device can then provide a live feed of audio or video to this web site, or listen passively and give a notification once the baby is crying.
+The purpose of this project is to make use of the great flexibility and availability of the [Raspberry Pi](https://www.raspberrypi.org/) mini-computer to create a user friendly and capable yet inexpensive baby monitor or babycall. Equipped with a small microphone and optionally an integrated camera, the Pi is controlled through a local web site accessible with a phone or computer on a wireless network. It can then stream audio or video to this web site, or listen passively and give a notification once the baby is crying.
 
 ## Features
 
@@ -36,15 +36,15 @@ Description to come.
 
 ### Powering on and off
 
-The Raspberry Pi will start as soon as you connect it to power. When finished, use the [web application](#the-web-application) to shut down the device. **Avoid shutting down by simply unplugging the power supply, as this may corrupt the SD card.** To start the device again after shutting down, remove and then reinsert the power cable.
+The Raspberry Pi will start as soon as you connect it to power. When finished, use the [web application](#the-web-application) to shut down the Pi. **Avoid shutting down by simply unplugging the power supply, as this may corrupt the SD card.** To start the Pi again after shutting down, remove and then reinsert the power cable.
 
 ### Local Wi-Fi or wireless access point
 
-The only way of communicating with baby monitor is over a wireless network. This can be done in two ways. It can be connected to a local Wi-Fi network and thus be controlled by e.g. a phone on the same network. Or it may act as an access point by creating its own network to which you can connect your phone. In this way the baby monitor may be used even if there is no Wi-Fi available.
+The only way of communicating with Pi is over a wireless network. This can be done in two ways. It can be connected to a local Wi-Fi network and thus be controlled by e.g. a phone on the same network. Or it may act as an access point by creating its own network to which you can connect your phone. In this way the baby monitor may be used even if there is no Wi-Fi available.
 
-You can switch between the two networking modes using the [web application](#the-web-application). The device will also switch automatically depending on whether it finds a network to connect to, so as not to leave you without a way of controlling it.
+You can switch between the two networking modes using the [web application](#the-web-application). The Pi will also switch automatically depending on whether it finds a network to connect to, so as not to leave you without a way of controlling it.
 
-If you installed a [pre-built image](#installation), the device will initially be in access point mode. You should be able to see a network with SSID `babymonitor` that you can connect to using the default password `babymonitor`. For security, this password should be changed in the network settings as soon as possible.
+If you installed a [pre-built system image](#installation), the Pi will initially be in access point mode. You should be able to see a network with SSID `babymonitor` that you can connect to using the default password `babymonitor`. For security, this password should be changed in the network settings as soon as possible.
 
 ### Mini USB Microphone
 
@@ -56,17 +56,17 @@ In order to fit the Mini USB Microphone next to the Micro USB power plug on a Pi
 
 ### Accessing the web application
 
-You can control the baby monitor through a web application that is accessed by opening the URL https://babymonitor in a browser. This requires that you are connected to the device's wireless access point, or to same local wireless network as the device.
+You can control the baby monitor through a web application that is accessed by opening the URL https://babymonitor in a browser. This requires that you are connected to the Pi's wireless access point, or to same local wireless network as the Pi.
 
-> **_Note:_** In the above URL, `babymonitor` is the hostname of the baby monitor device. Many routers automatically append a suffix like `.local`, `.home` or `.lan` to the hostnames of the devices on its network, so if the short version of the URL doesn't work, try adding one of the suffixes. No suffix is required when connected to the device's access point.
+> **_Note:_** In the above URL, `babymonitor` is the hostname of the Pi. Many routers automatically append a suffix like `.local`, `.home` or `.lan` to the hostnames of the devices on its network, so if the short version of the URL doesn't work, try adding one of the suffixes. No suffix is required when connected to the Pi's access point.
 
 Upon loading the website, your browser will typically show a warning about the site not being secure. This is expected and can typically be bypassed by clicking *Advanced* -> *Continue anyway* or something similar. While this is perfectly secure in the context of communicating with a device on the local network, **you should generally not bypass such warnings encountered when browsing the internet**.
 
-> **_Note:_** Both the `https` and `http` protocol is supported, but `https` is recommended because it encrypts the communication. However, because the device only uses the local network and thus is not connected to the internet, it has to use a [self-signed certificate](https://en.wikipedia.org/wiki/Self-signed_certificate) for the `https` protocol. Since such certificates are not as secure as certificates validated by a third party, they cause most browsers to emit warnings.
+> **_Note:_** Both the `https` and `http` protocol is supported, but `https` is recommended because it encrypts the communication. However, because the baby monitor only uses the local network and thus is not connected to the internet, it has to use a [self-signed certificate](https://en.wikipedia.org/wiki/Self-signed_certificate) for the `https` protocol. Since such certificates are not as secure as certificates validated by a third party, they cause most browsers to emit warnings.
 
 ### Signing in
 
-A password is required to sign in to the web application. If you used a [pre-built image](#installation) to install the baby monitor software, the default password is `babymonitor`. If you did a [manual installation](#manual-setup), you specified this password during the setup. It is a good idea to change this in the network settings after you have signed in the first time.
+A password is required to sign in to the web application. If you used a [pre-built system image](#installation) to install the baby monitor software on the Pi, the default password is `babymonitor`. If you did a [manual installation](#manual-setup), you specified this password during the setup. It is a good idea to change this in the network settings after you have signed in the first time.
 
 ### Basic operation
 
@@ -74,19 +74,19 @@ The main page of the web application has buttons for switching between different
 
 **Standby**
 
-Indicated by a crescent moon. The device is idle and does as little as possible. A button is available for testing your connection to the device. It will measure the latency and bandwidth of data transfer, and use this to show an indication of which functionality should work well with your current connection.
+Indicated by a crescent moon. The Pi is idle and does as little as possible. A button is available for testing your connection to the Pi. It will measure the latency and bandwidth of data transfer, and use this to show an indication of which functionality should work well with your current connection.
 
 **Notify**
 
-Indicated by a bell. The device will record and process audio, and send a notification when the baby is crying. You can also view a visual representation of how the device is interpreting the current sounds, as it uses a neural network to distinguish between (1): baby cries, (2): babbling and laughing and (3): other ambient sounds.
+Indicated by a bell. The Pi will record and process audio, and send a notification when the baby is crying. You can also view a visual representation of how the Pi is interpreting the current sounds, as it uses a neural network to distinguish between (1): baby cries, (2): babbling and laughing and (3): other ambient sounds.
 
 **Listen**
 
-Indicated by a microphone. The device will record and stream audio directly to the web application for you to hear. You can also watch live what the audio waveform or frequency spectrum looks like.
+Indicated by a microphone. The Pi will record and stream audio directly to the web application for you to hear. You can also watch live what the audio waveform or frequency spectrum looks like.
 
 **Observe**
 
-Indicated by a camera. The device will capture and stream video and audio directly to the web application. This mode will be unavailable if the device does not have a camera connected.
+Indicated by a camera. The Pi will capture and stream video and audio directly to the web application. This mode will be unavailable if the Pi does not have a camera connected.
 
 ## Power consumption
 
@@ -120,7 +120,7 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
     psk="<network password>"
     }
     ```
-    in the `boot` directory on the SD card. Insert the country code, SSID and password for your local wireless network. Make sure to keep the double quotes around the password. The `wpa_supplicant.conf` file lets the device connect to the local wireless network, and the `ssh` file enables us to acces to the device remotely via SSH.
+    in the `boot` directory on the SD card. Insert the country code, SSID and password for your local wireless network. Make sure to keep the double quotes around the password. The `wpa_supplicant.conf` file lets the Pi connect to the local wireless network, and the `ssh` file enables us to acces to the Pi remotely via SSH.
 
 3. Insert the SD card into the Raspberry Pi.
 
@@ -130,7 +130,7 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
     ```
     Try adding `.local`, `.home` or `.lan` after `raspberrypi` if it doesn't work.
 
-5. When you have successfully SSH'ed into the device, proceed by updating the package lists and installing Git:
+5. When you have successfully SSH'ed into the Pi, proceed by updating the package lists and installing Git:
     ```
     sudo apt -y update
     sudo apt -y install git
@@ -169,9 +169,9 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
     ```
     babymonitor/setup.sh
     ```
-    You will be prompted to change the password for the `pi` user. During further execution of the script you will be asked to create a couple of new passwords. First for the baby monitor website, and then for the wireless access point. The device will reboot when finished.
+    You will be prompted to change the password for the `pi` user. During further execution of the script you will be asked to create a couple of new passwords. First for the baby monitor website, and then for the wireless access point. The Pi will reboot when finished.
 
-After the device has rebooted you will be able to SSH in using the new hostname (defined by `BM_HOSTNAME` in `babymonitor/config/setup_config.env`) and the password for the `pi` user you entered in the previous step:
+After the Pi has rebooted you will be able to SSH in using the new hostname (defined by `BM_HOSTNAME` in `babymonitor/config/setup_config.env`) and the password for the `pi` user you entered in the previous step:
 ```
 ssh pi@<hostname>
 ```
