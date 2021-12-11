@@ -38,7 +38,7 @@ var _CONNECTION_LOST_BROWSER_NOTIFICATION;
 var _LAST_PING_TIME;
 
 $(function () {
-    connectModalToObject(_LISTEN_NOTIFICATION_MODAL_TRIGGER, { icon: 'exclamation-circle', noHeaderHiding: true, noBodyHiding: true, confirmOnclick: function () { hideModalWithoutDismissCallback(); changeModeTo('audiostream'); }, confirm: 'Begynn lydavspilling', dismiss: 'Lukk' });
+    connectModalToObject(_LISTEN_NOTIFICATION_MODAL_TRIGGER, { icon: 'exclamation-circle', noHeaderHiding: true, noBodyHiding: true, confirmOnclick: function () { hideModalWithoutDismissCallback(); changeModeTo('audiostream'); }, confirm: LANG['play_audio'], dismiss: LANG['close'] });
     connectModalToObject(_CONNECTION_LOST_MODAL_TRIGGER, { icon: 'wifi-off', header: LANG['connection_lost'], href: 'main.php', confirm: LANG['refresh_page'], dismiss: LANG['close'], dismissOnclick: function () { _CONNECTION_LOST_MODAL_IS_OPEN = false; } }, { text: LANG[ACCESS_POINT_ACTIVE ? 'connection_lost_ap_text' : 'connection_lost_client_text'], showText: () => { return true; } });
 
     if (INITIAL_MODE == LISTEN_MODE) {
