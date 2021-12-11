@@ -1,6 +1,6 @@
 # Raspberry Pi baby monitor
 
-<details open align="right" style="margin-bottom: 1%;">
+<details open>
 <summary>Click to toggle animation</summary>
 <img src="media/babymonitor_demo.gif" align="right" style="width: 40%; margin-left: 3%;  margin-top: 2%; margin-bottom: 3%;">
 </details>
