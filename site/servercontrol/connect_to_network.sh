@@ -107,11 +107,12 @@ else
         sudo wpa_cli -i $BM_NW_INTERFACE enable_network $ID 1>&3 2>&4
     done
 
+    $BM_SERVERCONTROL_DIR/write_result.sh 1
+
     # Return to the original mode
     if [[ "$IS_ACCESS_POINT" = "1" ]]; then
         $BM_SERVERCONTROL_DIR/activate_ap_mode.sh
     fi
 
-    $BM_SERVERCONTROL_DIR/write_result.sh 1
     exit 1
 fi

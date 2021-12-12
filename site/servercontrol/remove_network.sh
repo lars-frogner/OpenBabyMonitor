@@ -24,8 +24,8 @@ fi
 
 ALL_NETWORK_IDS="$(sudo wpa_cli -i $BM_NW_INTERFACE list_networks | tail -n +2 | cut -c-1)"
 
+$BM_SERVERCONTROL_DIR/write_result.sh 0
+
 if [[ "$IS_AP" = "1" || -z "$ALL_NETWORK_IDS" ]]; then
     $BM_SERVERCONTROL_DIR/activate_ap_mode.sh
 fi
-
-$BM_SERVERCONTROL_DIR/write_result.sh 0
