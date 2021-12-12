@@ -14,12 +14,14 @@ The purpose of this project is to make use of the great flexibility and availabi
 * Can either be connected to the home Wi-Fi or provide its own wireless access point.
 * Detects baby crying using either a simple loudness threshold or a neural network trained on Google's [AudioSet](https://research.google.com/audioset/) dataset to distinguish between crying, babbling and ambient sounds.
 * Live audio streaming and optionally video streaming in up to 1080p resolution.
-* Low power consumption (see [Power consumption](#power-consumption)), enabling tens of hours of battery life when powered by even a modestly sized portable power bank.
+* Low power consumption (see [Power consumption](#powe dr-consumption)), enabling tens of hours of battery life when powered by even a modestly sized portable power bank.
 
 ## Equipment
 
+<img src="media/babymonitor_components.jpg" align="right" style="width: 35%; margin-left: 2%;  margin-bottom: 2%;">
+
 * A Raspberry Pi computer, preferably a [Raspberry Pi Zero W](https://www.raspberrypi.com/products/raspberry-pi-zero-w/), which is priced at around $10. The non-W version of the Pi Zero will not do, as it does not have an inbuilt network adapter. Other, more powerful but pricier models like the [Zero 2 W](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/), [3B/3B+](https://www.raspberrypi.com/products/raspberry-pi-3-model-b-plus/) or [4B](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/) can also be used.
-* A MicroSD card with at least 8 GB of storage.
+* A MicroSD card with at least 8 GB of storage, as well as a MicroSD to USB adapter so that you can connect the card to your computer.
 * A [5.1V  power supply with Micro USB plug](https://www.raspberrypi.com/products/micro-usb-power-supply/) for Pi Zero 1/2 or Pi 3, or [with USB-C plug](https://www.raspberrypi.com/products/type-c-power-supply/) for Pi 4. These also cost around $10. To avoid the need for a wall outlet, a 5V power bank with an appropriate cable can be used instead.
 * A case for the Pi, e.g. [this](https://www.raspberrypi.com/products/raspberry-pi-zero-case/) for Pi Zero, [this](https://www.raspberrypi.com/products/raspberry-pi-3-case/) for Pi 3B or [this](https://www.raspberrypi.com/products/raspberry-pi-4-case/) for Pi 4B. These official cases cost around $6. Note that the Zero models have a smaller form factor, and unlike for the non-Zero models their official case comes with a convenient mount and hole for the [Pi Camera](https://www.raspberrypi.com/products/camera-module-v2/).
 <img src="media/babymonitor.jpg" align="right" style="width: 35%; margin-left: 2%;  margin-bottom: 2%;">
@@ -27,12 +29,6 @@ The purpose of this project is to make use of the great flexibility and availabi
 * A [USB microphone](https://www.adafruit.com/product/3367), with an [adapter to Micro USB](https://www.adafruit.com/product/2910) if using a Pi Zero 1/2. Together these cost around $9. Other USB microphones should work as well, but have not been tested.
 * For optional video streaming, the [Raspberry Pi Camera Module 2](https://www.raspberrypi.com/products/camera-module-v2/), or its [NoIR](https://www.raspberrypi.com/products/pi-noir-camera-v2/) variant is required. These are priced at around $27. The NoIR version has no infrared blocking filter, making the camera more sensitive at the expense of colour accuracy. (Hence the NoIR version is arguably the best choice for use in a baby monitor.) Note that the cheaper ZeroCam is not supported.
 * For mounting the Pi on a bed or a stroller, a flexible phone tripod can be of great use.
-
-## Installation
-
-> **_Note:_** This section describes installation using a pre-built image. You can also install the software manually, as described [here](#manual-setup).
-
-Description to come.
 
 ## Practical info
 
@@ -46,13 +42,33 @@ The only way of communicating with Pi is over a wireless network. This can be do
 
 You can switch between the two networking modes using the [web application](#the-web-application). The Pi will also switch automatically depending on whether it finds a network to connect to, so as not to leave you without a way of controlling it.
 
-If you installed a [pre-built system image](#installation), the Pi will initially be in access point mode. You should be able to see a network with SSID `babymonitor` that you can connect to using the default password `babymonitor`. For security, this password should be changed in the network settings as soon as possible.
-
 ### Mini USB Microphone
 
 The Mini USB Microphone linked in the [Equipment](#equipment) section is very affordable, but this comes at the cost of poor audio quality. Hence, to make the audio interpretation as reliable as possible, avoid placing the baby monitor too far from the baby.
 
 In order to fit the Mini USB Microphone next to the Micro USB power plug on a Pi Zero, you may have to cut away some of the rubber on the side of the power plug.
+
+## Installation
+
+> **_Note:_** This section describes installation using a pre-built system image. You can also install the software manually, as described [here](#manual-setup).
+
+1. Download the [latest babymonitor system image](/lars-frogner/babymonitor/releases/latest/download/babymonitor_image.zip) and extract the `babymonitor.img` file from the ZIP archive.
+
+2. Connect your Pi's MicroSD card to your computer.
+
+3. Download and launch the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
+
+4. In the Imager, click `CHOOSE OS` -> `Use custom` and select the extracted `babymonitor.img` file.
+
+5. Click `CHOOSE STORAGE` and select your MicroSD card.
+
+6. Click `WRITE` and wait for the Imager to finish.
+
+7. Eject the MicroSD card and insert it into your Pi (make sure the Pi is turned off).
+
+8. Power up the Pi. After some time a new wireless network called `babymonitor` will appear. Connect to it using the default password; `babymonitor`.
+
+9. You are now ready to control the baby monitor using [the web application](#the-web-application).
 
 ## The web application
 
@@ -62,13 +78,21 @@ You can control the baby monitor through a web application that is accessed by o
 
 > **_Note:_** In the above URL, `babymonitor` is the hostname of the Pi. Many routers automatically append a suffix like `.local`, `.home` or `.lan` to the hostnames of the devices on its network, so if the short version of the URL doesn't work, try adding one of the suffixes. No suffix is required when connected to the Pi's access point.
 
-Upon loading the website, your browser will typically show a warning about the site not being secure. This is expected and can typically be bypassed by clicking *Advanced* -> *Continue anyway* or something similar. While this is perfectly secure in the context of communicating with a device on the local network, **you should generally not bypass such warnings encountered when browsing the internet**.
+Upon loading the website, your browser will typically show a warning about the site not being secure. This is expected and can typically be bypassed by clicking `Advanced` -> `Continue anyway` or something similar. While this is perfectly secure in the context of communicating with a device on the local network, **you should generally not bypass such warnings encountered when browsing the internet**.
 
 > **_Note:_** Both the `https` and `http` protocol is supported, but `https` is recommended because it encrypts the communication. However, because the baby monitor only uses the local network and thus is not connected to the internet, it has to use a [self-signed certificate](https://en.wikipedia.org/wiki/Self-signed_certificate) for the `https` protocol. Since such certificates are not as secure as certificates validated by a third party, they cause most browsers to emit warnings.
 
 ### Signing in
 
-A password is required to sign in to the web application. If you used a [pre-built system image](#installation) to install the baby monitor software on the Pi, the default password is `babymonitor`. If you did a [manual installation](#manual-setup), you specified this password during the setup. It is a good idea to change this in the network settings after you have signed in the first time.
+A password is required to sign in to the web application. If you used a [pre-built system image](#installation) to install the baby monitor software on the Pi, the default password is `babymonitor`. If you did a [manual installation](#manual-setup), you specified this password during the setup. It is a good idea to [change this](#changing-passwords) in the network settings after you have signed in the first time.
+
+### Changing passwords
+
+> **_Note:_** This is most relevant if you installed a [pre-built system image](#installation).
+
+For security, you should change the baby monitor passwords to something other than the default values. There are three separate passwords that should be changed (all with `babymonitor` as the default value). These are the passwords for (1): connecting to the access point, (2): signing in to the web application and (3): performing privileged actions on the device, like logging in with SSH. All can be changed in the web application.
+
+In the navigation menu, click `Settings` -> `Network settings` to go to the network settings page, where there are options to change the access point password and the website password. After doing so, go to the system settings page by clicking `Settings` -> `System settings`. Here you can change the device password. When finished, reboot the Pi by clicking `Server` -> `Reboot`.
 
 ### Basic operation
 
@@ -109,7 +133,7 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
 
 ## Manual setup
 
-1. Write a [Raspbian Buster Lite image](https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-14/2020-02-13-raspbian-buster-lite.zip) to an SD card, using for instance the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
+1. Write a [Raspbian Buster Lite image](https://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2020-02-14/2020-02-13-raspbian-buster-lite.zip) to a MicroSD card, using for instance the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
 
 2. Create an empty file called `ssh` and a text file called `wpa_supplicant.conf` containing
     ```
@@ -118,11 +142,11 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
     country=<2-character country code>
 
     network={
-    ssid="<network name>"
-    psk="<network password>"
+        ssid="<network name>"
+        psk="<network password>"
     }
     ```
-    in the `boot` directory on the SD card. Insert the country code, SSID and password for your local wireless network. Make sure to keep the double quotes around the password. The `wpa_supplicant.conf` file lets the Pi connect to the local wireless network, and the `ssh` file enables us to acces to the Pi remotely via SSH.
+    in the `boot` directory on the MicroSD card. Insert the country code, SSID and password for your local wireless network. Make sure to keep the double quotes around the password. The `wpa_supplicant.conf` file lets the Pi connect to the local wireless network, and the `ssh` file enables us to acces to the Pi remotely via SSH.
 
 3. Insert the SD card into the Raspberry Pi.
 
