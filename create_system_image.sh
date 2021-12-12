@@ -7,8 +7,13 @@ if [[ "$AP_ACTIVE" = "0" ]]; then
     exit 1
 fi
 
-TAG=${1:-}
+TAG="${1:-}"
+IMAGE_STEM="/media/babymonitor$TAG"
+IMAGE_PATH="$IMAGE_STEM.img"
+ARCHIVE_PATH="$IMAGE_STEM.zip"
 
-$BM_SERVERCONTROL_DIR/clear_wpa_supplicant_conf.sh
+$BM_DIR/site/config/init/init_database.sh
 
-sudo ~/RonR-RPi-image-utils/image-backup --initial "/media/babymonitor$TAG.img"
+sudo ~/RonR-RPi-image-utils/image-backup --initial "$IMAGE_PATH"
+
+zip -Z bzip2 -9 "$ARCHIVE_PATH" "$IMAGE_PATH"
