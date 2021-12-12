@@ -120,10 +120,6 @@ if [[ "$SETUP_BASH_CONFIG" = true ]]; then
     echo -e "EDITOR=nano\n" >> /home/$BM_USER/.bashrc
 
     echo -e "source $BM_ENV_EXPORTS_PATH\n" >> /home/$BM_USER/.bashrc
-
-    if [[ "$BM_USER" == "pi" ]]; then
-        sudo sed -i 's/^pi .*$/pi ALL=(ALL) PASSWD: ALL/g' /etc/sudoers.d/010_pi-nopasswd
-    fi
 fi
 
 DISABLE_BLUETOOTH=true
@@ -579,6 +575,6 @@ fi
 
 INITIALIZE_DATABASE=true
 if [[ "$INITIALIZE_DATABASE" = true ]]; then
-    $BM_DIR/site/config/init/init_database.sh
+    BM_SITE_PW="$BM_SITE_PW" $BM_DIR/site/config/init/init_database.sh
 fi
 

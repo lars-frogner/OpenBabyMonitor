@@ -48,25 +48,29 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "${ENV_VAR_EXPORTS//'export '/}" > $BM_ENV_PATH
 fi
 
-while : ; do
-    stty -echo
-    printf "New wireless access point password (8-63 characters): "
-    read PASSWORD
-    stty echo
-    printf '\n'
+if [[ -z "$BM_AP_PW" ]]; then
+    while : ; do
+        stty -echo
+        printf "New wireless access point password (8-63 characters): "
+        read PASSWORD
+        stty echo
+        printf '\n'
 
-    stty -echo
-    printf "Repeat new password: "
-    read PASSWORD_REPEAT
-    stty echo
-    printf '\n'
+        stty -echo
+        printf "Repeat new password: "
+        read PASSWORD_REPEAT
+        stty echo
+        printf '\n'
 
-    if [[ "$PASSWORD" != "$PASSWORD_REPEAT" ]]; then
-        echo 'The passwords did not match'
-    else
-        break
-    fi
-done
+        if [[ "$PASSWORD" != "$PASSWORD_REPEAT" ]]; then
+            echo 'The passwords did not match'
+        else
+            break
+        fi
+    done
+else
+    PASSWORD="$BM_AP_PW"
+fi
 
 # Install access point software
 sudo apt -y install hostapd

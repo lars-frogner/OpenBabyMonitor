@@ -17,7 +17,11 @@ BM_LOCALE=en_GB.UTF-8
 
 source <(sed "s/INTERACTIVE=True/INTERACTIVE=False/g" /usr/bin/raspi-config)
 
-passwd $USER &&
+if [[ -z "$BM_DEVICE_PW" ]]; then
+    passwd $USER
+else
+    echo "$USER:$BM_DEVICE_PW" | chpasswd
+fi
 
 do_hostname $BM_HOSTNAME
 
@@ -29,4 +33,3 @@ echo -e "\nexport LC_ALL=$BM_LOCALE\nexport LANGUAGE=$BM_LOCALE\n" >> /home/$BM_
 do_change_timezone $BM_TIMEZONE
 
 do_camera 0
-
