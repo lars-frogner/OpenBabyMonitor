@@ -8,12 +8,14 @@ if [[ "$AP_ACTIVE" = "0" ]]; then
 fi
 
 TAG="${1:-}"
-IMAGE_STEM="/media/babymonitor$TAG"
-IMAGE_PATH="$IMAGE_STEM.img"
-ARCHIVE_PATH="$IMAGE_STEM.zip"
+TARGET_DIR=/media
+ROOT_NAME="babymonitor$TAG"
+IMAGE_FILE="$ROOT_NAME.img"
+ARCHIVE_FILE="$ROOT_NAME.zip"
 
 $BM_DIR/site/config/init/init_database.sh
 
-sudo ~/RonR-RPi-image-utils/image-backup --initial "$IMAGE_PATH"
+sudo ~/RonR-RPi-image-utils/image-backup --initial "$TARGET_DIR/$IMAGE_FILE"
 
-zip -Z bzip2 -9 "$ARCHIVE_PATH" "$IMAGE_PATH"
+cd $TARGET_DIR
+sudo zip -9 "$ARCHIVE_FILE" "$IMAGE_FILE"
