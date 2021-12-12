@@ -1,6 +1,7 @@
 <?php
 require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(__DIR__ . '/security.php');
+session_start();
 
 function tryLogin($database, $password, $destination) {
   $password_hash = readHashedPassword($database);
@@ -13,9 +14,6 @@ function tryLogin($database, $password, $destination) {
 }
 
 function isLoggedIn() {
-  if (!isset($_SESSION)) {
-    session_start();
-  }
   return isset($_SESSION['login']);
 }
 
@@ -37,9 +35,6 @@ function logout($destination, $exit_command = null) {
 }
 
 function destroySession() {
-  if (!isset($_SESSION)) {
-    session_start();
-  }
   session_unset();
   session_destroy();
 }
