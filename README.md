@@ -52,7 +52,7 @@ In order to fit the Mini USB Microphone next to the Micro USB power plug on a Pi
 
 > **_Note:_** This section describes installation using a pre-built system image. You can also install the software manually, as described [here](#manual-setup).
 
-1. Download the [latest babymonitor system image](/lars-frogner/babymonitor/releases/latest/download/babymonitor_image.zip) and extract the `babymonitor.img` file from the ZIP archive.
+1. Download the [latest babymonitor system image](/lars-frogner/babymonitor/releases/latest/download/babymonitor.zip) and extract the `babymonitor.img` file from the ZIP archive. The image is compatible with all Raspberry Pi models.
 
 2. Connect your Pi's MicroSD card to your computer.
 
