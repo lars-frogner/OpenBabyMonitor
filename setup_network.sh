@@ -165,3 +165,4 @@ net.ipv6.conf.all.disable_ipv6=1
 # Check connection every 10 minutes
 (crontab -l 2> /dev/null; echo "*/10 * * * * $BM_SERVERCONTROL_DIR/ensure_connection.sh") | crontab -
 
+BM_SERVERCONTROL_DIR=$BM_SERVERCONTROL_DIR BM_NW_CLIENT_DIR=$BM_NW_CLIENT_DIR $BM_SERVERCONTROL_DIR/activate_client_mode.sh

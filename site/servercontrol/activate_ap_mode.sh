@@ -16,4 +16,3 @@ sudo systemctl enable hostapd 1>&3 2>&4
 sudo systemctl enable dnsmasq 1>&3 2>&4
 sudo systemctl start hostapd 1>&3 2>&4
 sudo systemctl start dnsmasq 1>&3 2>&4
-sudo reboot
