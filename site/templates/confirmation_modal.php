@@ -1,6 +1,6 @@
 <div class="modal fade" tabindex="-1" id="confirmation_modal">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content mx-auto" style="max-width: 90vw;">
+    <div class="modal-content mx-auto" style="max-width: 95vw;">
       <div class="modal-header">
         <svg id="confirmation_modal_icon" class="bi me-3" fill="currentColor">
           <use id="confirmation_modal_icon_src" />
