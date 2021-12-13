@@ -1,4 +1,4 @@
-<nav id="navbar" class="navbar navbar-expand-lg navbar-<?php echo COLOR_SCHEME; ?>" style="display: none;">
+<nav id="navbar" class="navbar navbar-expand-md navbar-<?php echo COLOR_SCHEME; ?>" style="display: none;">
   <div class="container-fluid">
     <a id="title_nav_link" class="navbar-brand" href="main.php"><?php echo LANG['nav_title']; ?></a>
     <button id="navbar_toggler" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_entries">
