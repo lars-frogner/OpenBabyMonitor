@@ -13,7 +13,7 @@ ROOT_NAME="babymonitor$TAG"
 IMAGE_FILE="$ROOT_NAME.img"
 ARCHIVE_FILE="$ROOT_NAME.zip"
 
-$BM_DIR/site/config/init/init_database.sh
+BM_SITE_PW="$BM_SITE_PW" $BM_DIR/site/config/init/init_database.sh
 
 sudo ~/RonR-RPi-image-utils/image-backup --initial "$TARGET_DIR/$IMAGE_FILE"
 
