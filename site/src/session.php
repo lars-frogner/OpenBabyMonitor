@@ -1,7 +1,7 @@
 <?php
+session_start();
 require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(__DIR__ . '/security.php');
-session_start();
 
 function tryLogin($database, $password, $destination) {
   $password_hash = readHashedPassword($database);

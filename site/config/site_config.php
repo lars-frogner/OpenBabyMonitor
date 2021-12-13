@@ -1,5 +1,7 @@
 <?php
-include_once(__DIR__ . '/error_config.php');
+require_once(__DIR__ . '/path_config.php');
+require_once(SRC_DIR . '/session.php');
+require_once(__DIR__ . '/error_config.php');
 require_once(__DIR__ . '/env_config.php');
 require_once(__DIR__ . '/config.php');
 require_once(__DIR__ . '/network_config.php');
@@ -7,7 +9,6 @@ require_once(__DIR__ . '/database_config.php');
 require_once(__DIR__ . '/control_config.php');
 require_once(__DIR__ . '/monitoring_config.php');
 require_once(SRC_DIR . '/security.php');
-require_once(SRC_DIR . '/session.php');
 require_once(SRC_DIR . '/database.php');
 require_once(SRC_DIR . '/mode.php');
 require_once(SRC_DIR . '/control.php');

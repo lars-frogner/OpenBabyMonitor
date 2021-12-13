@@ -1,8 +1,8 @@
 <?php
 require_once(dirname(__DIR__) . '/config/path_config.php');
+require_once(SRC_DIR . '/session.php');
 require_once(dirname(__DIR__) . '/config/database_config.php');
 require_once(dirname(__DIR__) . '/config/control_config.php');
-require_once(SRC_DIR . '/session.php');
 require_once(SRC_DIR . '/settings.php');
 require_once(SRC_DIR . '/database.php');
 

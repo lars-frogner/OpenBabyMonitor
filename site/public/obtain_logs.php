@@ -1,7 +1,8 @@
 <?php
+require_once(dirname(__DIR__) . '/config/path_config.php');
+require_once(SRC_DIR . '/session.php');
 require_once(dirname(__DIR__) . '/config/error_config.php');
 require_once(dirname(__DIR__) . '/config/env_config.php');
-require_once(SRC_DIR . '/session.php');
 redirectIfLoggedOut('index.php');
 
 function readLog($log_file_path) {
