@@ -90,9 +90,9 @@ A password is required to sign in to the web application. If you used a [pre-bui
 
 > **_Note:_** This is most relevant if you installed a [pre-built system image](#installation).
 
-For security, you should change the baby monitor passwords to something other than the default values. There are three separate passwords that should be changed (all with `babymonitor` as the default value). These are the passwords for (1): connecting to the access point, (2): signing in to the web application and (3): performing privileged actions on the device, like logging in with SSH. All can be changed in the web application.
+For security, you should change the baby monitor passwords to something other than the default values. There are three separate passwords that should be changed (all with `babymonitor` as the default value). These are the passwords for (1): connecting to the access point, (2): signing in to the web application and (3): performing privileged actions on the server, like logging in with SSH. All can be changed in the web application.
 
-In the navigation menu, click `Settings` -> `Network settings` to go to the network settings page, where there are options to change the access point password and the website password. After doing so, go to the system settings page by clicking `Settings` -> `System settings`. Here you can change the device password. When finished, reboot the Pi by clicking `Server` -> `Reboot`.
+In the navigation menu, click `Settings` -> `Network settings` to go to the network settings page, where there are options to change the access point password and the website password. After doing so, go to the system settings page by clicking `Settings` -> `System settings`. Here you can change the server password. When finished, reboot the Pi by clicking `Server` -> `Reboot`.
 
 ### Basic operation
 
