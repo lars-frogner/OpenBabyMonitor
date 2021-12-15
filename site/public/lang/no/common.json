@@ -41,6 +41,7 @@
     "stay": "Bli på denne siden",
     "want_to_switch_site": "Vil du gå til den krypterte (https) versjonen av siden?",
     "not_supported_by_browser": "Denne nettleseren støtter ikke nettlerservarsler",
+    "replaced_by_sound": "Når de ikke er tilgjengelige vil nettleservarsler erstattes av en enkel varsellyd.",
     "ok": "Ok",
     "premission_required": "Tillatelse kreves for å bruke nettlerservarsler",
     "grant_permission": "Gi tillatelse",

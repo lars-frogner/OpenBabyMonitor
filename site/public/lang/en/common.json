@@ -41,6 +41,7 @@
     "stay": "Stay on this site",
     "want_to_switch_site": "Do you want to switch to the secure (https) version of this site?",
     "not_supported_by_browser": "This browser does not support browser notifications",
+    "replaced_by_sound": "When unavailable, browser notifications will be replaced by a simple notification sound.",
     "ok": "Ok",
     "premission_required": "Premission is required to use browser notifications",
     "grant_permission": "Grant permission",
