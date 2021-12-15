@@ -127,3 +127,9 @@ function playNotificationSound() {
 function createBrowserNotification(header, body, tag) {
     return new Notification(header, { body: body, tag: tag, renotify: true, requireInteraction: true });
 }
+
+function removeBrowserNotification(notification) {
+    if (notification) {
+        notification.close();
+    }
+}

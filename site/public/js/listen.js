@@ -113,7 +113,7 @@ function createListenBrowserNotification(notificationType) {
 
 function removeListenBrowserNotification() {
     if (_LISTEN_BROWSER_NOTIFICATION) {
-        _LISTEN_BROWSER_NOTIFICATION.close();
+        removeBrowserNotification(_LISTEN_BROWSER_NOTIFICATION);
         _LISTEN_BROWSER_NOTIFICATION = null;
     }
 }
@@ -125,7 +125,7 @@ function createConnectionLostBrowserNotification() {
 
 function removeConnectionLostBrowserNotification() {
     if (_CONNECTION_LOST_BROWSER_NOTIFICATION) {
-        _CONNECTION_LOST_BROWSER_NOTIFICATION.close();
+        removeBrowserNotification(_CONNECTION_LOST_BROWSER_NOTIFICATION);
         _CONNECTION_LOST_BROWSER_NOTIFICATION = null;
     }
 }
