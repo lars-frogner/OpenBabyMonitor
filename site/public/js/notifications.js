@@ -13,6 +13,33 @@ $(function () {
     }
 });
 
+function browserIsMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function browserIsChrome() {
+    var isChromium = window.chrome;
+    var winNav = window.navigator;
+    var vendorName = winNav.vendor;
+    var isOpera = typeof window.opr !== "undefined";
+    var isIEedge = winNav.userAgent.indexOf("Edg") > -1;
+    var isIOSChrome = winNav.userAgent.match("CriOS");
+
+    if (isIOSChrome) {
+        return 'ios';
+    } else if (
+        isChromium !== null &&
+        typeof isChromium !== "undefined" &&
+        vendorName === "Google Inc." &&
+        isOpera === false &&
+        isIEedge === false
+    ) {
+        return 'android';
+    } else {
+        return false;
+    }
+}
+
 function setupBrowserNotificationRedirectModal() {
     connectModalToObject(_REDIRECT_MODAL_TRIGGER, { icon: 'exclamation-circle', checkboxLabel: LANG['dont_ask_again'], checkboxChecked: false, confirmOnclick: function () { redirectModalCallback(function () { window.location.replace(SECURE_URL); }); }, dismissOnclick: redirectModalCallback, header: LANG['not_supported_unencrypted'], confirm: LANG['switch_site'], dismiss: LANG['stay'] }, [{ text: LANG['replaced_by_sound'], showText: () => { return true; } }, { text: LANG['want_to_switch_site'], showText: () => { return true; } }]);
 }
@@ -77,7 +104,7 @@ function performBrowserNotificationRequest() {
 }
 
 function browserNotificationsSupported() {
-    return 'Notification' in window;
+    return 'Notification' in window && !(browserIsMobile() && browserIsChrome() == 'android');
 }
 
 function browserNotificationsAllowed() {
