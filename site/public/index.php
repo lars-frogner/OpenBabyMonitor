@@ -55,8 +55,8 @@ if (isset($_POST['submit'])) {
                   </div>
                 </div>
               <?php } ?>
-              <aside id="signin_aside" class="col-sm-5<?php echo $automatically_signed_out ? ' align-self-start' : '' ?>">
-                <div class="card">
+              <aside id="signin_aside" class="col-auto<?php echo $automatically_signed_out ? ' align-self-start' : '' ?>">
+                <div class="card px-4">
                   <article class="card-body">
                     <h3 class="card-title text-center"><?php echo LANG['please_sign_in']; ?></h3>
                     <?php if ($login_successful === false) { ?>
