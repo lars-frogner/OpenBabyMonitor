@@ -15,7 +15,7 @@ const LISTEN_ANIMATION_LABEL_BG_CLASS = "listen-animation-label-bg";
 const LISTEN_ANIMATION_INDICATOR_CLASS = "listen-animation-indicator";
 
 const MIN_FOREGROUND_CONTRAST = 0;
-const MAX_FOREGROUND_CONTRAST = 40;
+const MAX_FOREGROUND_CONTRAST = 50;
 
 const LISTEN_NOTIFICATION_HEADERS = { sound: LANG['sound_alert'], bad: LANG['crying_alert'], good: LANG['babbling_alert'], bad_and_good: LANG['crying_and_babbling_alert'], bad_or_good: LANG['crying_or_babbling_alert'] };
 const LISTEN_NOTIFICATION_TEXTS = { sound: LANG['significant_sound'], bad: LANG['child_crying'], good: LANG['child_babbling'], bad_and_good: LANG['child_crying_and_babbling'], bad_or_good: LANG['child_crying_or_babbling'] };
