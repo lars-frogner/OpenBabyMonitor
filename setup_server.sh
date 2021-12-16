@@ -237,6 +237,27 @@ if [[ "$INSTALL_ANIME" = true ]]; then
     cd -
 fi
 
+INSTALL_NOSLEEP_JS=true
+if [[ "$INSTALL_NOSLEEP_JS" = true ]]; then
+    NOSLEEP_JS_VERSION=0.12.0
+    if [[ "$NOSLEEP_JS_VERSION" = "latest" ]]; then
+        FILENAME_ROOT="master"
+        FILENAME="$FILENAME_ROOT.zip"
+        DOWNLOAD_URL=https://github.com/richtr/NoSleep.js/archive/$FILENAME
+    else
+        FILENAME_ROOT=$NOSLEEP_JS_VERSION
+        FILENAME=v$NOSLEEP_JS_VERSION.zip
+        DOWNLOAD_URL=https://github.com/richtr/NoSleep.js/archive/refs/tags/$FILENAME
+    fi
+    cd /tmp
+    wget $DOWNLOAD_URL
+    unzip $FILENAME
+    mkdir -p $BM_LINKED_SITE_DIR/library/nosleep-js
+    mv NoSleep.js-$FILENAME_ROOT/dist/* $BM_LINKED_SITE_DIR/library/nosleep-js/
+    rm -r $FILENAME NoSleep.js-$FILENAME_ROOT
+    cd -
+fi
+
 INSTALL_VIDEOJS=true
 if [[ "$INSTALL_VIDEOJS" = true ]]; then
     VIDEOJS_VERSION=7.13.3

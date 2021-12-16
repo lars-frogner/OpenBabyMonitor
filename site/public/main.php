@@ -321,6 +321,7 @@ require_once(TEMPLATES_DIR . '/main.php');
   }
   require_once(TEMPLATES_DIR . '/hls-js_js.php');
   require_once(TEMPLATES_DIR . '/anime_js.php');
+  require_once(TEMPLATES_DIR . '/nosleep-js_js.php');
   require_once(TEMPLATES_DIR . '/jquery_js.php');
   require_once(TEMPLATES_DIR . '/js-cookie_js.php');
 
