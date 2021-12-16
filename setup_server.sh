@@ -177,7 +177,7 @@ INSTALL_BOOTSTRAP=true
 if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
     BOOTSTRAP_VERSION=5.0.2
     if [[ "$BOOTSTRAP_VERSION" = "latest" ]]; then
-        DOWNLOAD_URL=$(curl https://api.github.com/repos/twbs/bootstrap/releases/latest | grep browser_download_url | grep dist.zip | cut -d '"' -f 4)
+        DOWNLOAD_URL=$(curl -s https://api.github.com/repos/twbs/bootstrap/releases/latest | grep browser_download_url | grep dist.zip | cut -d '"' -f 4)
         FILENAME=$(echo $DOWNLOAD_URL | cut -d "/" -f 9)
     else
         FILENAME="bootstrap-${BOOTSTRAP_VERSION}-dist.zip"
@@ -201,7 +201,7 @@ INSTALL_HLS_JS=true
 if [[ "$INSTALL_HLS_JS" = true ]]; then
     HLS_JS_VERSION=1.0.11
     if [[ "$HLS_JS_VERSION" = "latest" ]]; then
-        DOWNLOAD_URL=$(curl https://api.github.com/repos/video-dev/hls.js/releases/latest | grep browser_download_url | grep release.zip | cut -d '"' -f 4)
+        DOWNLOAD_URL=$(curl -s https://api.github.com/repos/video-dev/hls.js/releases/latest | grep browser_download_url | grep release.zip | cut -d '"' -f 4)
         FILENAME=$(echo $DOWNLOAD_URL | cut -d "/" -f 9)
     else
         FILENAME="release.zip"
@@ -241,7 +241,7 @@ INSTALL_VIDEOJS=true
 if [[ "$INSTALL_VIDEOJS" = true ]]; then
     VIDEOJS_VERSION=7.13.3
     if [[ "$VIDEOJS_VERSION" = "latest" ]]; then
-        DOWNLOAD_URL=$(curl https://api.github.com/repos/videojs/video.js/releases/latest | grep browser_download_url | grep .zip | cut -d '"' -f 4)
+        DOWNLOAD_URL=$(curl -s https://api.github.com/repos/videojs/video.js/releases/latest | grep browser_download_url | grep .zip | cut -d '"' -f 4)
         FILENAME=$(echo $DOWNLOAD_URL | cut -d "/" -f 9)
     else
         FILENAME="video-js-${VIDEOJS_VERSION}.zip"
@@ -287,7 +287,7 @@ if [[ "$INSTALL_PICAM" = true ]]; then
     # Install picam binary
     PICAM_VERSION=1.4.9
     if [[ "$PICAM_VERSION" = "latest" ]]; then
-        DOWNLOAD_URL=$(curl https://api.github.com/repos/iizukanao/picam/releases/latest | grep browser_download_url | grep tar.xz | cut -d '"' -f 4)
+        DOWNLOAD_URL=$(curl -s https://api.github.com/repos/iizukanao/picam/releases/latest | grep browser_download_url | grep tar.xz | cut -d '"' -f 4)
         FILENAME=$(echo $DOWNLOAD_URL | cut -d "/" -f 9)
     else
         FILENAME="picam-${PICAM_VERSION}-binary.tar.xz"
