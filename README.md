@@ -76,7 +76,7 @@ In order to fit the Mini USB Microphone next to the Micro USB power plug on a Pi
 
 You can control the baby monitor through a web application that is accessed by opening the URL https://babymonitor in a browser. This requires that you are connected to the Pi's wireless access point, or to same local wireless network as the Pi.
 
-> **_Note:_** In the above URL, `babymonitor` is the hostname of the Pi. Many routers automatically append a suffix like `.local`, `.home` or `.lan` to the hostnames of the devices on its network, so if the short version of the URL doesn't work, try adding one of the suffixes. No suffix is required when connected to the Pi's access point.
+> **_Note:_** If the above URL does not work, see [troubleshooting](#troubleshooting).
 
 Upon loading the website, your browser will typically show a warning about the site not being secure. This is expected and can typically be bypassed by clicking `Advanced` -> `Continue anyway` or something similar. While this is perfectly secure in the context of communicating with a device on the local network, **you should generally not bypass such warnings encountered when browsing the internet**.
 
@@ -201,3 +201,17 @@ After the Pi has rebooted you will be able to SSH in using the new hostname (def
 ```
 ssh pi@<hostname>
 ```
+
+## Troubleshooting
+
+### I can't access the web application at `https://babymonitor` when the baby monitor is connected to the local Wi-Fi
+
+In the above URL, `babymonitor` is the hostname of the Pi. Many routers automatically append a suffix like `.local`, `.home` or `.lan` to the hostnames of the devices on its network, so if the short version of the URL doesn't work, try adding one of the suffixes. No suffix is required when connected to the Pi's access point.
+
+### The web application stops working on mobile when the screen is turned off
+
+This happens because the browser goes to sleep when the screen is turned off. There is unfortunately no way for a web application to prevent this. However, the web application will try to prevent the mobile device from turning off the screen automatically while the baby monitor is not in standby and the browser window is visible. Note that if you have reloaded the page while not in standby or if the mode was changed by another user, this anti-sleep function will not be activated in your browser until you touch the button for the currently active mode.
+
+### I can sign in to the web application but there is no content
+
+This may happen if you use an ad blocker. Make sure the ad blocker is disabled for the URL of the web application.
