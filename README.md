@@ -204,7 +204,7 @@ ssh pi@<hostname>
 
 ## Troubleshooting
 
-### I can't access the web application at `https://babymonitor` when the baby monitor is connected to the local Wi-Fi
+### I can't access the web application at https://babymonitor when the baby monitor is connected to the local Wi-Fi
 
 In the above URL, `babymonitor` is the hostname of the Pi. Many routers automatically append a suffix like `.local`, `.home` or `.lan` to the hostnames of the devices on its network, so if the short version of the URL doesn't work, try adding one of the suffixes. No suffix is required when connected to the Pi's access point.
 
