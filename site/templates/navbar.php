@@ -5,7 +5,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbar_entries">
-      <ul class="navbar-nav w-100 mb-2 mb-lg-0">
+      <ul class="navbar-nav w-100 mb-0">
         <li class="nav-item">
           <a id="modes_nav_link" class="nav-link<?php echo LOCATION == 'main' ? ' active' : ''; ?> d-flex align-items-center disabled" href="main.php">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
