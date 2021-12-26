@@ -24,6 +24,14 @@ if (isset($_POST['submit'])) {
 
 <head>
   <?php require_once(TEMPLATES_DIR . '/head_common.php'); ?>
+
+  <?php if (ACCESS_POINT_ACTIVE && !TIME_SYNCED) { ?>
+    <script>
+      const SERVER_TIMESTAMP = <?php echo microtime(true); ?> * 1e3; // Milliseconds
+      const CLIENT_TIMESTAMP = Date.now(); // Milliseconds
+    </script>
+    <script src="js/sync_time.js"></script>
+  <?php } ?>
 </head>
 
 <body class="fillview" style="overflow: hidden;">

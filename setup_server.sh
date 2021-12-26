@@ -47,6 +47,7 @@ BM_CONTROL_MIC_DIR=$BM_DIR/control/.mic
 BM_CONTROL_MIC_ID_FILE=$BM_CONTROL_MIC_DIR/id
 BM_CONTROL_CAM_DIR=$BM_DIR/control/.cam
 BM_CONTROL_CAM_CONNECTED_FILE=$BM_CONTROL_CAM_DIR/connected
+BM_CONTROL_TIME_SYNCED_FILE=$BM_DIR/control/.time_synced
 
 SETUP_AUDIO=true
 if [[ "$SETUP_AUDIO" = true ]]; then
@@ -164,6 +165,7 @@ if [[ "$SETUP_ENV" = true ]]; then
     echo "export BM_MODE_SIGNAL_FILE_STEM=$BM_MODE_SIGNAL_FILE_STEM" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_CONTROL_MIC_ID_FILE=$BM_CONTROL_MIC_ID_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_CONTROL_CAM_CONNECTED_FILE=$BM_CONTROL_CAM_CONNECTED_FILE" >> $BM_ENV_EXPORTS_PATH
+    echo "export BM_CONTROL_TIME_SYNCED_FILE=$BM_CONTROL_TIME_SYNCED_FILE" >> $BM_ENV_EXPORTS_PATH
     echo "export BM_DEBUG=$BM_DEBUG" >> $BM_ENV_EXPORTS_PATH
 
     # Copy environment variables (without 'export') into environment file for services and PHP

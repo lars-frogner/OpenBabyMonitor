@@ -59,6 +59,7 @@ case $FLAG in
         esac
     fi
     date +%s -s @${TIMESTAMP} 1>&3 2>&4
+    touch $BM_CONTROL_TIME_SYNCED_FILE
     ;;
 
   $WIRELESS_SCAN_FLAG)

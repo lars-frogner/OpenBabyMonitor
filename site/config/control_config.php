@@ -72,3 +72,5 @@ define('MODE_SWITCH_TIMEOUT', intval($_CONTROL_INFO['mode_switch_timeout'] * 1e6
 
 define('SERVER_ACTION_RESULT_FILE', getenv('BM_SERVER_ACTION_RESULT_FILE'));
 define('SERVER_ACTION_COMMANDS', $_CONTROL_INFO['server_actions']['commands']);
+
+define('TIME_SYNCED', file_exists(getenv('BM_CONTROL_TIME_SYNCED_FILE')));

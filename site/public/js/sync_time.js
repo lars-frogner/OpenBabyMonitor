@@ -11,12 +11,9 @@ function sendClientTimestampToServer() {
     fetch('sync_time.php', {
         method: 'post',
         body: data
-    })
-        .then(response => response.text())
-        .then(logoutIfSessionExpired)
-        .catch(error => {
-            console.error('Time synchronization failed:', error)
-        });
+    }).catch(error => {
+        console.error('Time synchronization failed:', error)
+    });
 
 }
 
