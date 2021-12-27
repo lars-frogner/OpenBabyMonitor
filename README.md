@@ -1,4 +1,4 @@
-# Raspberry Pi baby monitor
+# Open Baby Monitor
 
 <details open>
 <summary>Click to toggle animation</summary>
@@ -163,12 +163,12 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
     sudo apt -y install git
     ```
 
-6. Use Git to clone the `babymonitor` source code repository:
+6. Use Git to clone the `OpenBabyMonitor` source code repository:
     ```
-    git clone https://github.com/lars-frogner/babymonitor.git
+    git clone https://github.com/lars-frogner/OpenBabyMonitor.git
     ```
 
-7. (Optional) Edit environment variables in `babymonitor/config/setup_config.env`. The default version of the file looks like this:
+7. (Optional) Edit environment variables in `OpenBabyMonitor/config/setup_config.env`. The default version of the file looks like this:
     ```bash
     # The name of the Linux user that will control the baby monitor
     # (this is best left as pi)
@@ -194,11 +194,11 @@ Based on this, a 5000mAh 5V battery powering a Pi Zero baby monitor should last 
 
 8.  Run the setup script:
     ```
-    babymonitor/setup.sh
+    OpenBabyMonitor/setup.sh
     ```
     You will be prompted to change the password for the `pi` user. During further execution of the script you will be asked to create a couple of new passwords. First for the baby monitor website, and then for the wireless access point. The Pi will reboot when finished.
 
-After the Pi has rebooted you will be able to SSH in using the new hostname (defined by `BM_HOSTNAME` in `babymonitor/config/setup_config.env`) and the password for the `pi` user you entered in the previous step:
+After the Pi has rebooted you will be able to SSH in using the new hostname (defined by `BM_HOSTNAME` in `OpenBabyMonitor/config/setup_config.env`) and the password for the `pi` user you entered in the previous step:
 ```
 ssh pi@<hostname>
 ```
