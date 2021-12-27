@@ -1,5 +1,7 @@
 #!/bin/bash
-source /home/pi/babymonitor/env/envvar_exports
+
+BM_SERVERCONTROL_DIR=$(dirname $(readlink -f $0))
+source $BM_SERVERCONTROL_DIR/../../env/envvar_exports
 
 ACCESS_POINT_ACTIVE=$($BM_SERVERCONTROL_DIR/access_point_active.sh)
 
