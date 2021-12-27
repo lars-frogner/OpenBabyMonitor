@@ -28,7 +28,7 @@ do_hostname $BM_HOSTNAME
 do_wifi_country $BM_COUNTRY_CODE
 
 do_change_locale $BM_LOCALE
-echo -e "\nexport LC_ALL=$BM_LOCALE\nexport LANGUAGE=$BM_LOCALE\n" >> /home/$BM_USER/.bashrc
+echo -e "LC_ALL=\"$BM_LOCALE\"\nLANGUAGE=\"$BM_LOCALE\"" >> /etc/default/locale
 
 do_change_timezone $BM_TIMEZONE
 
