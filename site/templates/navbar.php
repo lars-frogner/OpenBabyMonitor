@@ -138,6 +138,28 @@
             </li>
           </ul>
         </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
+            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+              <use href="media/bootstrap-icons.svg#question-circle" />
+            </svg>
+            <?php echo LANG['nav_help']; ?>
+          </a>
+          <ul class="dropdown-menu" style="min-width: 1em;">
+            <li><a id="help_docs_nav_link" class="dropdown-item<?php echo LOCATION == 'documentation' ? ' active' : ''; ?> d-flex align-items-center" href="documentation.php">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use href="media/bootstrap-icons.svg#book" />
+                </svg>
+                <?php echo LANG['nav_docs']; ?>
+              </a></li>
+            <li><a id="help_github_nav_link" class="dropdown-item d-flex align-items-center" href="https://github.com/lars-frogner/babymonitor" <?php echo ACCESS_POINT_ACTIVE ? ' disabled' : ''; ?>>
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use href="media/bootstrap-icons.svg#github" />
+                </svg>
+                GitHub
+              </a></li>
+          </ul>
+        </li>
         <?php if ($_MEASURE_TEMPERATURE) { ?>
           <li id="temperature_nav_item" class="nav-item d-flex align-items-center text-bm">
             <div class="d-flex align-items-center py-2">

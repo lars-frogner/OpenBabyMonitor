@@ -34,6 +34,8 @@
     "nav_please_go_to_network": "Vennligst gå til nettverksinnstillingene og koble til et nettverk.",
     "nav_device_not_in_standby": "Enheten står ikke i hvilemodus. Den vil fortsette i nåværende modus selv om du logger ut.",
     "nav_unsaved_settings": "Merk at du har endringer i innstillingene som ikke er lagret.",
+    "nav_help": "Hjelp",
+    "nav_docs": "Dokumentasjon",
     "dont_ask_again": "Ikke spør igjen",
     "dont_show_again": "Ikke vis igjen",
     "not_supported_unencrypted": "Nettleservarsler støttes ikke på ukrypterte nettsider",

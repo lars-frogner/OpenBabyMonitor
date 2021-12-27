@@ -34,6 +34,8 @@
     "nav_please_go_to_network": "Please go to the network settings and connect to a network.",
     "nav_device_not_in_standby": "The device is not in standby mode. It will still remain in the current mode after you sign out.",
     "nav_unsaved_settings": "Note that you have unsaved modifications to the settings.",
+    "nav_help": "Help",
+    "nav_docs": "Documentation",
     "dont_ask_again": "Don't ask again",
     "dont_show_again": "Don't show again",
     "not_supported_unencrypted": "Browser notifications are not supported on insecure sites",

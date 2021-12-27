@@ -8,4 +8,5 @@ define('SERVERCONTROL_DIR', realpath(__DIR__ . '/../servercontrol'));
 define('MEDIA_DIR', realpath(__DIR__ . '/../public/media'));
 define('LANGUAGE_DIR', realpath(__DIR__ . '/../public/lang'));
 define('LIBRARY_DIR', realpath(__DIR__ . '/../public/library'));
+define('DOCS_DIR', realpath(__DIR__ . '/../public/docs'));
 define('CONTROL_DIR', realpath(__DIR__ . '/../../control'));

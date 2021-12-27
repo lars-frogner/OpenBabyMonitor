@@ -97,6 +97,9 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     # Install packages for audio recording and streaming
     sudo apt -y install alsa-utils ffmpeg lame
 
+    # Install pandoc for rendering markdown
+    sudo apt -y install pandoc
+
     # Install required Python packages
     sudo apt -y install libatlas-base-dev # Requirement for numpy
     sudo apt -y install libopenexr-dev # Requirement for OpenCV
@@ -174,6 +177,13 @@ if [[ "$SETUP_ENV" = true ]]; then
 fi
 
 source /home/$BM_USER/.bashrc
+
+SETUP_DOCS=true
+if [[ "$SETUP_DOCS" = true ]]; then
+    mkdir $BM_LINKED_SITE_DIR/docs
+    pandoc -f gfm -t html -o $BM_LINKED_SITE_DIR/docs/readme.html $BM_DIR/README.md
+    ln -s $BM_DIR/media/* $BM_LINKED_SITE_DIR/media/
+fi
 
 INSTALL_BOOTSTRAP=true
 if [[ "$INSTALL_BOOTSTRAP" = true ]]; then
@@ -600,4 +610,3 @@ INITIALIZE_DATABASE=true
 if [[ "$INITIALIZE_DATABASE" = true ]]; then
     BM_SITE_PW="$BM_SITE_PW" $BM_DIR/site/config/init/init_database.sh
 fi
-
