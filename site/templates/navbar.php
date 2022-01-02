@@ -180,6 +180,12 @@
   </div>
 </nav>
 
+<?php
+if (BM_DEBUG) {
+  require_once(TEMPLATES_DIR . '/error.php');
+}
+?>
+
 <script>
   const ANY_KNOWN_NETWORKS = <?php echo anyKnownNetworks($_DATABASE) ? 'true' : 'false'; ?>;
 </script>

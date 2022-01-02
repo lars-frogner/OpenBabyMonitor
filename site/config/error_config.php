@@ -1,7 +1,9 @@
 <?php
 require_once(__DIR__ . '/env_config.php');
 
-if (getenv('BM_DEBUG') == '1') {
+define('BM_DEBUG', getenv('BM_DEBUG') == '1');
+
+if (BM_DEBUG) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);
   error_reporting(E_ALL);
