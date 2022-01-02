@@ -78,7 +78,7 @@ class AudiostreamContext {
     #rebuildAnalyserSamplesArray = true;
 
     constructor() {
-        [this.playerObject, this.#hls] = AudiostreamContext.#createPlayer();
+        [this.playerObject, this.#hls] = AudiostreamContext.createPlayer();
 
         this.#context = new (window.AudioContext || window.webkitAudioContext)({
             latencyHint: 'balanced',
@@ -138,7 +138,7 @@ class AudiostreamContext {
     }
 
     get maxToMinFrequencyRatio() {
-        return (AudiostreamContext.#computeBufferLength(this.nFrequencies) - 1) / AudiostreamContext.#computeBufferOffset(this.nFrequencies);
+        return (AudiostreamContext.computeBufferLength(this.nFrequencies) - 1) / AudiostreamContext.computeBufferOffset(this.nFrequencies);
     }
 
     set visualizer(newVisualizationMode) {
@@ -187,7 +187,7 @@ class AudiostreamContext {
             this.#rebuildAnalyserSamplesArray = true;
         }
 
-        this.#maintainAnalyserSampleArray();
+        this.maintainAnalyserSampleArray();
 
         switch (this.#visualizer.mode) {
             case VISUALIZATION_MODES.TIME:
@@ -219,7 +219,7 @@ class AudiostreamContext {
         this.player.remove();
     }
 
-    #maintainAnalyserSampleArray() {
+    maintainAnalyserSampleArray() {
         if (!this.#rebuildAnalyserSamplesArray || this.#visualizer == null) {
             return;
         }
@@ -230,9 +230,9 @@ class AudiostreamContext {
                 this.#rebuildAnalyserSamplesArray = false;
                 break;
             case VISUALIZATION_MODES.FREQUENCY:
-                const length = AudiostreamContext.#computeBufferLength(this.nFrequencies);
+                const length = AudiostreamContext.computeBufferLength(this.nFrequencies);
                 this.#analyserSamples = new Uint8Array(length);
-                this.#analyserSamplesOffset = AudiostreamContext.#computeBufferOffset(this.nFrequencies);
+                this.#analyserSamplesOffset = AudiostreamContext.computeBufferOffset(this.nFrequencies);
                 this.#rebuildAnalyserSamplesArray = false;
                 break;
             default:
@@ -240,15 +240,15 @@ class AudiostreamContext {
         }
     }
 
-    static #computeBufferOffset(nFrequencies) {
+    static computeBufferOffset(nFrequencies) {
         return Math.max(1, Math.floor(nFrequencies * SETTING_MIN_FREQUENCY / AudiostreamContext.maxFrequency));
     }
 
-    static #computeBufferLength(nFrequencies) {
+    static computeBufferLength(nFrequencies) {
         return Math.min(nFrequencies, Math.ceil(nFrequencies * SETTING_MAX_FREQUENCY / AudiostreamContext.maxFrequency));
     }
 
-    static #createPlayer() {
+    static createPlayer() {
         if (document.getElementById(AUDIO_PLAYER_ID) != null) {
             console.error('AudiostreamContext constructor called when player already exists');
         }
@@ -314,22 +314,22 @@ class AudioVisualizer {
     #mode;
 
     constructor(audioContext, mode) {
-        this.#shrinkAudioIcon();
+        this.shrinkAudioIcon();
         $('#' + AUDIO_FFTSIZE_PARENT_ID).show();
 
         this.#audioContext = audioContext;
 
-        this.#canvasObject = AudioVisualizer.#createCanvas();
-        this.#resizeCanvasBound = this.#resizeCanvas.bind(this);
+        this.#canvasObject = AudioVisualizer.createCanvas();
+        this.#resizeCanvasBound = this.resizeCanvas.bind(this);
         addEventListener('resize', this.#resizeCanvasBound);
-        this.#resizeCanvas();
+        this.resizeCanvas();
 
         this.#startAnimationBound = this.startAnimation.bind(this);
         this.#stopAnimationBound = this.stopAnimation.bind(this);
         this.#audioContext.player.addEventListener('play', this.#startAnimationBound);
         this.#audioContext.player.addEventListener('pause', this.#stopAnimationBound);
 
-        this.#setMode(mode);
+        this.setMode(mode);
         if (this.#audioContext.player.paused) {
             this.clearCanvas();
         }
@@ -347,7 +347,7 @@ class AudioVisualizer {
         if (newMode == this.mode) {
             return;
         }
-        this.#setMode(newMode);
+        this.setMode(newMode);
         if (this.#audioContext.player.paused) {
             this.clearCanvas();
         } else {
@@ -376,7 +376,7 @@ class AudioVisualizer {
         So higher fftSize gives higher frequency resolution and is taken over a larger duration.
         */
         var sampler = this.#audioContext.createSampler();
-        var canvas = this.#canvas;
+        var canvas = this.canvas;
         var canvasContext = canvas.getContext('2d');
 
         var previousTimestamp = null;
@@ -408,36 +408,36 @@ class AudioVisualizer {
     }
 
     clearCanvas() {
-        var canvas = this.#canvas;
+        var canvas = this.canvas;
         var canvasContext = canvas.getContext('2d');
         this.#clearCanvas(canvasContext, canvas.width, canvas.height);
     }
 
     destroy() {
         $('#' + AUDIO_FFTSIZE_PARENT_ID).hide();
-        this.#unshrinkAudioIcon();
+        this.unshrinkAudioIcon();
         this.stopAnimation();
         this.#audioContext.player.removeEventListener('play', this.#startAnimationBound);
         this.#audioContext.player.removeEventListener('pause', this.#stopAnimationBound);
         removeEventListener('resize', this.#resizeCanvasBound);
-        this.#canvas.remove();
+        this.canvas.remove();
     }
 
-    get #canvas() {
+    get canvas() {
         return this.#canvasObject.get()[0];
     }
-    static get #MIN_PITCH() { return AudioVisualizer.#hertzToMels(SETTING_MIN_FREQUENCY); }
-    static get #MAX_PITCH() { return AudioVisualizer.#hertzToMels(SETTING_MAX_FREQUENCY); }
+    static get MIN_PITCH() { return AudioVisualizer.hertzToMels(SETTING_MIN_FREQUENCY); }
+    static get MAX_PITCH() { return AudioVisualizer.hertzToMels(SETTING_MAX_FREQUENCY); }
 
-    #setMode(newMode) {
+    setMode(newMode) {
         switch (newMode) {
             case VISUALIZATION_MODES.TIME:
-                this.#drawFrame = AudioVisualizer.#drawFrameTimeDomain;
-                this.#clearCanvas = AudioVisualizer.#clearCanvasTimeDomain;
+                this.#drawFrame = AudioVisualizer.drawFrameTimeDomain;
+                this.#clearCanvas = AudioVisualizer.clearCanvasTimeDomain;
                 break;
             case VISUALIZATION_MODES.FREQUENCY:
-                this.#drawFrame = AudioVisualizer.#drawFrameFrequencyDomain;
-                this.#clearCanvas = AudioVisualizer.#clearCanvasFrequencyDomain;
+                this.#drawFrame = AudioVisualizer.drawFrameFrequencyDomain;
+                this.#clearCanvas = AudioVisualizer.clearCanvasFrequencyDomain;
                 break;
             default:
                 console.error('Mode is not valid: ' + newMode);
@@ -446,7 +446,7 @@ class AudioVisualizer {
         this.#mode = newMode;
     }
 
-    #resizeCanvas() {
+    resizeCanvas() {
         var parent = $('#main');
         var width = this.#audioContext.playerObject.width();
         var maxHeight = parent.height() - this.#audioContext.playerObject.height() - $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).height() - $('#' + AUDIO_FFTSIZE_PARENT_ID).height();
@@ -455,19 +455,19 @@ class AudioVisualizer {
         this.#canvasObject.prop({ width: width, height: height }).css({ width: width + 'px', height: height + 'px' });
     }
 
-    #shrinkAudioIcon() {
+    shrinkAudioIcon() {
         $('#' + AUDIO_ICON_ID).css({ width: '5vh', height: '5vh' });
         $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).removeClass('mt-5');
         $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).addClass('mt-4');
     }
 
-    #unshrinkAudioIcon() {
+    unshrinkAudioIcon() {
         $('#' + AUDIO_ICON_ID).css({ width: '15vh', height: '15vh' });
         $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).removeClass('mt-4');
         $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).addClass('mt-5');
     }
 
-    static #createCanvas() {
+    static createCanvas() {
         if (document.getElementById(AUDIO_CANVAS_ID) != null) {
             console.error('AudioVisualizer constructor called when audio visualization canvas already exists');
         }
@@ -476,8 +476,8 @@ class AudioVisualizer {
         return canvasObject;
     }
 
-    static #drawFrameTimeDomain(canvasContext, width, height, samples) {
-        AudioVisualizer.#clearCanvasTimeDomain(canvasContext, width, height);
+    static drawFrameTimeDomain(canvasContext, width, height, samples) {
+        AudioVisualizer.clearCanvasTimeDomain(canvasContext, width, height);
 
         canvasContext.lineWidth = CANVAS_TIME_LINEWIDTH;
         canvasContext.strokeStyle = CANVAS_TIME_FOREGROUND;
@@ -501,16 +501,16 @@ class AudioVisualizer {
         canvasContext.stroke();
     }
 
-    static #hertzToMels(frequency) {
+    static hertzToMels(frequency) {
         return 2595 * Math.log10(1 + frequency / 700);
     }
 
-    static #melsToHertz(pitch) {
+    static melsToHertz(pitch) {
         return 700 * (10 ** (pitch / 2595) - 1);
     }
 
-    static #drawFrameFrequencyDomain(canvasContext, width, height, samples, start_idx) {
-        AudioVisualizer.#clearCanvasFrequencyDomain(canvasContext, width, height);
+    static drawFrameFrequencyDomain(canvasContext, width, height, samples, start_idx) {
+        AudioVisualizer.clearCanvasFrequencyDomain(canvasContext, width, height);
 
         const barWidth = width / (samples.length - start_idx);
         const actualBarWidth = barWidth * 0.95;
@@ -522,8 +522,8 @@ class AudioVisualizer {
         var idx_lower, idx_upper, fraction, sample_value;
 
         const frequencyToIdx = (frequency) => frequency * (samples.length - 1) / SETTING_MAX_FREQUENCY;
-        const xToPitch = (x) => AudioVisualizer.#MIN_PITCH + (x / width) * (AudioVisualizer.#MAX_PITCH - AudioVisualizer.#MIN_PITCH);
-        const xToIdx = (x) => frequencyToIdx(AudioVisualizer.#melsToHertz(xToPitch(x)));
+        const xToPitch = (x) => AudioVisualizer.MIN_PITCH + (x / width) * (AudioVisualizer.MAX_PITCH - AudioVisualizer.MIN_PITCH);
+        const xToIdx = (x) => frequencyToIdx(AudioVisualizer.melsToHertz(xToPitch(x)));
 
         for (var i = start_idx; i < samples.length; i++) {
             idx = xToIdx(x);
@@ -541,16 +541,16 @@ class AudioVisualizer {
         }
     }
 
-    static #clearCanvasTimeDomain(canvasContext, width, height) {
+    static clearCanvasTimeDomain(canvasContext, width, height) {
         canvasContext.clearRect(0, 0, width, height);
     }
 
-    static #clearCanvasFrequencyDomain(canvasContext, width, height) {
+    static clearCanvasFrequencyDomain(canvasContext, width, height) {
         canvasContext.clearRect(0, 0, width, height);
 
         const idxToFrequency = (idx) => SETTING_MIN_FREQUENCY + idx * (SETTING_MAX_FREQUENCY - SETTING_MIN_FREQUENCY) / (CANVAS_FREQUENCY_N_GRID_LINES - 1);
-        const pitchToX = (m) => width * (m - AudioVisualizer.#MIN_PITCH) / (AudioVisualizer.#MAX_PITCH - AudioVisualizer.#MIN_PITCH);
-        const idxToX = (idx) => pitchToX(AudioVisualizer.#hertzToMels(idxToFrequency(idx)));
+        const pitchToX = (m) => width * (m - AudioVisualizer.MIN_PITCH) / (AudioVisualizer.MAX_PITCH - AudioVisualizer.MIN_PITCH);
+        const idxToX = (idx) => pitchToX(AudioVisualizer.hertzToMels(idxToFrequency(idx)));
         var x;
         canvasContext.lineWidth = CANVAS_FREQUENCY_GRID_LINE_WIDTH;
         canvasContext.strokeStyle = CANVAS_FREQUENCY_GRID_COLOR;
