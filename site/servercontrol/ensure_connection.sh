@@ -16,10 +16,4 @@ if [[ "$ACCESS_POINT_ACTIVE" = "0" ]]; then
         echo "[$NOW] Connection lost, activating access point mode" >> $BM_SERVER_LOG_PATH
         $BM_SERVERCONTROL_DIR/perform_action.sh activate_ap_mode
     fi
-
-elif [[ "$($BM_SERVERCONTROL_DIR/access_point_working.sh)" = "0" ]]; then
-
-    NOW=$(date)
-    echo "[$NOW] Access point not functional, activating client mode" >> $BM_SERVER_LOG_PATH
-    $BM_SERVERCONTROL_DIR/perform_action.sh activate_client_mode
 fi
