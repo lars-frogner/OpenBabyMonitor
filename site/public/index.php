@@ -71,7 +71,7 @@ if (isset($_POST['submit'])) {
                       <hr>
                       <p class="text-center text-danger"><?php echo LANG['wrong_password']; ?></p>
                     <?php } ?>
-                    <form action="" method="post">
+                    <form action="" method="post" class="mb-0">
                       <div class="my-3 form-group">
                         <label class="visually-hidden" for="password"><?php echo LANG['password']; ?></label>
                         <input type="password" name="password" class="form-control" id="password" placeholder="<?php echo LANG['password']; ?>" required>
