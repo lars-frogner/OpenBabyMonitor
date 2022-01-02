@@ -152,12 +152,14 @@
                 </svg>
                 <?php echo LANG['nav_docs']; ?>
               </a></li>
-            <li><a id="help_github_nav_link" class="dropdown-item d-flex align-items-center" href="https://github.com/lars-frogner/OpenBabyMonitor" <?php echo ACCESS_POINT_ACTIVE ? ' disabled' : ''; ?>>
+            <li>
+              <<?php echo ACCESS_POINT_ACTIVE ? 'button' : 'a'; ?> id="help_github_nav_link" class="dropdown-item d-flex align-items-center" href="https://github.com/lars-frogner/OpenBabyMonitor" <?php echo ACCESS_POINT_ACTIVE ? ' disabled' : ''; ?>>
                 <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
                   <use href="media/bootstrap-icons.svg#github" />
                 </svg>
                 GitHub
-              </a></li>
+              </<?php echo ACCESS_POINT_ACTIVE ? 'button' : 'a'; ?>>
+            </li>
           </ul>
         </li>
         <?php if ($_MEASURE_TEMPERATURE) { ?>
