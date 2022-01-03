@@ -15,6 +15,9 @@ ARCHIVE_FILE="$ROOT_NAME.zip"
 
 BM_SITE_PW="$BM_SITE_PW" $BM_DIR/site/config/init/init_database.sh
 
+echo '' > $BM_APACHE_LOG_PATH
+echo '' > $BM_SERVER_LOG_PATH
+
 sudo ~/RonR-RPi-image-utils/image-backup --initial "$TARGET_DIR/$IMAGE_FILE"
 
 cd $TARGET_DIR
