@@ -19,7 +19,7 @@ function waitForFileToExist($file_path, $interval, $timeout) {
 
 function waitForFileUpdate($file_path, $start_time, $interval, $timeout) {
   $elapsed_time = 0;
-  while (!file_exists($file_path) || filemtime($file_path) <= $start_time) {
+  while (!file_exists($file_path) || filemtime($file_path) < $start_time) {
     clearstatcache(true, $file_path);
     usleep($interval);
     $elapsed_time += $interval;
