@@ -512,6 +512,7 @@ _EOF_
         SIGNAL_FILE="$BM_MODE_SIGNAL_FILE_STEM.$MODE"
         touch $SIGNAL_FILE
         chmod $BM_WRITE_PERMISSIONS $SIGNAL_FILE
+        sudo chown $BM_USER:$BM_WEB_GROUP $SIGNAL_FILE
     done
 
     # Set write permissions
