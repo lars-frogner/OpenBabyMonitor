@@ -15,9 +15,12 @@ $BM_SERVERCONTROL_DIR/create_ssl_key.sh $NEW_HOSTNAME 1>&3 2>&4
 
 $BM_SERVERCONTROL_DIR/set_apache_site_hostname.sh $NEW_HOSTNAME 1>&3 2>&4
 
-sed -i "s/[[:space:]][[:space:]]*$OLD_HOSTNAME$/     $NEW_HOSTNAME/g" $BM_NW_AP_DIR/etc/hosts
+echo $NEW_HOSTNAME | sudo tee /etc/hostname
 
-sudo raspi-config nonint do_hostname $NEW_HOSTNAME 1>&3 2>&4
+for DIR in $BM_NW_AP_DIR $BM_NW_CLIENT_DIR
+do
+    sed -i "s/[[:space:]][[:space:]]*$OLD_HOSTNAME$/     $NEW_HOSTNAME/g" $DIR/etc/hosts
+done
 
 $BM_SERVERCONTROL_DIR/set_env_variable.sh BM_HOSTNAME $NEW_HOSTNAME
 
