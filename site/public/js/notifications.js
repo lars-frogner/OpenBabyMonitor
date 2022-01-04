@@ -85,15 +85,15 @@ function permissionModalCallback() {
 }
 
 function performBrowserNotificationRequest() {
-    if (!USES_SECURE_PROTOCOL) {
-        if (SETTING_ASK_SECURE_REDIRECT) {
-            setupBrowserNotificationRedirectModal();
-            _REDIRECT_MODAL_TRIGGER.triggerModal();
-        }
-    } else if (!browserNotificationsSupported()) {
+    if (!browserNotificationsSupported()) {
         if (SETTING_SHOW_UNSUPPORTED_MESSAGE) {
             setupBrowserNotificationUnsupportedModal();
             _UNSUPPORTED_MODAL_TRIGGER.triggerModal();
+        }
+    } else if (!USES_SECURE_PROTOCOL) {
+        if (SETTING_ASK_SECURE_REDIRECT) {
+            setupBrowserNotificationRedirectModal();
+            _REDIRECT_MODAL_TRIGGER.triggerModal();
         }
     } else if (browserNotificationsNotAllowed()) {
         if (SETTING_ASK_NOTIFICATION_PERMISSION) {
