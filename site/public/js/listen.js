@@ -131,9 +131,10 @@ function removeConnectionLostBrowserNotification() {
 }
 
 function displayNotificationModal(notificationType) {
-    setModalHeaderHTML(LISTEN_NOTIFICATION_HEADERS[notificationType]);
-    setModalBodyHTML('<p>' + LISTEN_NOTIFICATION_TEXTS[notificationType] + '</p>');
-    _LISTEN_NOTIFICATION_MODAL_TRIGGER.triggerModal()
+    _LISTEN_NOTIFICATION_MODAL_TRIGGER.triggerModal(function () {
+        setModalHeaderHTML(LISTEN_NOTIFICATION_HEADERS[notificationType]);
+        setModalBodyHTML('<p>' + LISTEN_NOTIFICATION_TEXTS[notificationType] + '</p>');
+    })
 }
 
 function handleClassificationResultEvent(event) {

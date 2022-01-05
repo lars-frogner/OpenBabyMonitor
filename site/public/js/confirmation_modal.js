@@ -9,6 +9,42 @@ const MODAL_CONFIRM_LINK_ID = MODAL_ID + '_confirm_link';
 const MODAL_CONFIRM_BUTTON_ID = MODAL_ID + '_confirm_button';
 const MODAL_DISMISS_ID = MODAL_ID + '_dismiss';
 
+var _MODAL_QUEUE;
+
+$(function () {
+    _MODAL_QUEUE = new ModalQueue();
+});
+
+class ModalQueue {
+    constructor() {
+        this.queue = [];
+        this.currentTriggerObject = null;
+    }
+
+    get length() {
+        return this.queue.length;
+    }
+
+    insert(triggerObject, revealFunc) {
+        // Avoid repeats of same modal
+        if (modalIsRevealed() && triggerObject === this.currentTriggerObject) {
+            return;
+        } else if (this.length > 0 && triggerObject === this.queue[this.length - 1].triggerObject) {
+            this.queue.pop();
+        }
+        // Enqueue modal
+        this.queue.push({ triggerObject: triggerObject, reveal: revealFunc });
+    }
+
+    revealNext() {
+        if (this.length > 0) {
+            const modal = this.queue.shift();
+            this.currentTriggerObject = modal.triggerObject;
+            modal.reveal();
+        }
+    }
+}
+
 function setConfirmationModalProperties(properties) {
     if (properties.hasOwnProperty('icon')) {
         $('#' + MODAL_ICON_SRC_ID).attr('href', 'media/bootstrap-icons.svg#' + properties['icon']);
@@ -98,7 +134,10 @@ function setConfirmationModalProperties(properties) {
     }
     if (properties.hasOwnProperty('confirmOnclick')) {
         useConfirm = true;
-        $('#' + confirmId).click(properties['confirmOnclick']);
+        $('#' + confirmId).click(function () {
+            properties['confirmOnclick']();
+            revealNextModal();
+        });
     }
     if (useConfirm) {
         $('#' + confirmId).show();
@@ -116,12 +155,16 @@ function setConfirmationModalProperties(properties) {
     }
     if (properties.hasOwnProperty('dismissOnclick')) {
         useDismiss = true;
-        $('#' + MODAL_ID).on('hide.bs.modal', function () {
+        $('#' + MODAL_ID).off('hide.bs.modal');
+        $('#' + MODAL_ID).on('hide.bs.modal', function (event) {
             properties['dismissOnclick']();
             $('#' + MODAL_ID).off('hide.bs.modal');
+            $('#' + MODAL_ID).on('hide.bs.modal', switchToNextModal);
+            switchToNextModal(event);
         });
     } else {
         $('#' + MODAL_ID).off('hide.bs.modal');
+        $('#' + MODAL_ID).on('hide.bs.modal', switchToNextModal);
     }
     if (useDismiss) {
         $('#' + MODAL_DISMISS_ID).show();
@@ -140,7 +183,27 @@ function hideModal() {
 
 function hideModalWithoutDismissCallback() {
     $('#' + MODAL_ID).off('hide.bs.modal');
+    $('#' + MODAL_ID).on('hide.bs.modal', switchToNextModal);
     hideModal();
+}
+
+function modalIsRevealed() {
+    return $('#' + MODAL_ID).is(':visible');
+}
+
+function revealNextModal() {
+    _MODAL_QUEUE.revealNext();
+}
+
+function enqueueModal(triggerObject, revealFunc) {
+    _MODAL_QUEUE.insert(triggerObject, revealFunc);
+}
+
+function switchToNextModal(hideEvent) {
+    if (_MODAL_QUEUE.length > 0) {
+        hideEvent.preventDefault();
+        revealNextModal();
+    }
 }
 
 function setModalHeaderHTML(html) {
@@ -167,24 +230,30 @@ function connectModalToObject(object, modalProperties, bodySetters) {
     object._bodySetters = bodySetters;
     object._showModal = showModal;
 
-    object.triggerModal = function (event) {
-        var modalProperties = object._modalProperties;
-        var bodySetters = object._bodySetters;
+    object.triggerModal = function (extraAction) {
         var showModal = object._showModal;
         if (showModal()) {
-            if (bodySetters.length > 0) {
-                modalProperties['body'] = [];
-            }
-            bodySetters.forEach(setter => {
-                if (setter.showText && setter.showText()) {
-                    modalProperties['body'].push($('<p></p>').html(setter.text));
+            enqueueModal(object, function () {
+                var modalProperties = object._modalProperties;
+                var bodySetters = object._bodySetters;
+
+                if (bodySetters.length > 0) {
+                    modalProperties['body'] = [];
                 }
+                bodySetters.forEach(setter => {
+                    if (setter.showText && setter.showText()) {
+                        modalProperties['body'].push($('<p></p>').html(setter.text));
+                    }
+                });
+                if (extraAction) {
+                    extraAction();
+                }
+                setConfirmationModalProperties(modalProperties);
+                revealModal();
             });
-            setConfirmationModalProperties(modalProperties);
-            if (event) {
-                event.preventDefault();
+            if (!modalIsRevealed()) {
+                revealNextModal();
             }
-            revealModal();
         }
     };
 }
@@ -195,5 +264,10 @@ function connectModalToLink(link_id, modalProperties, bodySetters) {
         return;
     }
     connectModalToObject(link, modalProperties, bodySetters)
-    link.click(link.triggerModal);
+    link.click(function (event) {
+        link.triggerModal(function () {
+            event.preventDefault();
+
+        });
+    });
 }
