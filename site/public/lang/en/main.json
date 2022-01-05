@@ -34,5 +34,6 @@
     "connection_lost": "No connection to the device",
     "connection_lost_ap_text": "Please ensure that the device has power and that you are still connected to its access point.",
     "connection_lost_client_text": "Please ensure that the device has power and WiFi coverage and that you are connected to the same network.",
-    "play_audio": "Play audio"
+    "play_audio": "Play audio",
+    "prevent_sleep": "Keep screen awake"
 }

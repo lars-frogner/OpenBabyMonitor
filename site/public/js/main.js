@@ -4,11 +4,12 @@ const FOOTER_CONTAINER_ID = 'footer_container';
 const MODE_RADIO_STANDBY_ID = 'mode_radio_standby';
 const MODE_RADIO_LISTEN_ID = 'mode_radio_listen';
 const MODE_RADIO_AUDIO_ID = 'mode_radio_audiostream';
+const MODE_RADIO_VIDEO_ID = 'mode_radio_videostream';
 
 var radioIds = [MODE_RADIO_STANDBY_ID, MODE_RADIO_LISTEN_ID, MODE_RADIO_AUDIO_ID];
 var contentIds = ['mode_content_standby', MODE_CONTENT_LISTEN_ID, MODE_CONTENT_AUDIO_ID];
 if (USES_CAMERA) {
-    radioIds.push('mode_radio_videostream');
+    radioIds.push(MODE_RADIO_VIDEO_ID);
     contentIds.push(MODE_CONTENT_VIDEO_ID);
 }
 const MODE_RADIO_IDS = radioIds;
@@ -19,9 +20,14 @@ const WAITING_CONTENT_ID = 'mode_content_waiting';
 const ERROR_CONTENT_ID = 'mode_content_error';
 const ERROR_CONTENT_MESSAGE_ID = 'mode_content_error_message';
 
+const PREVENT_SLEEP_LISTEN_SWITCH_ID = 'listen_prevent_sleep_switch';
+const PREVENT_SLEEP_AUDIO_SWITCH_ID = 'audio_prevent_sleep_switch';
+
 var _CURRENT_MODE = INITIAL_MODE;
 var _IS_SWITCHING_MODE = false;
 var _ONLY_WAIT_FOR_STREAM = false;
+
+var _NO_SLEEP;
 
 $(function () {
     registerModeChangeHandler();
@@ -63,25 +69,50 @@ function getModeRadio(modeName) {
 }
 
 function setupSleepPrevention() {
-    const NO_SLEEP = new NoSleep();
+    _NO_SLEEP = new NoSleep();
 
-    $('#' + MODE_RADIO_LISTEN_ID).click(function () {
-        if (!NO_SLEEP.enabled) {
-            NO_SLEEP.enable();
+    $('#' + MODE_RADIO_LISTEN_ID).click(enableNoSleep);
+    $('#' + MODE_RADIO_AUDIO_ID).click(enableNoSleep);
+    $('#' + MODE_RADIO_STANDBY_ID).click(disableNoSleep);
+
+    setNoSleepSwitchesChecked(false);
+
+    $('#' + PREVENT_SLEEP_LISTEN_SWITCH_ID).click(function (clickEvent) {
+        if (this.checked) {
+            enableNoSleep(clickEvent);
+        } else {
+            disableNoSleep();
         }
     });
 
-    $('#' + MODE_RADIO_AUDIO_ID).click(function () {
-        if (!NO_SLEEP.enabled) {
-            NO_SLEEP.enable();
+    $('#' + PREVENT_SLEEP_AUDIO_SWITCH_ID).click(function (clickEvent) {
+        if (this.checked) {
+            enableNoSleep(clickEvent);
+        } else {
+            disableNoSleep();
         }
     });
+}
 
-    $('#' + MODE_RADIO_STANDBY_ID).click(function () {
-        if (NO_SLEEP.enabled) {
-            NO_SLEEP.disable();
+function enableNoSleep(clickEvent) {
+    if (clickEvent.originalEvent) { // Only defined if click was user initiated
+        setNoSleepSwitchesChecked(true);
+        if (!_NO_SLEEP.enabled) {
+            _NO_SLEEP.enable();
         }
-    });
+    }
+}
+
+function disableNoSleep() {
+    setNoSleepSwitchesChecked(false);
+    if (_NO_SLEEP.enabled) {
+        _NO_SLEEP.disable();
+    }
+}
+
+function setNoSleepSwitchesChecked(checked) {
+    $('#' + PREVENT_SLEEP_LISTEN_SWITCH_ID).prop('checked', checked);
+    $('#' + PREVENT_SLEEP_AUDIO_SWITCH_ID).prop('checked', checked);
 }
 
 function registerModeChangeHandler() {

@@ -34,5 +34,6 @@
     "connection_lost": "Ingen forbindelse med enheten",
     "connection_lost_ap_text": "Vennligst sjekk at enheten har strøm og at du fortsatt er tilkoblet tilgangspunktet.",
     "connection_lost_client_text": "Vennligst sjekk at enheten har strøm og WiFi-dekning og at dere er koblet til det samme nettverket.",
-    "play_audio": "Begynn lydavspilling"
+    "play_audio": "Begynn lydavspilling",
+    "prevent_sleep": "Hold skjermen på"
 }

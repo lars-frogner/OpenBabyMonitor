@@ -133,7 +133,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                 </svg>
               </div>
             <?php } else { ?>
-              <div id="listen_animation_container" class="container ratio px-0 mb-3" style="position: relative; width: 25vh; --bs-aspect-ratio: 86.6%; display: none;">
+              <div id="listen_animation_container" class="container ratio px-0 mb-3" style="position: relative; width: 18vh; --bs-aspect-ratio: 86.6%; display: none;">
                 <div id="listen_animation_context" style="position: absolute; width: 100%; height: 100%; filter: brightness(3); background: linear-gradient(to top, rgba(20,39,59,1), rgba(20,39,59,0)), linear-gradient(to left, rgba(31,57,35,1), rgba(31,57,35,0) 80%), linear-gradient(to right, rgba(80,10,10,1), rgba(80,10,10,0) 80%); -webkit-clip-path: polygon(0% 0%, 50% 100%, 100% 0%); clip-path: polygon(0% 0%, 50% 100%, 100% 0%);"></div>
                 <svg class="listen-animation-label-bg bi" style="position: absolute; left: 1.0rem; top: 0.2rem; width: 1.8rem; height: 1.8rem;">
                   <use href="media/bootstrap-icons.svg#emoji-frown-fill" />
@@ -149,6 +149,18 @@ require_once(TEMPLATES_DIR . '/main.php');
                 </svg>
               </div>
             <?php } ?>
+
+            <div class="row justify-content-center pt-2 mb-2">
+              <div class="col-auto d-flex align-items-center btn-bm pe-0" role="button" onclick="$('#listen_prevent_sleep_switch').click();">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use href="media/bootstrap-icons.svg#display" />
+                </svg>
+                <?php echo LANG['prevent_sleep']; ?>
+              </div>
+              <div class="col-auto form-check form-switch my-0 ms-2 pe-0">
+                <input id="listen_prevent_sleep_switch" class="form-check-input" type="checkbox" role="button">
+              </div>
+            </div>
           </div>
 
           <div id="mode_content_audio" class="col-auto text-center text-bm" <?php echo ($mode != MODE_VALUES['audiostream']) ? HIDDEN_STYLE : ''; ?>>
@@ -202,6 +214,18 @@ require_once(TEMPLATES_DIR . '/main.php');
             <div class="row justify-content-center" id="audiostream_canvas_box">
             </div>
             <div class="row justify-content-center mb-3" id="audiostream_player_box">
+            </div>
+
+            <div class="row justify-content-center pt-2 mb-2">
+              <div class="col-auto d-flex align-items-center btn-bm pe-0" role="button" onclick="$('#audio_prevent_sleep_switch').click();">
+                <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+                  <use href="media/bootstrap-icons.svg#display" />
+                </svg>
+                <?php echo LANG['prevent_sleep']; ?>
+              </div>
+              <div class="col-auto form-check form-switch my-0 ms-2 pe-0">
+                <input id="audio_prevent_sleep_switch" class="form-check-input" type="checkbox" role="button">
+              </div>
             </div>
           </div>
 
