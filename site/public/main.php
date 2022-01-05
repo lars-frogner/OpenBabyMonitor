@@ -315,7 +315,11 @@ require_once(TEMPLATES_DIR . '/main.php');
   require_once(TEMPLATES_DIR . '/nosleep-js_js.php');
   require_once(TEMPLATES_DIR . '/jquery_js.php');
   require_once(TEMPLATES_DIR . '/js-cookie_js.php');
+  ?>
 
+  <script src="js/confirmation_modal.js"></script>
+
+  <?php
   require_once(TEMPLATES_DIR . '/notifications_js.php');
   require_once(TEMPLATES_DIR . '/monitoring_js.php');
   ?>
@@ -339,8 +343,8 @@ require_once(TEMPLATES_DIR . '/main.php');
     const SETTING_MIN_FREQUENCY = Math.min(min_frequency, max_frequency);
     const SETTING_MAX_FREQUENCY = Math.max(min_frequency, max_frequency);
   </script>
+
   <script src="js/style.js"></script>
-  <script src="js/confirmation_modal.js"></script>
   <script src="js/navbar.js"></script>
   <script src="js/listen.js"></script>
   <script src="js/navbar_main.js"></script>

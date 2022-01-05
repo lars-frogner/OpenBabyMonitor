@@ -168,7 +168,11 @@ if ($settings_edited) {
 require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 require_once(TEMPLATES_DIR . '/jquery_js.php');
 require_once(TEMPLATES_DIR . '/js-cookie_js.php');
+?>
 
+<script src="js/confirmation_modal.js"></script>
+
+<?php
 require_once(TEMPLATES_DIR . '/notifications_js.php');
 require_once(TEMPLATES_DIR . '/monitoring_js.php');
 ?>
@@ -185,10 +189,10 @@ require_once(TEMPLATES_DIR . '/monitoring_js.php');
   const SERVER_HOSTNAME = '<?php echo SERVER_HOSTNAME; ?>';
   const CURRENT_TIMEZONE = '<?php echo $current_timezone; ?>';
 </script>
+
 <script src="js/style.js"></script>
 <script src="js/jquery_utils.js"></script>
 <script src="js/settings.js"></script>
-<script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
 <script src="js/system_settings.js"></script>

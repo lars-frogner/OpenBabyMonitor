@@ -45,14 +45,18 @@ redirectIfLoggedOut('index.php');
 require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 require_once(TEMPLATES_DIR . '/jquery_js.php');
 require_once(TEMPLATES_DIR . '/js-cookie_js.php');
+?>
 
+<script src="js/confirmation_modal.js"></script>
+
+<?php
 require_once(TEMPLATES_DIR . '/notifications_js.php');
 require_once(TEMPLATES_DIR . '/monitoring_js.php');
 ?>
 
 <script src="js/style.js"></script>
 <script src="js/jquery_utils.js"></script>
-<script src="js/confirmation_modal.js"></script>
+
 <script src="js/navbar.js"></script>
 <script src="js/navbar_main.js"></script>
 <script src="js/debugging.js"></script>

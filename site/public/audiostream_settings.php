@@ -68,7 +68,11 @@ require_once(TEMPLATES_DIR . '/settings.php');
 require_once(TEMPLATES_DIR . '/bootstrap_js.php');
 require_once(TEMPLATES_DIR . '/jquery_js.php');
 require_once(TEMPLATES_DIR . '/js-cookie_js.php');
+?>
 
+<script src="js/confirmation_modal.js"></script>
+
+<?php
 require_once(TEMPLATES_DIR . '/notifications_js.php');
 require_once(TEMPLATES_DIR . '/monitoring_js.php');
 ?>
@@ -82,10 +86,10 @@ require_once(TEMPLATES_DIR . '/monitoring_js.php');
   const INITIAL_MODE = <?php echo $mode; ?>;
   const DETECT_FORM_CHANGES = true;
 </script>
+
 <script src="js/style.js"></script>
 <script src="js/jquery_utils.js"></script>
 <script src="js/settings.js"></script>
-<script src="js/confirmation_modal.js"></script>
 <script src="js/navbar.js"></script>
 <script src="js/navbar_settings.js"></script>
 <script>
