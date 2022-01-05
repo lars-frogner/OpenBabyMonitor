@@ -205,14 +205,14 @@ ssh pi@<hostname>
 
 ## Troubleshooting
 
-### I can't access the web application at https://babymonitor when the baby monitor is connected to the local Wi-Fi
+#### I can't access the web application at https://babymonitor when the baby monitor is connected to the local Wi-Fi
 
 In the above URL, `babymonitor` is the hostname of the Pi. Many routers automatically append a suffix like `.local`, `.home` or `.lan` to the hostnames of the devices on its network, so if the short version of the URL doesn't work, try adding one of the suffixes. No suffix is required when connected to the Pi's access point.
 
-### The web application stops working on mobile when the screen is turned off
+#### The web application stops working on mobile when the screen is turned off
 
-This happens because the browser goes to sleep when the screen is turned off. There is unfortunately no way for a web application to prevent this. However, the web application will try to prevent the mobile device from turning off the screen automatically while the baby monitor is not in standby and the browser window is visible. Note that if you have reloaded the page while not in standby or if the mode was changed by another user, this anti-sleep function will not be activated in your browser until you touch the button for the currently active mode.
+This happens because the browser goes to sleep when the screen is turned off, and stops communicating with the Pi. There is unfortunately no way for a web application to prevent this. However, the web application will try to prevent the mobile device from turning off the screen automatically while the baby monitor is not in standby and the browser window is visible. Note that if you have reloaded the page while not in standby or if the mode was not changed manually by you, you will have to activate the anti-sleep function manually using the switch shown on the screen. Video streaming mode is an exception, because when streaming video the browser will always attempt to keep the screen awake.
 
-### I can sign in to the web application but there is no content
+#### I can sign in to the web application but there is no content
 
 This may happen if you use an ad blocker. Make sure the ad blocker is disabled for the URL of the web application.
