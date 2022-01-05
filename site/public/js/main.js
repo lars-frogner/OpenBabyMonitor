@@ -31,8 +31,8 @@ $(function () {
     setAllowSessionTimeout(INITIAL_MODE == STANDBY_MODE);
 
     addModeMonitoringEventListener(function (event) {
-        if (!isSwitchingMode()) {
-            const newModeName = event.data;
+        const newModeName = event.data;
+        if (!isSwitchingMode() && getModeRadio(newModeName).val() != getCurrentMode()) {
             _ONLY_WAIT_FOR_STREAM = true;
             changeModeTo(newModeName);
             _ONLY_WAIT_FOR_STREAM = false;
