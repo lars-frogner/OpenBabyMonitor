@@ -59,7 +59,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                     <input type="radio" class="form-check-input" name="listen_control_radio" id="listen_none_radio" autocomplete="off" onclick="deactivateLiveResultsMode();" checked disabled>
                     <label class="form-check-label" for="listen_none_radio"><?php echo LANG['none']; ?></label>
                   </div>
-                  <div class="form-check form-check-inline">
+                  <div class="form-check form-check-inline me-0">
                     <input type="radio" class="form-check-input" name="listen_control_radio" id="listen_live_radio" autocomplete="off" onclick="activateLiveResultsMode();" disabled>
                     <label class="form-check-label" for="listen_live_radio"><?php echo LANG['audio_interpretation']; ?></label>
                   </div>
@@ -177,7 +177,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                     <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_time_radio" autocomplete="off" onclick="switchAudioVisualizationModeTo('time');">
                     <label class="form-check-label" for="audiostream_time_radio"><?php echo LANG['wave']; ?></label>
                   </div>
-                  <div class="form-check form-check-inline">
+                  <div class="form-check form-check-inline me-0">
                     <input type="radio" class="form-check-input" name="audiostream_control_radio" id="audiostream_frequency_radio" autocomplete="off" onclick="switchAudioVisualizationModeTo('frequency');">
                     <label class="form-check-label" for="audiostream_frequency_radio"><?php echo LANG['frequencies']; ?></label>
                   </div>
