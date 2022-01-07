@@ -77,7 +77,7 @@ require_once(TEMPLATES_DIR . '/main.php');
                       <use id="listen_info_card_header_icon" href="media/bootstrap-icons.svg#caret-down-fill" />
                     </svg>
                   </div>
-                  <div id="listen_info_card_body" class="collapse">
+                  <div id="listen_info_card_body" class="collapse" style="font-size: 0.85rem;">
                     <ul class="list-group list-group-flush">
                       <li class="list-group-item py-0">
                         <div class="row align-items-center">
