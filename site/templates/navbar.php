@@ -1,3 +1,12 @@
+<?php
+define('ANY_KNOWN_NETWORKS', anyKnownNetworks($_DATABASE));
+?>
+
+<script>
+  const ANY_KNOWN_NETWORKS = <?php echo ANY_KNOWN_NETWORKS ? 'true' : 'false'; ?>;
+  const DISABLE_CLIENT_MODE = <?php echo (ACCESS_POINT_ACTIVE && !ANY_KNOWN_NETWORKS) ? 'true' : 'false'; ?>;
+</script>
+
 <nav id="navbar" class="navbar navbar-expand-md navbar-<?php echo COLOR_SCHEME; ?>" style="display: none;">
   <div class="container-fluid">
     <a id="title_nav_link" class="navbar-brand" href="main.php"><?php echo LANG['nav_title']; ?></a>
@@ -65,7 +74,7 @@
           </a>
           <ul class="dropdown-menu" style="min-width: 1em;">
             <li>
-              <div class="pe-2 dropdown-item d-flex align-items-center">
+              <div id="ap_mode_switch_label" class="pe-2 dropdown-item d-flex align-items-center">
                 <div class="d-flex align-items-center" role="button" onclick="$('#ap_mode_switch').click();">
                   <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
                     <use href="media/bootstrap-icons.svg#broadcast-pin" />
@@ -185,7 +194,3 @@ if (BM_DEBUG) {
   require_once(TEMPLATES_DIR . '/error.php');
 }
 ?>
-
-<script>
-  const ANY_KNOWN_NETWORKS = <?php echo anyKnownNetworks($_DATABASE) ? 'true' : 'false'; ?>;
-</script>

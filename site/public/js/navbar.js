@@ -8,6 +8,7 @@ const NETWORK_SETTINGS_NAV_LINK_ID = 'network_settings_nav_link';
 const LOGOUT_NAV_LINK_ID = 'logout_nav_link';
 const REBOOT_NAV_LINK_ID = 'reboot_nav_link';
 const SHUTDOWN_NAV_LINK_ID = 'shutdown_nav_link';
+const AP_MODE_SWITCH_LABEL_ID = 'ap_mode_switch_label';
 const AP_MODE_SWITCH_ID = 'ap_mode_switch';
 
 const MODES_MODAL_BASE_PROPERTIES = { href: 'main.php', header: LANG['nav_want_to_leave_site'], confirm: LANG['nav_continue'], dismiss: LANG['cancel'] };
@@ -53,6 +54,11 @@ $(function () {
             }
         }
     });
+
+    if (DISABLE_CLIENT_MODE) {
+        $('#' + AP_MODE_SWITCH_ID).prop('disabled', true);
+        $('#' + AP_MODE_SWITCH_LABEL_ID).css({ 'pointer-events': 'none', 'color': $('.btn-secondary:disabled').css('color'), 'opacity': $('.btn-secondary:disabled').css('opacity') });
+    }
 
     $('#' + NAVBAR_ID).show();
 
