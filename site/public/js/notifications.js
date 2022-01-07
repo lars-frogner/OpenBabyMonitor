@@ -1,7 +1,7 @@
 const NOTIFICATION_SOUND = new Audio('media/notification_sound.mp3');
 
 const USES_SECURE_PROTOCOL = location.protocol === 'https:';
-const SECURE_URL = 'https://' + location.host + location.pathname;
+const SECURE_URL = 'https://' + location.host + location.pathname + location.search;
 
 var _REDIRECT_MODAL_TRIGGER = {};
 var _UNSUPPORTED_MODAL_TRIGGER = {};
