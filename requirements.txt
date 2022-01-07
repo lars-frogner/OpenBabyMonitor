@@ -1,5 +1,6 @@
 six
 mysql-connector-python
+numpy==1.21.4
 scipy
 python_speech_features
 opencv-python-headless==4.5.3.56
