@@ -1,7 +1,9 @@
 function displayError(event) {
-    document.getElementById('error_message').innerHTML += `
+    const message = document.getElementById('error_message');
+    message.innerHTML += `
         <b>Javascript error on line ${event.lineno}, column ${event.colno} in ${event.filename}:</b><br>
         ${event.message}<br><br>`;
+    message.style.display = 'block';
 }
 
 window.addEventListener('error', displayError);
