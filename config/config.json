@@ -83,6 +83,7 @@
                 "set_ap_ssid_password": "$BM_SERVERCONTROL_DIR/perform_action.sh set_ap_ssid_password",
                 "set_ap_password": "$BM_SERVERCONTROL_DIR/perform_action.sh set_ap_password",
                 "set_country_code": "$BM_SERVERCONTROL_DIR/perform_action.sh set_country_code",
+                "set_env_var": "$BM_SERVERCONTROL_DIR/perform_action.sh set_env_var",
                 "select_mic": "$BM_SERVERCONTROL_DIR/perform_action.sh select_mic"
             }
         }

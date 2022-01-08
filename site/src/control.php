@@ -232,3 +232,7 @@ function executeSettingOfNewAPPassword($password) {
 function executeSettingOfNewCountryCode($country_code) {
   executeServerControlAction('set_country_code', $country_code);
 }
+
+function executeSettingOfEnvVar($name, $value) {
+  executeServerControlAction('set_env_var', array($name, $value));
+}

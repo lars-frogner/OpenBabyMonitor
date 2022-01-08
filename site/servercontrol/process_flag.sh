@@ -16,6 +16,7 @@ SET_AP_CHANNEL_FLAG=set_ap_channel
 SET_AP_SSID_PASSWORD_FLAG=set_ap_ssid_password
 SET_AP_PASSWORD_FLAG=set_ap_password
 SET_COUNTRY_CODE_FLAG=set_country_code
+SET_ENV_VAR=set_env_var
 SELECT_MIC_FLAG=select_mic
 
 if [[ ! -f "$BM_SERVER_ACTION_FILE" ]]; then
@@ -100,6 +101,10 @@ case $FLAG in
 
   $SET_COUNTRY_CODE_FLAG)
     $BM_SERVERCONTROL_DIR/set_country_code.sh "${ARGUMENTS[@]:1}" 1>&3 2>&4
+    ;;
+
+  $SET_ENV_VAR)
+    $BM_SERVERCONTROL_DIR/set_env_variable.sh "${ARGUMENTS[@]:1}" 1>&3 2>&4
     ;;
 
   $SELECT_MIC_FLAG)
