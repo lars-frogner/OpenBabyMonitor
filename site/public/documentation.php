@@ -27,7 +27,7 @@ redirectIfLoggedOut('index.php');
       <main id="main_container" class="fillview">
         <div class="container" style="max-width: 60rem;">
           <div class="row justify-content-center">
-            <div class="col">
+            <div class="col px-3">
               <?php require_once(DOCS_DIR . '/readme.html'); ?>
             </div>
           </div>
