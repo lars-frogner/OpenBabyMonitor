@@ -1,4 +1,5 @@
 function triggerErrorEvent(error) {
+    console.error(error);
     window.dispatchEvent(new ErrorEvent('error', {
         error: error,
         message: error.message,
@@ -9,8 +10,11 @@ function triggerErrorEvent(error) {
 }
 
 function displayJSErrorEvent(event) {
+    const colnoText = event.colno ? `, column ${event.colno}` : '';
+    const linenoText = event.lineno ? ` on line ${event.lineno}${colnoText}` : '';
+    const filenameText = event.filename ? ` in ${event.filename}` : '';
     displayErrorMessage(`
-        <b>JavaScript error on line ${event.lineno}, column ${event.colno} in ${event.filename}:</b><br>
+        <b>JavaScript error${linenoText}${filenameText}:</b><br>
         ${event.message}<br><br>`);
 }
 
