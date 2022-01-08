@@ -204,7 +204,7 @@ class AudiostreamContext {
                     return this.#analyserSamples;
                 }.bind(this);
             default:
-                console.error('createSampler called when mode is not valid');
+                triggerErrorEvent(new Error('createSampler called when mode is not valid'));
                 break;
         }
     }
@@ -253,7 +253,7 @@ class AudiostreamContext {
 
     static createPlayer() {
         if (document.getElementById(AUDIO_PLAYER_ID) != null) {
-            console.error('AudiostreamContext constructor called when player already exists');
+            triggerErrorEvent(new Error('AudiostreamContext constructor called when player already exists'));
         }
         var playerObject = $('<audio></audio>')
             .prop({ id: AUDIO_PLAYER_ID, controls: true, autoplay: true }).css('max-width', CANVAS_MAX_WIDTH + 'px')
@@ -443,7 +443,7 @@ class AudioVisualizer {
                 this.#clearCanvas = AudioVisualizer.clearCanvasFrequencyDomain;
                 break;
             default:
-                console.error('Mode is not valid: ' + newMode);
+                triggerErrorEvent(new Error('Mode is not valid: ' + newMode));
                 break;
         }
         this.#mode = newMode;
@@ -472,7 +472,7 @@ class AudioVisualizer {
 
     static createCanvas() {
         if (document.getElementById(AUDIO_CANVAS_ID) != null) {
-            console.error('AudioVisualizer constructor called when audio visualization canvas already exists');
+            triggerErrorEvent(new Error('AudioVisualizer constructor called when audio visualization canvas already exists'));
         }
         var canvasObject = $('<canvas></canvas>').prop('id', AUDIO_CANVAS_ID).addClass('px-0');
         $('#' + AUDIO_CANVAS_PARENT_ID).append(canvasObject);

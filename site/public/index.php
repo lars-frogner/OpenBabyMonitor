@@ -23,19 +23,19 @@ if (isset($_POST['submit'])) {
 <html class="fillview">
 
 <head>
-  <?php require_once(TEMPLATES_DIR . '/head_common.php'); ?>
+  <script>
+    const SERVER_TIMESTAMP = <?php echo microtime(true); ?> * 1e3; // Milliseconds
+    const CLIENT_TIMESTAMP = Date.now(); // Milliseconds
+  </script>
 
-  <?php if (ACCESS_POINT_ACTIVE && !TIME_SYNCED) { ?>
-    <script>
-      const SERVER_TIMESTAMP = <?php echo microtime(true); ?> * 1e3; // Milliseconds
-      const CLIENT_TIMESTAMP = Date.now(); // Milliseconds
-    </script>
-    <script src="js/sync_time.js"></script>
-  <?php } ?>
+  <?php require_once(TEMPLATES_DIR . '/head_common.php'); ?>
 </head>
 
 <body class="fillview" style="overflow: hidden;">
   <div class="d-flex flex-column fillview">
+
+    <p id="error_message" class="px-2 py-3" style="display: none;"></p>
+
     <div class="d-flex flex-column flex-grow-1 justify-content-center overflow-auto">
       <main id="main_container" class="fillview">
         <?php if (!MIC_CONNECTED) { ?>
@@ -91,6 +91,10 @@ if (isset($_POST['submit'])) {
   </div>
   <div style="position: relative; top: 100%; left: 0; width: 100%; height: 10vh; overflow: hidden;"></div>
 </body>
+
+<?php if (ACCESS_POINT_ACTIVE && !TIME_SYNCED) { ?>
+  <script src="js/sync_time.js"></script>
+<?php } ?>
 
 <?php
 require_once(TEMPLATES_DIR . '/jquery_js.php');

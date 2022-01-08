@@ -121,7 +121,7 @@ function handleMonitoringErrorEvent(event) {
             _MONITORING_EVENT_SOURCE = null;
             break
         default:
-            console.error('SSE stream failed:', event.data);
+            triggerErrorEvent(new Error('SSE stream failed: ' + event.data));
             _MONITORING_EVENT_SOURCE.close();
             _MONITORING_EVENT_SOURCE = null;
     }

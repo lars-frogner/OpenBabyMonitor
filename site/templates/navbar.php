@@ -189,8 +189,4 @@ define('ANY_KNOWN_NETWORKS', anyKnownNetworks($_DATABASE));
   </div>
 </nav>
 
-<?php
-if (BM_DEBUG) {
-  require_once(TEMPLATES_DIR . '/error.php');
-}
-?>
+<p id="error_message" class="px-2 py-3" style="display: none;"></p>

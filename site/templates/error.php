@@ -1,2 +1,4 @@
-<p id="error_message" class="px-2 py-3" style="display: none;"></p>
+<script>
+  const DEBUG = <?php echo DEBUG ? 'true' : 'false'; ?>;
+</script>
 <script src="js/error.js"></script>

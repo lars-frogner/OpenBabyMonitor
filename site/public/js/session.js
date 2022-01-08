@@ -14,7 +14,7 @@ function logout() {
 function preventSessionTimeout() {
     if (!_SESSION_REFRESH_INTERVAL_HANDLE) {
         _SESSION_REFRESH_INTERVAL_HANDLE = setInterval(() => {
-            fetch('refresh_session.php');
+            fetch('refresh_session.php').catch(triggerErrorEvent);
         }, SESSION_REFRESH_INTERVAL);
     }
 }

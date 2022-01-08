@@ -11,9 +11,7 @@ function sendClientTimestampToServer() {
     fetch('sync_time.php', {
         method: 'post',
         body: data
-    }).catch(error => {
-        console.error('Time synchronization failed:', error)
-    });
+    }).catch(triggerErrorEvent);
 
 }
 

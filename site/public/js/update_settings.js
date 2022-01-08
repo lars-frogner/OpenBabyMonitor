@@ -13,7 +13,5 @@ async function updateSettings(settingType, settings) {
     })
         .then(response => response.text())
         .then(logoutIfSessionExpired)
-        .catch(error => {
-            console.error('Setting update failed:', error)
-        });
+        .catch(triggerErrorEvent);
 }

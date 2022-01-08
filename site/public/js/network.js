@@ -200,10 +200,7 @@ function determineNextFileSize(fileSize, fileTransmitTime, strengthOfChangeLimit
 
 async function timeDataRequest(fileSize) {
     const startTime = performance.now();
-    const response = await fetch('send_bandwidth_test_data.php?file_size=' + (fileSize * 1000).toFixed())
-        .catch(error => {
-            console.error('Bandwidth test request failed:', error)
-        });
+    const response = await fetch('send_bandwidth_test_data.php?file_size=' + (fileSize * 1000).toFixed()).catch(triggerErrorEvent);
     const firstResponseTimeMS = performance.now() - startTime;
 
     const buffer = await response.arrayBuffer();

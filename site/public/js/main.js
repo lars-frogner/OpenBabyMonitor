@@ -155,9 +155,7 @@ function requestModeChange(radio) {
     })
         .then(response => response.text())
         .then(responseText => { handleModeChangeResponse(checkedRadioId, newMode, responseText); })
-        .catch(error => {
-            console.error(error)
-        });
+        .catch(triggerErrorEvent);
 
     indicateWaiting();
 }
@@ -261,7 +259,7 @@ function getContentIdByRadioId(radioId) {
     if (idx >= 0) {
         return MODE_CONTENT_IDS[idx];
     } else {
-        console.error('Invalid radio ID' + radioId);
+        triggerErrorEvent(new Error('Invalid radio ID ' + radioId));
         return null;
     }
 }
