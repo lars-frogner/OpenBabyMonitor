@@ -108,15 +108,15 @@ function browserNotificationsSupported() {
 }
 
 function browserNotificationsAllowed() {
-    return Notification.permission === 'granted';
+    return 'Notification' in window && Notification.permission === 'granted';
 }
 
 function browserNotificationsNotAllowed() {
-    return Notification.permission === 'default';
+    return 'Notification' in window && Notification.permission === 'default';
 }
 
 function browserNotificationsBlocked() {
-    return Notification.permission === 'denied';
+    return 'Notification' in window && Notification.permission === 'denied';
 }
 
 function askBrowserNotificationPermission(callback) {
