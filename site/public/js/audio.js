@@ -4,6 +4,7 @@ const AUDIO_PLAYER_PARENT_ID = 'audiostream_player_box';
 const AUDIO_CANVAS_PARENT_ID = 'audiostream_canvas_box';
 const AUDIO_VISUALIZATION_MODE_PARENT_ID = 'audiostream_visualization_mode_box';
 const AUDIO_FFTSIZE_PARENT_ID = 'audiostream_fftsize_range_box';
+const AUDIO_FFTSIZE_RANGE_ID = 'audiostream_fftsize_range';
 const AUDIO_PLAYER_ID = 'audiostream_audio';
 const AUDIO_CANVAS_ID = 'audiostream_canvas';
 const AUDIO_ERROR_ID = 'mode_content_audio_error';
@@ -71,7 +72,7 @@ class AudiostreamContext {
     #lowpassFilter;
     #gain;
     #analyser;
-    #fftSizePower = 7;
+    #fftSizePower;
     #visualizer;
     #analyserSamples;
     #analyserSamplesOffset;
@@ -97,6 +98,8 @@ class AudiostreamContext {
 
         setupBandpassFilters(this.#highpassFilter, this.#lowpassFilter);
         setupGain(this.#gain);
+
+        this.#fftSizePower = parseInt($('#' + AUDIO_FFTSIZE_RANGE_ID).val());
 
         $('#' + AUDIO_VISUALIZATION_MODE_PARENT_ID).show();
     }
