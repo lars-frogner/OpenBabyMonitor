@@ -1,3 +1,4 @@
 {
-    "download_logs": "Last ned logger"
+    "download_logs": "Last ned logger",
+    "display_error_messages": "Vis feilmeldinger fra JavaScript og PHP"
 }

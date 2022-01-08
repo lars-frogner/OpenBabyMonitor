@@ -1,3 +1,4 @@
 {
-    "download_logs": "Download logs"
+    "download_logs": "Download logs",
+    "display_error_messages": "Display JavaScript and PHP error messages"
 }

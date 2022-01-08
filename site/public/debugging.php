@@ -25,6 +25,18 @@ redirectIfLoggedOut('index.php');
 
     <main class="d-flex flex-column flex-grow-1 align-items-center justify-content-center overflow-auto text-center">
       <div class="container">
+        <div class="row justify-content-center mb-5">
+          <div class="col-auto d-flex align-items-center btn-bm pe-0" role="button" onclick="$('#display_error_messages_switch').click();">
+            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+              <use href="media/bootstrap-icons.svg#exclamation-octagon" />
+            </svg>
+            <?php echo LANG['display_error_messages']; ?>
+          </div>
+          <div class="col-auto form-check form-switch my-0 ms-2 pe-0">
+            <input id="display_error_messages_switch" class="form-check-input" type="checkbox" role="button" onclick="setDebug(this.checked);" <?php echo DEBUG ? 'checked' : ''; ?>>
+          </div>
+        </div>
+
         <div class="row justify-content-center">
           <div class="col-auto">
             <a class="btn btn-secondary d-flex justify-content-center align-items-center" href="obtain_logs.php">
