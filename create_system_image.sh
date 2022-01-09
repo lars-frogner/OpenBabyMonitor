@@ -9,9 +9,9 @@ fi
 
 TAG="${1:-}"
 TARGET_DIR=/media
-ROOT_NAME="babymonitor$TAG"
+ROOT_NAME="babymonitor"
 IMAGE_FILE="$ROOT_NAME.img"
-ARCHIVE_FILE="$ROOT_NAME.zip"
+ARCHIVE_FILE="${ROOT_NAME}${TAG}.zip"
 
 BM_SITE_PW="$BM_SITE_PW" $BM_DIR/site/config/init/init_database.sh
 
