@@ -1,5 +1,7 @@
 # Open Baby Monitor
 
+**_Disclaimer:_** Due to limited time (you know.. kids), this project is not actively maintained. Furthermore, this is not a professional baby monitoring product. It is not guaranteed to be reliable or even to work. If you want to try it, tinker with it or build upon it, that is awesome! But please don't entrust the well-being of your child to the side project of a random person on the internet.
+
 <details open>
 <summary>Click to toggle animation</summary>
 <img src="media/babymonitor_demo.gif" align="right" style="width: 26rem; max-width: 95%; margin-left: 1rem; margin-right: 1rem; margin-bottom: 1rem;">
