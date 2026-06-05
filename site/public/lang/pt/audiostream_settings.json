@@ -1,0 +1,15 @@
+{
+    "audio_settings": "Configurações de áudio",
+    "submit": "Confirmar",
+    "encrypted": "Criptografado",
+    "gain": "Amplificação do microfone (%)",
+    "volume": "Ajuste de volume",
+    "sampling_rate": "Taxa de amostragem (Hz)",
+    "mp3_bitrate": "Taxa de bits MP3 (kbps)",
+    "min_frequency": "Frequência mínima (Hz)",
+    "max_frequency": "Frequência máxima (Hz)",
+    "g_streaming": "Transmissão",
+    "g_volume": "Volume",
+    "g_quality": "Qualidade",
+    "g_filtration": "Filtragem"
+}

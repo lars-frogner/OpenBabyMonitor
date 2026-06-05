@@ -161,6 +161,12 @@ define('ANY_KNOWN_NETWORKS', anyKnownNetworks($_DATABASE));
                 Norsk
               </a>
             </li>
+            <li>
+              <a id="language_pt_nav_link" class="dropdown-item<?php echo LANGUAGE == 'pt' ? ' active"' : '" href="' . URL_WITHOUT_SEARCH . '?lang=pt"'; ?>">
+                <span class="me-2 fi fi-br" style="height: 1.1em; width: 1.1em;"></span>
+                Português (BR)
+              </a>
+            </li>
           </ul>
         </li>
         <li class="nav-item dropdown">
