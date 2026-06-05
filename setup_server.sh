@@ -106,6 +106,12 @@ if [[ "$INSTALL_PACKAGES" = true ]]; then
     sudo apt -y install libopenexr-dev # Requirement for OpenCV
     pip3 install --no-cache-dir -r $BM_DIR/requirements.txt
 
+    # Generate VAPID keys for Web Push notifications (if not already present)
+    if [ ! -f "$BM_DIR/config/vapid_private.key" ]; then
+        echo "Generating VAPID keys for Web Push notifications..."
+        BM_DIR=$BM_DIR python3 $BM_DIR/control/generate_vapid_keys.py
+    fi
+
     sudo apt -y autoremove
 fi
 
@@ -306,6 +312,12 @@ INSTALL_JS_COOKIE=true
 if [[ "$INSTALL_JS_COOKIE" = true ]]; then
     JS_COOKIE_VERSION=3.0.1
     wget -P $BM_LINKED_SITE_DIR/library/js-cookie/js https://github.com/js-cookie/js-cookie/releases/download/v$JS_COOKIE_VERSION/js.cookie.min.js
+fi
+
+INSTALL_CHARTJS=true
+if [[ "$INSTALL_CHARTJS" = true ]]; then
+    CHARTJS_VERSION=4.4.0
+    wget -O $BM_LINKED_SITE_DIR/js/chart.umd.min.js https://cdn.jsdelivr.net/npm/chart.js@${CHARTJS_VERSION}/dist/chart.umd.min.js
 fi
 
 INSTALL_PICAM=true

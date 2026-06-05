@@ -47,6 +47,33 @@ createPasswordTableIfMissing($database, strlen($hashed_password));
 storeHashedPassword($database, $hashed_password);
 
 $table_names = array('modes', 'language', 'listen_settings', 'audiostream_settings', 'system_settings', 'videostream_settings');
+
+// Create events table for history dashboard
+$events_create = "CREATE TABLE IF NOT EXISTS `events` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `event_type` ENUM('cry','babble','sound','bad_and_good','bad_or_good') NOT NULL,
+  `started_at` DATETIME NOT NULL,
+  `ended_at` DATETIME DEFAULT NULL,
+  `confidence` FLOAT DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+if (!$database->query($events_create)) {
+  bm_error("Could not create events table: " . $database->error);
+}
+echo "Created events table\n";
+
+// Create push_subscriptions table for Web Push
+$push_create = "CREATE TABLE IF NOT EXISTS `push_subscriptions` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `endpoint` TEXT NOT NULL,
+  `p256dh` TEXT NOT NULL,
+  `auth` VARCHAR(64) NOT NULL,
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `endpoint_hash` (endpoint(255))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+if (!$database->query($push_create)) {
+  bm_error("Could not create push_subscriptions table: " . $database->error);
+}
+echo "Created push_subscriptions table\n";
 foreach ($table_names as $table_name) {
   echo "Creating table $table_name in database $db_name\n";
   createTableIfMissing($database, $table_name, readTableColumnsFromConfig($table_name));

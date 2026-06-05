@@ -43,6 +43,9 @@ switch (basename($_SERVER['SCRIPT_NAME'])) {
   case 'documentation.php':
     define('LOCATION', 'documentation');
     break;
+  case 'history.php':
+    define('LOCATION', 'history');
+    break;
   default:
     define('LOCATION', 'login');
     break;
@@ -55,7 +58,9 @@ if (!MIC_CONNECTED && LOCATION != 'login') {
 
 define('USES_CAMERA', cameraIsConnected());
 
-if (isset($_COOKIE['color_scheme'])) {
+if (isset($_COOKIE['color_scheme_override']) && in_array($_COOKIE['color_scheme_override'], ['light', 'dark'])) {
+  define('COLOR_SCHEME', $_COOKIE['color_scheme_override']);
+} elseif (isset($_COOKIE['color_scheme']) && in_array($_COOKIE['color_scheme'], ['light', 'dark'])) {
   define('COLOR_SCHEME', $_COOKIE['color_scheme']);
 } else {
   define('COLOR_SCHEME', 'light');

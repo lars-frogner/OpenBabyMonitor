@@ -1,0 +1,21 @@
+{
+  "name": "Baby Monitor",
+  "short_name": "BabyMon",
+  "description": "Baby monitor web application",
+  "start_url": "/main.php",
+  "display": "standalone",
+  "background_color": "#111111",
+  "theme_color": "#111111",
+  "icons": [
+    {
+      "src": "media/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "media/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

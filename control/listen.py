@@ -13,8 +13,19 @@ sys.path.append(os.path.join(os.environ['BM_DIR'], 'detection'))
 import features
 import control
 import mic
+import database as db_module
+import config as config_module
 
 MODE = 'listen'
+
+# Maps notification type strings to DB event_type values
+_NOTIFICATION_TO_EVENT_TYPE = {
+    'sound': 'sound',
+    'bad': 'cry',
+    'good': 'babble',
+    'bad_and_good': 'bad_and_good',
+    'bad_or_good': 'bad_or_good',
+}
 
 
 class Model:
@@ -230,6 +241,8 @@ def listen_with_settings_sound_level_threshold(
 
         if notification is not None:
             write_notification(notification_file, notification)
+            log_event_to_db(notification)
+            trigger_push_notification(notification)
 
         time.sleep(max(0, interval - (time.time() - last_start_time)))
 
@@ -321,6 +334,9 @@ def process_features(task_queue, config, control_dir, model,
 
         if notification is not None:
             write_notification(notification_file, notification)
+            best_prob = float(np.max(probabilities))
+            log_event_to_db(notification, confidence=best_prob)
+            trigger_push_notification(notification)
 
 
 def find_probabilities(feature, ambient_probabilities, model):
@@ -403,6 +419,43 @@ def write_probabilities(label_names, probabilities_file, probabilities, *args):
 def write_notification(notification_file, notification):
     with open(notification_file, 'w') as f:
         f.write(notification)
+
+
+def trigger_push_notification(notification_type):
+    """Fire-and-forget: call send_push.py in a daemon subprocess."""
+    try:
+        import subprocess
+        script = pathlib.Path(os.environ['BM_DIR']) / 'control' / 'send_push.py'
+        subprocess.Popen(
+            [sys.executable, str(script), notification_type],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+    except Exception:
+        pass
+
+
+def log_event_to_db(notification_type, confidence=None):
+    event_type = _NOTIFICATION_TO_EVENT_TYPE.get(notification_type)
+    if event_type is None:
+        return
+    try:
+        cfg = config_module.read_config()
+        with db_module.Database.from_config(cfg) as database:
+            started_at = time.strftime('%Y-%m-%d %H:%M:%S')
+            if confidence is not None:
+                database.cursor.execute(
+                    "INSERT INTO `events` (event_type, started_at, confidence) VALUES (%s, %s, %s)",
+                    (event_type, started_at, float(confidence))
+                )
+            else:
+                database.cursor.execute(
+                    "INSERT INTO `events` (event_type, started_at) VALUES (%s, %s)",
+                    (event_type, started_at)
+                )
+            database.connection.commit()
+    except Exception:
+        pass  # never crash the monitor due to DB logging failure
 
 
 if __name__ == '__main__':

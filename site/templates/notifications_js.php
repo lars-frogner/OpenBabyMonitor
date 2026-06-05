@@ -7,3 +7,4 @@
 
 <script src="js/update_settings.js"></script>
 <script src="js/notifications.js"></script>
+<script src="js/push_notifications.js"></script>

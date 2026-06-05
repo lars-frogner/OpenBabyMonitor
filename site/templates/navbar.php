@@ -125,6 +125,22 @@ define('ANY_KNOWN_NETWORKS', anyKnownNetworks($_DATABASE));
               </a></li>
           </ul>
         </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center<?php echo LOCATION == 'history' ? ' active' : ''; ?> disabled" href="history.php">
+            <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+              <use href="media/bootstrap-icons.svg#clock-history" />
+            </svg>
+            <?php echo LANG['nav_history']; ?>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center disabled" href="#" onclick="toggleDarkMode(); return false;" role="button">
+            <svg id="dark_mode_toggle_icon" class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
+              <use href="media/bootstrap-icons.svg#moon-fill" />
+            </svg>
+            <?php echo LANG['nav_dark_mode']; ?>
+          </a>
+        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle d-flex align-items-center disabled" href="#" data-bs-toggle="dropdown">
             <svg class="bi me-2" style="height: 1.1em; width: 1.1em;" fill="currentColor">
