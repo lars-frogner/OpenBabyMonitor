@@ -28,7 +28,7 @@ def stream_video_with_settings(encrypted=True,
                                exposure_value_compensation=0,
                                exposure_time=100,
                                iso=400,
-                               white_balance_mode='greyworld',
+                               white_balance_mode='auto',
                                red_gain=0.0,
                                blue_gain=0.0,
                                capture_audio=True,
@@ -81,7 +81,7 @@ def stream_video_with_settings(encrypted=True,
 
     if encrypted:
         with open(os.path.join(output_dir, 'stream.hexkey')) as f:
-            encryption_key = f.read()
+            encryption_key = f.read().strip()
         encryption_args = [
             '--hlsenc', '--hlsenckeyuri', 'stream.key', '--hlsenckey',
             encryption_key
@@ -98,7 +98,7 @@ def stream_video_with_settings(encrypted=True,
                               output_args + encryption_args + resolution_args +
                               fps_args + orientation_args + brightness_args +
                               color_args + audio_args + time_args,
-                              stdout=subprocess.DEVNULL,
+                              stdout=log_file,
                               stderr=log_file,
                               cwd=output_dir)
 

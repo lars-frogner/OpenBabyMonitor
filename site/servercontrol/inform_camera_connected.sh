@@ -35,7 +35,10 @@ if [[ "$CONNECTED" -eq 0 ]]; then
 fi
 
 if [[ "$CONNECTED" -eq 1 ]]; then
-    touch $BM_CONTROL_CAM_CONNECTED_FILE
+    # Remove and recreate so the file is always owned by the current user,
+    # avoiding permission errors when root created it at boot but pi re-runs later.
+    rm -f "$BM_CONTROL_CAM_CONNECTED_FILE"
+    touch "$BM_CONTROL_CAM_CONNECTED_FILE"
 else
-    rm -f $BM_CONTROL_CAM_CONNECTED_FILE
+    rm -f "$BM_CONTROL_CAM_CONNECTED_FILE"
 fi
